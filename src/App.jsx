@@ -1,0 +1,73 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
+// Layouts
+import DashboardLayout from './layouts/DashboardLayout';
+
+// Guards
+import ProtectedRoute from './components/routes/ProtectedRoute';
+
+// Auth Views
+import Login    from './views/auth/Login';
+import Register from './views/auth/Register';
+
+// Dashboard Views
+import Dashboard  from './views/Dashboard';
+import Users      from './views/Users';
+import Settings   from './views/Settings';
+import RolesPermissions from './views/RolesPermissions';
+import RoadmapDev from './views/RoadmapDev';
+
+// Página de acceso denegado
+function NoAutorizado() {
+  return (
+    <div className="d-flex flex-column align-items-center justify-content-center min-vh-100 text-center px-4">
+      <span className="fas fa-ban text-danger" style={{ fontSize: '4rem' }}></span>
+      <h3 className="mt-4 mb-2">Acceso restringido</h3>
+      <p className="text-700">No tienes permisos para acceder a esta sección.</p>
+      <a href="/" className="btn btn-primary mt-2">
+        <span className="fas fa-arrow-left me-2"></span>Volver al inicio
+      </a>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+
+        {/* ── Rutas Públicas ─────────────────────────────────────────── */}
+        <Route path="/login"         element={<Login />} />
+        <Route path="/register"      element={<Register />} />
+        <Route path="/no-autorizado" element={<NoAutorizado />} />
+
+        {/* ── Rutas Privadas (requieren sesión) ──────────────────────── */}
+        <Route
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index        element={<Dashboard />} />
+          <Route path="usuarios"     element={<Users />} />
+          <Route path="configuracion" element={<Settings />} />
+          <Route path="permisos"     element={<RolesPermissions />} />
+          <Route path="roadmap"      element={<RoadmapDev />} />
+
+          {/* ── Fase A: Contabilidad (próximas semanas) ─────────────── */}
+          {/* <Route path="contabilidad/puc"      element={<PucIndex />} /> */}
+          {/* <Route path="terceros"              element={<TercerosIndex />} /> */}
+          {/* <Route path="contabilidad/asientos" element={<AsientosIndex />} /> */}
+        </Route>
+
+        {/* Ruta de fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;

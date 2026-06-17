@@ -1,0 +1,173 @@
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+
+function Sidebar() {
+  const location = useLocation();
+  
+  const menuItems = [
+    {
+      title: 'Dashboard',
+      icon: 'fas fa-chart-pie',
+      path: '/'
+    },
+    {
+      title: 'Configuración',
+      icon: 'fas fa-cog',
+      id: 'configuracionMenu',
+      children: [
+        {
+          title: 'General',
+          path: '/configuracion'
+        },
+        {
+          title: 'Usuarios',
+          path: '/usuarios'
+        },
+        {
+          title: 'Roles & Permisos',
+          path: '/permisos'
+        }
+      ]
+    },
+    {
+      title: 'Roadmap Dev',
+      icon: 'fas fa-code-branch',
+      path: '/roadmap'
+    }
+  ];
+
+  const handleToggle = (e) => {
+    e.preventDefault();
+    document.documentElement.classList.toggle('navbar-vertical-collapsed');
+  };
+
+  const [navbarStyle, setNavbarStyle] = React.useState(localStorage.getItem('navbarStyle') || 'card');
+
+  React.useEffect(() => {
+    // Force collapsed mode on mount
+    document.documentElement.classList.add('navbar-vertical-collapsed');
+    localStorage.setItem('isNavbarVerticalCollapsed', true);
+    
+    const handleStorageChange = () => {
+      setNavbarStyle(localStorage.getItem('navbarStyle') || 'card');
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  let navbarClass = 'navbar-light';
+  if (navbarStyle === 'inverted') navbarClass = 'navbar-dark';
+  else if (navbarStyle === 'card') navbarClass = 'navbar-light navbar-card';
+  else if (navbarStyle === 'vibrant') navbarClass = 'navbar-dark navbar-vibrant';
+
+  const handleMouseEnter = () => {
+    if (document.documentElement.classList.contains('navbar-vertical-collapsed')) {
+      document.documentElement.classList.add('navbar-vertical-collapsed-hover');
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (document.documentElement.classList.contains('navbar-vertical-collapsed-hover')) {
+      document.documentElement.classList.remove('navbar-vertical-collapsed-hover');
+    }
+  };
+
+  return (
+    <nav 
+      className={`navbar ${navbarClass} navbar-vertical navbar-expand-xl`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="d-flex align-items-center">
+        <div className="toggle-icon-wrapper">
+          <button 
+            className="btn navbar-toggler-humburger-icon navbar-vertical-toggle" 
+            onClick={handleToggle}
+            type="button"
+            title="Toggle Navigation"
+          >
+            <span className="navbar-toggle-icon"><span className="toggle-line"></span></span>
+          </button>
+        </div>
+        <Link className="navbar-brand" to="/">
+          <div className="d-flex align-items-center py-3">
+            <img src="/logo.png" alt="Mindsoftia Logo" className="me-2" style={{ maxHeight: '35px', width: 'auto' }} />
+          </div>
+        </Link>
+      </div>
+      
+      <div className="collapse navbar-collapse" id="navbarVerticalCollapse">
+        <div className="navbar-vertical-content scrollbar">
+          <ul className="navbar-nav flex-column mb-3" id="navbarVerticalNav">
+            <li className="nav-item">
+              <div className="row navbar-vertical-label-wrapper mt-3 mb-2">
+                <div className="col-auto navbar-vertical-label">Navegación</div>
+                <div className="col ps-0">
+                  <hr className="mb-0 navbar-vertical-divider" />
+                </div>
+              </div>
+              
+              {menuItems.map((item, idx) => {
+                if (item.children) {
+                  const isActive = item.children.some(child => location.pathname === child.path);
+                  return (
+                    <React.Fragment key={idx}>
+                      <a 
+                        className={`nav-link dropdown-indicator ${isActive ? '' : 'collapsed'}`}
+                        href={`#${item.id}`} 
+                        role="button" 
+                        data-bs-toggle="collapse" 
+                        aria-expanded={isActive} 
+                        aria-controls={item.id}
+                      >
+                        <div className="d-flex align-items-center">
+                          <span className="nav-link-icon">
+                            <span className={item.icon}></span>
+                          </span>
+                          <span className="nav-link-text ps-1">{item.title}</span>
+                        </div>
+                      </a>
+                      <ul className={`nav collapse ${isActive ? 'show' : ''}`} id={item.id}>
+                        {item.children.map((child, cIdx) => (
+                          <li className="nav-item" key={cIdx}>
+                            <Link 
+                              className={`nav-link ${location.pathname === child.path ? 'active' : ''}`} 
+                              to={child.path}
+                            >
+                              <div className="d-flex align-items-center">
+                                <span className="nav-link-text ps-1">{child.title}</span>
+                              </div>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </React.Fragment>
+                  );
+                }
+
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link 
+                    key={idx} 
+                    className={`nav-link ${isActive ? 'active' : ''}`} 
+                    to={item.path}
+                    role="button"
+                  >
+                    <div className="d-flex align-items-center">
+                      <span className="nav-link-icon">
+                        <span className={item.icon}></span>
+                      </span>
+                      <span className="nav-link-text ps-1">{item.title}</span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+export default Sidebar;

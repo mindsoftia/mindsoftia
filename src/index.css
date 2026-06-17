@@ -1,0 +1,41 @@
+@import './css/theme.css';
+@import './css/user.css';
+
+/* Custom global rules for Mindsoftia can go here */
+html, body {
+  font-family: 'Open Sans', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+:root, [data-bs-theme="light"] {
+  --falcon-primary: #00B7FF;
+  --falcon-info: #4DEBFF;
+  --falcon-secondary: #9D4DFF;
+  --falcon-warning: #FF2ECF;
+  --falcon-danger: #FF66D9;
+  
+  --falcon-primary-rgb: 0, 183, 255;
+  --falcon-info-rgb: 77, 235, 255;
+  --falcon-secondary-rgb: 157, 77, 255;
+  
+  --falcon-link-color: #00B7FF;
+  --falcon-link-hover-color: #004DCC;
+}
+
+[data-bs-theme="dark"], .dark {
+  --falcon-primary: #00B7FF;
+  --falcon-info: #4DEBFF;
+  --falcon-secondary: #9D4DFF;
+  --falcon-link-color: #4DEBFF;
+  --falcon-link-hover-color: #CFFAFF;
+}
+
+/* Custom Gradients for Dashboard Cards (Light Mode Only) */
+[data-bs-theme="light"] .card-gradient-warning {
+  background: linear-gradient(to bottom right, #ffffff, #fff2eb) !important;
+}
+[data-bs-theme="light"] .card-gradient-info {
+  background: linear-gradient(to bottom right, #ffffff, #ebf5ff) !important;
+}
+[data-bs-theme="light"] .card-gradient-success {
+  background: linear-gradient(to bottom right, #ffffff, #f0fcf4) !important;
+}
