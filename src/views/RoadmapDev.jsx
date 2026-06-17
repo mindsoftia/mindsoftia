@@ -224,14 +224,44 @@ function RoadmapDev() {
               
               <div className="accordion" id="accordionReportes">
                 
+                {/* Reporte 2: 17 de Junio 2026 */}
+                <div className="accordion-item border-top-0 border-x-0">
+                  <h2 className="accordion-header" id="headingTwo">
+                    <button className="accordion-button shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                      <span className="fas fa-file-invoice text-primary me-2"></span> Resumen de Avances: 17 Jun, 2026
+                    </button>
+                  </h2>
+                  <div className="accordion-collapse collapse show" id="collapseTwo" aria-labelledby="headingTwo" data-bs-parent="#accordionReportes">
+                    <div className="accordion-body pt-0 pb-3">
+                      <div className="ps-3 border-start border-3 border-primary mt-2">
+                        
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Infraestructura VPS y API Separada</h6>
+                        <p className="fs--1 mb-3 text-600">Transición del entorno local a producción en el VPS (Ubuntu 26.04). Apache configurado para enrutar el frontend estático (`dist`) y el backend Laravel (`backend/public`). Corrección de enrutamiento SPA mediante archivo `.htaccess` en public.</p>
+                        
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 2. Desarrollo del Backend Contable (PUC)</h6>
+                        <p className="fs--1 mb-3 text-600">Implementación de esquema para el Plan Único de Cuentas (PUC). Migración y Modelo `Account.php` creados con soporte para jerarquías (padre-hijo), naturaleza contable y aislamiento Multitenant.</p>
+                        
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 3. Seeding de Seguridad</h6>
+                        <p className="fs--1 mb-3 text-600">Creación de `RolSeeder.php` integrado en `DatabaseSeeder.php`. Poblamiento de la tabla `cnf_roles` con 6 perfiles base de sistema (Super Administrador, Propietario, Analista de Cartera, Director de Marketing, Vendedor, Auditor Externo).</p>
+
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Refactorización React UI (Usuarios)</h6>
+                        <p className="fs--1 mb-3 text-600">Actualización de `Users.jsx` aplicando tablas avanzadas auténticas de Falcon (avatares, selección). Integración de botón flotante (FAB) y modal con estilo propio Mindsoftia. Conexión directa del CRUD Frontend a Supabase.</p>
+
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 5. Gestión de Repositorio Segura</h6>
+                        <p className="fs--1 mb-0 text-600">Bloqueos de GitHub resueltos al remover archivos de tokens expuestos (`tokengit`). Flujo de despliegue estabilizado permitiendo actualizaciones rápidas mediante `git pull` y `npm run build` en el servidor.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Reporte 1: 16 de Junio 2026 */}
                 <div className="accordion-item border-top-0 border-x-0">
                   <h2 className="accordion-header" id="headingOne">
-                    <button className="accordion-button shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    <button className="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
                       <span className="fas fa-file-invoice text-primary me-2"></span> Resumen de Avances: 16 Jun, 2026
                     </button>
                   </h2>
-                  <div className="accordion-collapse collapse show" id="collapseOne" aria-labelledby="headingOne" data-bs-parent="#accordionReportes">
+                  <div className="accordion-collapse collapse" id="collapseOne" aria-labelledby="headingOne" data-bs-parent="#accordionReportes">
                     <div className="accordion-body pt-0 pb-3">
                       <div className="ps-3 border-start border-3 border-primary mt-2">
                         
@@ -254,8 +284,8 @@ function RoadmapDev() {
 
                 {/* Futuro reporte */}
                 <div className="accordion-item border-x-0">
-                  <h2 className="accordion-header" id="headingTwo">
-                    <button className="accordion-button collapsed shadow-none text-500" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" disabled>
+                  <h2 className="accordion-header" id="headingThree">
+                    <button className="accordion-button collapsed shadow-none text-500" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" disabled>
                       <span className="fas fa-hourglass-half me-2"></span> Próximos reportes se registrarán aquí...
                     </button>
                   </h2>
