@@ -110,10 +110,10 @@ function TopNav() {
             >
               <div className="avatar">
                 <img 
-                  className="rounded-circle" 
-                  src="/assets/img/team/3-thumb.png" 
-                  alt="User Avatar" 
-                  style={{ width: '32px', height: '32px', objectFit: 'cover' }}
+                  className="rounded-circle bg-white p-1" 
+                  src="/logo.png" 
+                  alt="Mindsoftia Avatar" 
+                  style={{ width: '32px', height: '32px', objectFit: 'contain', border: '1px solid #ddd' }}
                 />
               </div>
             </button>
