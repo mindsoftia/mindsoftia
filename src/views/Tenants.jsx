@@ -147,124 +147,105 @@ function Tenants() {
         </div>
       </div>
 
-      {/* Modal CRUD (Estilo Yuka-Do) */}
+      {/* Modal CRUD (Estilo Yuka-Do Compacto) */}
       {showModal && (
         <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} tabIndex="-1">
-          <div className="modal-dialog modal-xl modal-dialog-centered">
+          <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
-              <div className="modal-header bg-light">
-                <h5 className="modal-title">{formData.id ? 'Configurar Empresa' : 'Crear Nueva Empresa'}</h5>
-                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+              <div className="modal-header bg-light py-2">
+                <h6 className="modal-title mb-0">{formData.id ? 'Configurar Empresa' : 'Crear Nueva Empresa'}</h6>
+                <button type="button" className="btn-close btn-close-sm" onClick={() => setShowModal(false)}></button>
               </div>
               <form onSubmit={handleSave}>
-                <div className="modal-body p-4">
-                  <div className="row g-4">
+                <div className="modal-body p-3">
+                  <div className="row g-3">
                     {/* Columna Izquierda: Información de la Empresa */}
-                    <div className="col-lg-7">
-                      <h6 className="text-700 mb-3">Información General</h6>
+                    <div className="col-md-7">
+                      <h6 className="text-700 mb-2 fs--1 text-uppercase">Información General</h6>
                       
-                      <div className="mb-3">
-                        <label className="form-label">Razón Social o Nombre *</label>
-                        <input type="text" className="form-control" name="nombre" value={formData.nombre} onChange={handleInputChange} required />
+                      <div className="mb-2">
+                        <label className="form-label fs--2 mb-1">Razón Social o Nombre *</label>
+                        <input type="text" className="form-control form-control-sm" name="nombre" value={formData.nombre} onChange={handleInputChange} required />
                       </div>
 
-                      <div className="card shadow-none border mb-3">
-                        <div className="card-body bg-light p-3">
-                          <h6 className="text-700 mb-2"><span className="fas fa-sitemap me-2"></span>Acceso y Dominios</h6>
+                      <div className="card shadow-none border mb-2">
+                        <div className="card-body bg-light p-2">
+                          <h6 className="text-700 mb-1 fs--2"><span className="fas fa-sitemap me-2"></span>Acceso y Dominios</h6>
                           <div className="mb-0">
-                            <label className="form-label fs--1">Subdominio (SaaS) *</label>
+                            <label className="form-label fs--2 mb-1">Subdominio (SaaS) *</label>
                             <div className="input-group input-group-sm">
                               <input type="text" className="form-control" name="subdominio" value={formData.subdominio} onChange={handleInputChange} required placeholder="ej: miempresa" />
-                              <span className="input-group-text">.mindsoftia.com</span>
+                              <span className="input-group-text py-0 text-500 bg-200">.mindsoftia.com</span>
                             </div>
-                            <small className="form-text text-muted">La URL con la que ingresarán los empleados de esta empresa.</small>
                           </div>
                         </div>
                       </div>
 
-                      <div className="row mb-3">
+                      <div className="row mb-2 g-2">
                         <div className="col-sm-6">
-                          <label className="form-label">RUC / NIT</label>
-                          <input type="text" className="form-control" name="ruc_nit" value={formData.ruc_nit} onChange={handleInputChange} />
+                          <label className="form-label fs--2 mb-1">RUC / NIT</label>
+                          <input type="text" className="form-control form-control-sm" name="ruc_nit" value={formData.ruc_nit} onChange={handleInputChange} />
                         </div>
                         <div className="col-sm-6">
-                          <label className="form-label">Teléfono</label>
-                          <input type="text" className="form-control" name="telefono" value={formData.telefono} onChange={handleInputChange} />
+                          <label className="form-label fs--2 mb-1">Teléfono</label>
+                          <input type="text" className="form-control form-control-sm" name="telefono" value={formData.telefono} onChange={handleInputChange} />
                         </div>
                       </div>
 
-                      <div className="mb-4">
-                        <label className="form-label">Email Administrativo</label>
-                        <input type="email" className="form-control" name="email" value={formData.email} onChange={handleInputChange} />
+                      <div className="mb-2">
+                        <label className="form-label fs--2 mb-1">Email Administrativo</label>
+                        <input type="email" className="form-control form-control-sm" name="email" value={formData.email} onChange={handleInputChange} />
                       </div>
 
                       <div className="card shadow-none border">
-                        <div className="card-body bg-light p-3">
-                          <h6 className="text-700 mb-2"><span className="fas fa-user-tie me-2"></span>Administrador Principal</h6>
-                          <div className="mb-2">
-                            <label className="form-label fs--1">Nombre del Administrador (Próximamente)</label>
-                            <input type="text" className="form-control form-control-sm" disabled placeholder="Se configurará en Supabase" />
-                          </div>
+                        <div className="card-body bg-light p-2">
+                          <h6 className="text-700 mb-1 fs--2"><span className="fas fa-user-tie me-2"></span>Administrador Principal</h6>
+                          <input type="text" className="form-control form-control-sm bg-white" disabled placeholder="Se configurará en Supabase" />
                         </div>
                       </div>
                     </div>
 
-                    {/* Columna Derecha: Módulos (Estilo Yuka-Do) */}
-                    <div className="col-lg-5">
-                      <h6 className="text-700 mb-3">Configuración de Módulos</h6>
+                    {/* Columna Derecha: Módulos (Compacto) */}
+                    <div className="col-md-5">
+                      <h6 className="text-700 mb-2 fs--1 text-uppercase">Módulos</h6>
                       
-                      <div className="mb-4">
-                        <p className="fs--2 text-600 mb-2 fw-semi-bold text-uppercase">Módulos Base (Siempre Activos)</p>
-                        <div className="d-flex align-items-center mb-1"><span className="fas fa-check-circle text-success me-2"></span><span className="fs--1">Dashboard Core</span></div>
-                        <div className="d-flex align-items-center mb-1"><span className="fas fa-check-circle text-success me-2"></span><span className="fs--1">Contabilidad (Libro Diario)</span></div>
-                        <div className="d-flex align-items-center mb-1"><span className="fas fa-check-circle text-success me-2"></span><span className="fs--1">Ajustes del Sistema</span></div>
+                      <div className="mb-3 bg-100 p-2 rounded">
+                        <p className="fs--2 text-600 mb-1 fw-semi-bold">Base (Siempre Activos)</p>
+                        <div className="d-flex align-items-center"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Dashboard Core</span></div>
+                        <div className="d-flex align-items-center"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Contabilidad</span></div>
+                        <div className="d-flex align-items-center"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Ajustes</span></div>
                       </div>
 
-                      <p className="fs--2 text-600 mb-2 fw-semi-bold text-uppercase">Complementos Premium</p>
+                      <p className="fs--2 text-600 mb-1 fw-semi-bold text-uppercase">Complementos</p>
                       
-                      <div className="border rounded p-3 mb-2 d-flex justify-content-between align-items-center">
-                        <div>
-                          <h6 className="mb-0">Facturación Electrónica</h6>
-                          <span className="fs--2 text-500">Activar para esta empresa</span>
-                        </div>
-                        <div className="form-check form-switch mb-0">
-                          <input className="form-check-input" type="checkbox" defaultChecked />
-                        </div>
+                      <div className="border rounded p-2 mb-1 d-flex justify-content-between align-items-center">
+                        <div className="fs--1">Facturación Elect.</div>
+                        <div className="form-check form-switch mb-0"><input className="form-check-input mt-0" type="checkbox" defaultChecked /></div>
                       </div>
 
-                      <div className="border rounded p-3 mb-2 d-flex justify-content-between align-items-center">
-                        <div>
-                          <h6 className="mb-0">Inventarios y Compras</h6>
-                          <span className="fs--2 text-500">Activar para esta empresa</span>
-                        </div>
-                        <div className="form-check form-switch mb-0">
-                          <input className="form-check-input" type="checkbox" />
-                        </div>
+                      <div className="border rounded p-2 mb-1 d-flex justify-content-between align-items-center">
+                        <div className="fs--1">Inventarios</div>
+                        <div className="form-check form-switch mb-0"><input className="form-check-input mt-0" type="checkbox" /></div>
                       </div>
                       
-                      <div className="border rounded p-3 mb-2 d-flex justify-content-between align-items-center">
-                        <div>
-                          <h6 className="mb-0">Nómina / RRHH</h6>
-                          <span className="fs--2 text-500">Activar para esta empresa</span>
-                        </div>
-                        <div className="form-check form-switch mb-0">
-                          <input className="form-check-input" type="checkbox" />
-                        </div>
+                      <div className="border rounded p-2 mb-1 d-flex justify-content-between align-items-center">
+                        <div className="fs--1">Nómina / RRHH</div>
+                        <div className="form-check form-switch mb-0"><input className="form-check-input mt-0" type="checkbox" /></div>
                       </div>
 
-                      <div className="mt-4 form-check form-switch">
-                        <input className="form-check-input" type="checkbox" id="isActive" name="is_active" checked={formData.is_active} onChange={handleInputChange} />
-                        <label className="form-check-label fw-semi-bold" htmlFor="isActive">
-                          Empresa Activa en el Sistema
+                      <div className="mt-3 form-check form-switch bg-primary-subtle p-2 rounded d-flex align-items-center justify-content-between px-3">
+                        <label className="form-check-label fw-bold text-primary fs--1 mb-0" htmlFor="isActive">
+                          Empresa Activa
                         </label>
+                        <input className="form-check-input mt-0" type="checkbox" id="isActive" name="is_active" checked={formData.is_active} onChange={handleInputChange} />
                       </div>
 
                     </div>
                   </div>
                 </div>
-                <div className="modal-footer bg-light">
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
-                  <button type="submit" className="btn btn-primary">Guardar Empresa</button>
+                <div className="modal-footer bg-light py-2">
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowModal(false)}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary btn-sm">Guardar Empresa</button>
                 </div>
               </form>
             </div>
