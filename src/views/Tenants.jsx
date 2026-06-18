@@ -8,6 +8,7 @@ function Tenants() {
   const [formData, setFormData] = useState({
     id: null,
     nombre: '',
+    subdominio: '',
     ruc_nit: '',
     email: '',
     telefono: '',
@@ -44,7 +45,7 @@ function Tenants() {
     if (empresa) {
       setFormData(empresa);
     } else {
-      setFormData({ id: null, nombre: '', ruc_nit: '', email: '', telefono: '', is_active: true });
+      setFormData({ id: null, nombre: '', subdominio: '', ruc_nit: '', email: '', telefono: '', is_active: true });
     }
     setShowModal(true);
   };
@@ -94,6 +95,7 @@ function Tenants() {
               <thead className="bg-200 text-900">
                 <tr>
                   <th>NOMBRE DE LA EMPRESA</th>
+                  <th>SUBDOMINIO</th>
                   <th>RUC / NIT</th>
                   <th>CONTACTO</th>
                   <th className="text-center">MÓDULOS</th>
@@ -103,13 +105,17 @@ function Tenants() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan="6" className="text-center py-3">Cargando...</td></tr>
+                  <tr><td colSpan="7" className="text-center py-3">Cargando...</td></tr>
                 ) : empresas.length === 0 ? (
-                  <tr><td colSpan="6" className="text-center py-3">No hay empresas registradas.</td></tr>
+                  <tr><td colSpan="7" className="text-center py-3">No hay empresas registradas.</td></tr>
                 ) : (
                   empresas.map((empresa) => (
                     <tr key={empresa.id}>
                       <td className="align-middle fw-semi-bold">{empresa.nombre}</td>
+                      <td className="align-middle text-primary fw-semi-bold">
+                        <span className="fas fa-link me-1" style={{fontSize: '0.7rem'}}></span>
+                        {empresa.subdominio ? `${empresa.subdominio}.mindsoftia.com` : '-'}
+                      </td>
                       <td className="align-middle">{empresa.ruc_nit || '-'}</td>
                       <td className="align-middle">
                         <div>{empresa.email || '-'}</div>
@@ -160,6 +166,20 @@ function Tenants() {
                       <div className="mb-3">
                         <label className="form-label">Razón Social o Nombre *</label>
                         <input type="text" className="form-control" name="nombre" value={formData.nombre} onChange={handleInputChange} required />
+                      </div>
+
+                      <div className="card shadow-none border mb-3">
+                        <div className="card-body bg-light p-3">
+                          <h6 className="text-700 mb-2"><span className="fas fa-sitemap me-2"></span>Acceso y Dominios</h6>
+                          <div className="mb-0">
+                            <label className="form-label fs--1">Subdominio (SaaS) *</label>
+                            <div className="input-group input-group-sm">
+                              <input type="text" className="form-control" name="subdominio" value={formData.subdominio} onChange={handleInputChange} required placeholder="ej: miempresa" />
+                              <span className="input-group-text">.mindsoftia.com</span>
+                            </div>
+                            <small className="form-text text-muted">La URL con la que ingresarán los empleados de esta empresa.</small>
+                          </div>
+                        </div>
                       </div>
 
                       <div className="row mb-3">

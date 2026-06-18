@@ -15,11 +15,12 @@ class EmpresaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre'    => 'required|string|max:255',
-            'ruc_nit'   => 'nullable|string|max:50|unique:empresas,ruc_nit',
-            'email'     => 'nullable|email|max:255',
-            'telefono'  => 'nullable|string|max:20',
-            'is_active' => 'boolean',
+            'nombre'     => 'required|string|max:255',
+            'subdominio' => 'required|string|max:50|unique:empresas,subdominio|regex:/^[a-z0-9\-]+$/i',
+            'ruc_nit'    => 'nullable|string|max:50|unique:empresas,ruc_nit',
+            'email'      => 'nullable|email|max:255',
+            'telefono'   => 'nullable|string|max:20',
+            'is_active'  => 'boolean',
         ]);
 
         $empresa = Empresa::create($validated);
@@ -34,11 +35,12 @@ class EmpresaController extends Controller
     public function update(Request $request, Empresa $empresa)
     {
         $validated = $request->validate([
-            'nombre'    => 'required|string|max:255',
-            'ruc_nit'   => 'nullable|string|max:50|unique:empresas,ruc_nit,' . $empresa->id,
-            'email'     => 'nullable|email|max:255',
-            'telefono'  => 'nullable|string|max:20',
-            'is_active' => 'boolean',
+            'nombre'     => 'required|string|max:255',
+            'subdominio' => 'required|string|max:50|regex:/^[a-z0-9\-]+$/i|unique:empresas,subdominio,' . $empresa->id,
+            'ruc_nit'    => 'nullable|string|max:50|unique:empresas,ruc_nit,' . $empresa->id,
+            'email'      => 'nullable|email|max:255',
+            'telefono'   => 'nullable|string|max:20',
+            'is_active'  => 'boolean',
         ]);
 
         $empresa->update($validated);
