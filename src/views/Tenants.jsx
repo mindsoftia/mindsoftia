@@ -211,9 +211,18 @@ function Tenants() {
                       
                       <div className="mb-3 bg-100 p-2 rounded">
                         <p className="fs--2 text-600 mb-1 fw-semi-bold">Base (Siempre Activos)</p>
-                        <div className="d-flex align-items-center"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Dashboard Core</span></div>
-                        <div className="d-flex align-items-center"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Contabilidad</span></div>
-                        <div className="d-flex align-items-center"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Ajustes</span></div>
+                        <div className="row g-0">
+                          <div className="col-6">
+                            <div className="d-flex align-items-center mb-1"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Dashboard Core</span></div>
+                            <div className="d-flex align-items-center mb-1"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Libro Diario</span></div>
+                            <div className="d-flex align-items-center mb-1"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Plan de Cuentas</span></div>
+                          </div>
+                          <div className="col-6">
+                            <div className="d-flex align-items-center mb-1"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Directorio (Terceros)</span></div>
+                            <div className="d-flex align-items-center mb-1"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Reportes Financieros</span></div>
+                            <div className="d-flex align-items-center mb-1"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Configuración</span></div>
+                          </div>
+                        </div>
                       </div>
 
                       <p className="fs--2 text-600 mb-1 fw-semi-bold text-uppercase">Complementos Premium</p>
