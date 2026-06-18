@@ -43,17 +43,25 @@ class VerifySupabaseToken
             $request->attributes->set('auth_user_id', $decoded->sub);
             $request->attributes->set('auth_user_email', $decoded->email ?? null);
 
-            // Extraer el tenant_id desde app_metadata del JWT
-            $tenantId = $decoded->app_metadata->tenant_id ?? null;
+            // Intentar loguear al usuario en Laravel para que auth()->user() funcione en todo el sistema
+            $user = \App\Models\User::where('email', $decoded->email ?? '')->first();
+            
+            if ($user) {
+                \Illuminate\Support\Facades\Auth::login($user);
+                $empresaId = $user->empresa_id;
+            } else {
+                // Si no existe localmente, tomamos el dato del JWT (app_metadata)
+                $empresaId = $decoded->app_metadata->empresa_id ?? $decoded->app_metadata->tenant_id ?? null;
+            }
 
-            if (!$tenantId) {
+            if (!$empresaId) {
                 return response()->json([
                     'error'   => 'Acceso denegado',
-                    'message' => 'El usuario no tiene una empresa (tenant) asignada.'
+                    'message' => 'El usuario no tiene una empresa asignada.'
                 ], 403);
             }
 
-            $request->attributes->set('tenant_id', $tenantId);
+            $request->attributes->set('empresa_id', $empresaId);
 
             // Extraer el rol del usuario si existe
             $role = $decoded->app_metadata->role ?? 'asistente';
