@@ -216,20 +216,33 @@ function Tenants() {
                         <div className="d-flex align-items-center"><span className="fas fa-check text-success me-2 fs--2"></span><span className="fs--2">Ajustes</span></div>
                       </div>
 
-                      <p className="fs--2 text-600 mb-1 fw-semi-bold text-uppercase">Complementos</p>
+                      <p className="fs--2 text-600 mb-1 fw-semi-bold text-uppercase">Complementos Premium</p>
                       
                       <div className="border rounded p-2 mb-1 d-flex justify-content-between align-items-center">
-                        <div className="fs--1">Facturación Elect.</div>
+                        <div className="fs--1">
+                          Facturación Electrónica <span className="text-500 fs--2">(DIAN)</span>
+                        </div>
                         <div className="form-check form-switch mb-0"><input className="form-check-input mt-0" type="checkbox" defaultChecked /></div>
                       </div>
 
                       <div className="border rounded p-2 mb-1 d-flex justify-content-between align-items-center">
-                        <div className="fs--1">Inventarios</div>
+                        <div className="fs--1">
+                          Nómina Electrónica <span className="text-500 fs--2">(Auto)</span>
+                        </div>
                         <div className="form-check form-switch mb-0"><input className="form-check-input mt-0" type="checkbox" /></div>
                       </div>
                       
                       <div className="border rounded p-2 mb-1 d-flex justify-content-between align-items-center">
-                        <div className="fs--1">Nómina / RRHH</div>
+                        <div className="fs--1">
+                          Inventarios Inteligentes
+                        </div>
+                        <div className="form-check form-switch mb-0"><input className="form-check-input mt-0" type="checkbox" /></div>
+                      </div>
+
+                      <div className="border rounded p-2 mb-1 d-flex justify-content-between align-items-center">
+                        <div className="fs--1">
+                          IA: Copiloto Financiero
+                        </div>
                         <div className="form-check form-switch mb-0"><input className="form-check-input mt-0" type="checkbox" /></div>
                       </div>
 
