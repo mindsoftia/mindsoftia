@@ -1,13 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function Tenants() {
+  const [empresas, setEmpresas] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchEmpresas = async () => {
+    try {
+      // Usamos import.meta.env.VITE_API_URL o relativo
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'https://mindsoftia.com'}/api/empresas`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('supabase.auth.token')}`
+        }
+      });
+      setEmpresas(response.data);
+    } catch (error) {
+      console.error("Error cargando empresas:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmpresas();
+  }, []);
+
   return (
     <>
       <div className="card mb-3">
         <div className="card-header bg-light">
           <div className="row align-items-center">
             <div className="col">
-              <h5 className="mb-0" id="tenants-title">Gestión de Empresas (Tenants)</h5>
+              <h5 className="mb-0">Gestión de Empresas (Tenants)</h5>
             </div>
             <div className="col-auto">
               <button className="btn btn-primary btn-sm">
@@ -17,10 +41,7 @@ function Tenants() {
           </div>
         </div>
         <div className="card-body">
-          <p className="mb-0">
-            Aquí podrás administrar las empresas suscritas a Mindsoftia. 
-            Cada empresa tendrá su propia base de usuarios, plan de cuentas, y contabilidad completamente aislada.
-          </p>
+          <p className="mb-0">Aquí podrás administrar las empresas suscritas a Mindsoftia.</p>
         </div>
       </div>
       
@@ -30,38 +51,37 @@ function Tenants() {
             <table className="table table-sm table-striped fs--1 mb-0 overflow-hidden">
               <thead className="bg-200 text-900">
                 <tr>
-                  <th className="sort pe-1 align-middle white-space-nowrap">Nombre de la Empresa</th>
-                  <th className="sort pe-1 align-middle white-space-nowrap">RUC / NIT</th>
-                  <th className="sort pe-1 align-middle white-space-nowrap">Email de Contacto</th>
-                  <th className="sort pe-1 align-middle white-space-nowrap text-center">Estado</th>
-                  <th className="no-sort pe-1 align-middle data-table-row-action"></th>
+                  <th>Nombre de la Empresa</th>
+                  <th>RUC / NIT</th>
+                  <th>Email de Contacto</th>
+                  <th className="text-center">Estado</th>
+                  <th className="text-end">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="list" id="table-tenants-body">
-                <tr>
-                  <td className="align-middle fw-semi-bold">Mindsoftia Demo</td>
-                  <td className="align-middle">123456789001</td>
-                  <td className="align-middle">demo@mindsoftia.com</td>
-                  <td className="align-middle text-center">
-                    <span className="badge badge rounded-pill d-block p-1 fs--2 badge-subtle-success">
-                      Activo<span className="ms-1 fas fa-check" data-fa-transform="shrink-2"></span>
-                    </span>
-                  </td>
-                  <td className="align-middle white-space-nowrap text-end">
-                    <div className="dropstart font-sans-serif position-static d-inline-block">
-                      <button className="btn btn-link text-600 btn-sm dropdown-toggle btn-reveal" type="button" id="btn-ten-1" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false">
-                        <span className="fas fa-ellipsis-h fs--1"></span>
-                      </button>
-                      <div className="dropdown-menu dropdown-menu-end border py-0" aria-labelledby="btn-ten-1">
-                        <div className="py-2">
-                          <a className="dropdown-item" href="#!">Editar</a>
-                          <div className="dropdown-divider"></div>
-                          <a className="dropdown-item text-danger" href="#!">Suspender</a>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
+              <tbody>
+                {loading ? (
+                  <tr><td colSpan="5" className="text-center py-3">Cargando...</td></tr>
+                ) : empresas.length === 0 ? (
+                  <tr><td colSpan="5" className="text-center py-3">No hay empresas registradas.</td></tr>
+                ) : (
+                  empresas.map((empresa) => (
+                    <tr key={empresa.id}>
+                      <td className="align-middle fw-semi-bold">{empresa.nombre}</td>
+                      <td className="align-middle">{empresa.ruc_nit || '-'}</td>
+                      <td className="align-middle">{empresa.email || '-'}</td>
+                      <td className="align-middle text-center">
+                        {empresa.is_active ? (
+                          <span className="badge badge rounded-pill d-block p-1 fs--2 badge-subtle-success">Activo</span>
+                        ) : (
+                          <span className="badge badge rounded-pill d-block p-1 fs--2 badge-subtle-danger">Inactivo</span>
+                        )}
+                      </td>
+                      <td className="align-middle text-end">
+                        <button className="btn btn-sm btn-outline-primary me-2">Editar</button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

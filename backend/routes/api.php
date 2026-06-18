@@ -46,4 +46,7 @@ Route::middleware(['supabase.auth'])->group(function () {
     Route::middleware(['role:admin'])->group(function () {
         // Route::apiResource('usuarios', UserController::class);
     });
+
+    // ── Superadmin (Gestión de Tenants) ────────────────────────────────────
+    Route::apiResource('empresas', \App\Http\Controllers\EmpresaController::class);
 });
