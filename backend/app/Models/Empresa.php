@@ -9,17 +9,18 @@ class Empresa extends Model
 {
     use HasFactory;
 
-    protected $table = 'saas_empresas';
-    protected $primaryKey = 'id_empresa';
-    public $incrementing = false; // UUID
-    protected $keyType = 'string';
-
-    const CREATED_AT = 'fecha_registro';
-    const UPDATED_AT = 'fecha_actualizacion';
+    protected $table = 'empresas';
 
     protected $fillable = [
-        'nombre_empresa',
-        'documento_identidad',
-        'estado_empresa',
+        'nombre',
+        'ruc_nit',
+        'email',
+        'telefono',
+        'is_active',
     ];
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
 }

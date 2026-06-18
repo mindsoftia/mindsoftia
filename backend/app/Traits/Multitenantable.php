@@ -13,20 +13,16 @@ trait Multitenantable
     public static function bootMultitenantable(): void
     {
         // Filtro global de lectura
-        static::addGlobalScope('tenant', function (Builder $builder) {
-            $tenantId = request()->attributes->get('tenant_id');
-            if ($tenantId) {
-                $builder->where('tenant_id', $tenantId);
+        static::addGlobalScope('empresa', function (Builder $builder) {
+            if (auth()->check() && auth()->user()->empresa_id) {
+                $builder->where('empresa_id', auth()->user()->empresa_id);
             }
         });
 
         // Inyección automática al crear
         static::creating(function ($model) {
-            if (!$model->tenant_id) {
-                $tenantId = request()->attributes->get('tenant_id');
-                if ($tenantId) {
-                    $model->tenant_id = $tenantId;
-                }
+            if (!$model->empresa_id && auth()->check()) {
+                $model->empresa_id = auth()->user()->empresa_id;
             }
         });
     }
