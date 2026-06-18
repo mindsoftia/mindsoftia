@@ -11,6 +11,11 @@ function Sidebar() {
       path: '/'
     },
     {
+      title: 'Empresas (Tenants)',
+      icon: 'fas fa-building',
+      path: '/empresas'
+    },
+    {
       title: 'Configuración',
       icon: 'fas fa-cog',
       id: 'configuracionMenu',

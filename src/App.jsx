@@ -13,6 +13,7 @@ import Register from './views/auth/Register';
 
 // Dashboard Views
 import Dashboard  from './views/Dashboard';
+import Tenants    from './views/Tenants';
 import Users      from './views/Users';
 import Settings   from './views/Settings';
 import RolesPermissions from './views/RolesPermissions';
@@ -51,6 +52,7 @@ function App() {
           }
         >
           <Route index        element={<Dashboard />} />
+          <Route path="empresas"     element={<Tenants />} />
           <Route path="usuarios"     element={<Users />} />
           <Route path="configuracion" element={<Settings />} />
           <Route path="permisos"     element={<RolesPermissions />} />
