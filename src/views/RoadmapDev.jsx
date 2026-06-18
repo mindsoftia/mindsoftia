@@ -224,14 +224,44 @@ function RoadmapDev() {
               
               <div className="accordion" id="accordionReportes">
                 
+                {/* Reporte Hoy: 18 de Junio 2026 */}
+                <div className="accordion-item border-top-0 border-x-0">
+                  <h2 className="accordion-header" id="headingToday">
+                    <button className="accordion-button shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToday" aria-expanded="true" aria-controls="collapseToday">
+                      <span className="fas fa-file-invoice text-primary me-2"></span> Resumen de Avances: 18 Jun, 2026
+                    </button>
+                  </h2>
+                  <div className="accordion-collapse collapse show" id="collapseToday" aria-labelledby="headingToday" data-bs-parent="#accordionReportes">
+                    <div className="accordion-body pt-0 pb-3">
+                      <div className="ps-3 border-start border-3 border-primary mt-2">
+                        
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Despliegue en Producción y Seguridad SSL</h6>
+                        <p className="fs--1 mb-3 text-600">Implementación exitosa de Certbot en el servidor VPS Ubuntu, garantizando que todo el tráfico de la API y el frontend se cifre bajo protocolo HTTPS estricto.</p>
+                        
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 2. Arquitectura de Base de Datos Multitenant</h6>
+                        <p className="fs--1 mb-3 text-600">Resolución de conflictos de puertos con el Connection Pooler de Supabase (Port 6543 vs 5432). Creación e integración de la tabla central `empresas` en el esquema relacional conectada a los `users`.</p>
+                        
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 3. Aislamiento Lógico (Global Scopes)</h6>
+                        <p className="fs--1 mb-3 text-600">Desarrollo del trait `Multitenantable` en Laravel. Esto asegura que todas las consultas (Libro Diario, Terceros) inyecten automáticamente la restricción `empresa_id`, eliminando fugas de información entre cuentas comerciales.</p>
+
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Sincronización Auth de Supabase a Laravel</h6>
+                        <p className="fs--1 mb-3 text-600">Actualización crítica del Middleware `VerifySupabaseToken` para que desencripte el JWT de Supabase Auth en cada petición y loguee la sesión silenciosa en Laravel, conectando la identidad con su `empresa_id`.</p>
+
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 5. Frontend UI/UX: Panel Superadmin</h6>
+                        <p className="fs--1 mb-0 text-600">Diseño en React del submódulo de Tenants para superadministradores. Incluye gestión de subdominios, validaciones de API, y un modelo modular compacto preparado para la estructura funcional SaaS 2026 (Nómina Auto, Facturación DIAN, IA).</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Reporte 2: 17 de Junio 2026 */}
                 <div className="accordion-item border-top-0 border-x-0">
                   <h2 className="accordion-header" id="headingTwo">
-                    <button className="accordion-button shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                    <button className="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                       <span className="fas fa-file-invoice text-primary me-2"></span> Resumen de Avances: 17 Jun, 2026
                     </button>
                   </h2>
-                  <div className="accordion-collapse collapse show" id="collapseTwo" aria-labelledby="headingTwo" data-bs-parent="#accordionReportes">
+                  <div className="accordion-collapse collapse" id="collapseTwo" aria-labelledby="headingTwo" data-bs-parent="#accordionReportes">
                     <div className="accordion-body pt-0 pb-3">
                       <div className="ps-3 border-start border-3 border-primary mt-2">
                         
