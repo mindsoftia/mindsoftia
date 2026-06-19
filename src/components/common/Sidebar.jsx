@@ -6,38 +6,84 @@ function Sidebar() {
   
   const menuItems = [
     {
-      title: 'Dashboard',
+      title: 'Dashboard y Analíticas',
       icon: 'fas fa-chart-pie',
       path: '/'
     },
     {
-      title: 'Empresas (Tenants)',
+      title: 'Empresas',
       icon: 'fas fa-building',
-      path: '/empresas'
-    },
-    {
-      title: 'Configuración',
-      icon: 'fas fa-cog',
-      id: 'configuracionMenu',
+      id: 'empresasMenu',
       children: [
         {
-          title: 'General',
-          path: '/configuracion'
+          title: 'Directorio Global',
+          path: '/empresas/directorio'
         },
         {
-          title: 'Usuarios',
-          path: '/usuarios'
+          title: 'Certificados DIAN (.p12)',
+          path: '/empresas/certificados'
         },
         {
-          title: 'Roles & Permisos',
-          path: '/permisos'
+          title: 'Solicitudes de Alta',
+          path: '/empresas/solicitudes'
+        },
+        {
+          title: 'Métricas de Consumo',
+          path: '/empresas/metricas'
         }
       ]
     },
     {
-      title: 'Roadmap Dev',
-      icon: 'fas fa-code-branch',
-      path: '/roadmap'
+      title: 'Suscripciones y Pagos',
+      icon: 'fas fa-credit-card',
+      id: 'billingMenu',
+      children: [
+        {
+          title: 'Suscripciones Activas',
+          path: '/facturacion/suscripciones'
+        },
+        {
+          title: 'Planes y Precios',
+          path: '/facturacion/planes'
+        },
+        {
+          title: 'Historial de Pagos',
+          path: '/facturacion/historial'
+        },
+        {
+          title: 'Cupones y Descuentos',
+          path: '/facturacion/cupones'
+        }
+      ]
+    },
+    {
+      title: 'App Store (Módulos)',
+      icon: 'fas fa-cubes',
+      path: '/modulos'
+    },
+    {
+      title: 'Soporte y Helpdesk',
+      icon: 'fas fa-headset',
+      path: '/soporte'
+    },
+    {
+      title: 'Configuración Global',
+      icon: 'fas fa-cog',
+      id: 'configuracionMenu',
+      children: [
+        {
+          title: 'Ajustes Generales',
+          path: '/configuracion'
+        },
+        {
+          title: 'Integraciones Maestras',
+          path: '/integraciones'
+        },
+        {
+          title: 'Roles y Permisos',
+          path: '/permisos'
+        }
+      ]
     }
   ];
 
