@@ -49,8 +49,11 @@ function TopNav() {
           <button 
             className="btn navbar-toggler-humburger-icon navbar-toggler me-1 me-sm-3" 
             type="button" 
-            onClick={handleToggle}
-            title="Toggle Navigation"
+            data-bs-toggle="collapse" 
+            data-bs-target="#navbarVerticalCollapse" 
+            aria-controls="navbarVerticalCollapse" 
+            aria-expanded="false" 
+            aria-label="Toggle Navigation"
           >
             <span className="navbar-toggle-icon"><span className="toggle-line"></span></span>
           </button>
