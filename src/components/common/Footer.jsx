@@ -6,9 +6,7 @@ function Footer() {
       <div className="row g-0 justify-content-between fs--1 mt-4 mb-3">
         <div className="col-12 col-sm-auto text-center">
           <p className="mb-0 text-600">
-            Gracias por construir con <span className="font-sans-serif fw-bold text-primary">Mindsoftia</span>
-            <span className="d-none d-sm-inline-block"> | </span>
-            <br className="d-sm-none" /> {new Date().getFullYear()} &copy;
+            &copy; {new Date().getFullYear()} <span className="font-sans-serif fw-bold text-primary">Mindsoftia</span> Todos los Derechos Reservados.
           </p>
         </div>
         <div className="col-12 col-sm-auto text-center">
