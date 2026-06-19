@@ -84,6 +84,11 @@ function Sidebar() {
           path: '/permisos'
         }
       ]
+    },
+    {
+      title: 'Roadmap Dev',
+      icon: 'fas fa-map-signs',
+      path: '/roadmap'
     }
   ];
 

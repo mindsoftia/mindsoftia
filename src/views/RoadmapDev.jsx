@@ -224,14 +224,44 @@ function RoadmapDev() {
               
               <div className="accordion" id="accordionReportes">
                 
-                {/* Reporte Hoy: 18 de Junio 2026 */}
+                {/* Reporte Hoy: 19 de Junio 2026 */}
                 <div className="accordion-item border-top-0 border-x-0">
                   <h2 className="accordion-header" id="headingToday">
                     <button className="accordion-button shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToday" aria-expanded="true" aria-controls="collapseToday">
-                      <span className="fas fa-file-invoice text-primary me-2"></span> Resumen de Avances: 18 Jun, 2026
+                      <span className="fas fa-file-invoice text-primary me-2"></span> Resumen de Avances: 19 Jun, 2026
                     </button>
                   </h2>
                   <div className="accordion-collapse collapse show" id="collapseToday" aria-labelledby="headingToday" data-bs-parent="#accordionReportes">
+                    <div className="accordion-body pt-0 pb-3">
+                      <div className="ps-3 border-start border-3 border-primary mt-2">
+                        
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Arquitectura Superadmin (Multi-Tenant)</h6>
+                        <p className="fs--1 mb-3 text-600">Diseño y maquetación de la estructura del Backoffice, aislando la gestión global del SaaS. Se creó una barra lateral con módulos de Empresas, Facturación y App Store.</p>
+                        
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 2. Tablero de Certificados DIAN (.p12)</h6>
+                        <p className="fs--1 mb-3 text-600">Creación de un panel vital con semaforización para monitorear vencimientos de firmas digitales de clientes, previniendo caídas en la facturación electrónica.</p>
+                        
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 3. App Store y Feature Toggles</h6>
+                        <p className="fs--1 mb-3 text-600">Interfaz de App Store para activar/desactivar submódulos (Nómina, CRM, ERP) por tenant, unificando el diseño visual bajo una sola marca premium.</p>
+
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Gestión de Suscripciones (Billing)</h6>
+                        <p className="fs--1 mb-3 text-600">Implementación del módulo financiero con vistas dedicadas para Suscripciones Activas, Planes y Precios, Historial de Pagos y Cupones promocionales.</p>
+
+                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 5. Enrutamiento Frontend</h6>
+                        <p className="fs--1 mb-0 text-600">Resolución de conflictos en el React Router DOM, estabilizando rutas profundas (`/empresas/directorio`) y creando marcadores (Próximamente) para funciones futuras.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Reporte: 18 de Junio 2026 */}
+                <div className="accordion-item border-top-0 border-x-0">
+                  <h2 className="accordion-header" id="heading18">
+                    <button className="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse18" aria-expanded="false" aria-controls="collapse18">
+                      <span className="fas fa-file-invoice text-primary me-2"></span> Resumen de Avances: 18 Jun, 2026
+                    </button>
+                  </h2>
+                  <div className="accordion-collapse collapse" id="collapse18" aria-labelledby="heading18" data-bs-parent="#accordionReportes">
                     <div className="accordion-body pt-0 pb-3">
                       <div className="ps-3 border-start border-3 border-primary mt-2">
                         
