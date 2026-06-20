@@ -10,8 +10,77 @@
       href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,500,600,700|Poppins:100,200,300,400,500,600,700,800,900&display=swap"
     />
     <title>Mindsoftia | Dashboard & WebApp</title>
+    <style>
+      #mindsoftia-preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #f9fafd; /* Falcon Light background */
+        z-index: 999999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.6s;
+      }
+      .dark #mindsoftia-preloader, [data-bs-theme="dark"] #mindsoftia-preloader {
+        background-color: #0b1727; /* Falcon Dark background */
+      }
+      
+      .preloader-content {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 180px;
+        height: 180px;
+      }
+      
+      .preloader-logo {
+        width: 120px;
+        animation: pulse-logo 2.5s infinite ease-in-out;
+        filter: drop-shadow(0 10px 15px rgba(0, 183, 255, 0.2));
+        z-index: 2;
+      }
+
+      .preloader-spinner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 4px solid rgba(0, 183, 255, 0.1);
+        border-radius: 50%;
+        border-top-color: #00B7FF;
+        border-right-color: #9D4DFF;
+        animation: spin-loader 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        z-index: 1;
+      }
+
+      @keyframes pulse-logo {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(0.95); }
+      }
+
+      @keyframes spin-loader {
+        to { transform: rotate(360deg); }
+      }
+
+      .preloader-fade-out {
+        opacity: 0 !important;
+        visibility: hidden !important;
+      }
+    </style>
   </head>
   <body>
+    <div id="mindsoftia-preloader">
+      <div class="preloader-content">
+        <div class="preloader-spinner"></div>
+        <img src="/logo.png" alt="Cargando Mindsoftia..." class="preloader-logo" />
+      </div>
+    </div>
     <div id="root"></div>
     <!-- Vendor JS Dependencies -->
     <script src="/vendors/fontawesome/all.min.js"></script>

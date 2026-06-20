@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts
@@ -44,6 +44,16 @@ function NoAutorizado() {
 }
 
 function App() {
+  useEffect(() => {
+    const preloader = document.getElementById('mindsoftia-preloader');
+    if (preloader) {
+      setTimeout(() => {
+        preloader.classList.add('preloader-fade-out');
+        setTimeout(() => preloader.remove(), 600);
+      }, 800); // Pequeño delay para apreciar la animación
+    }
+  }, []);
+
   return (
     <Router>
       <Routes>

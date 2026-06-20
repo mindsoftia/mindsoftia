@@ -36,158 +36,109 @@ function Login() {
   return (
     <main className="main" id="top">
       <div className="container-fluid">
-        <div className="row min-vh-100 flex-center g-0">
-
-          {/* Panel izquierdo decorativo */}
-          <div className="col-lg-6 col-xxl-5 py-3 position-relative d-none d-lg-block"
-            style={{
-              background: 'linear-gradient(135deg, #00B7FF 0%, #9D4DFF 100%)',
-              minHeight: '100vh',
-            }}
-          >
-            <div className="d-flex flex-column justify-content-center align-items-center h-100 text-white px-5">
-              <div className="mb-4 d-flex justify-content-center">
-                <div 
-                  className="bg-white d-flex align-items-center justify-content-center shadow-lg" 
-                  style={{ 
-                    width: '130px', 
-                    height: '130px', 
-                    borderRadius: '50%', 
-                    border: '5px solid rgba(255, 255, 255, 0.5)',
-                    boxShadow: '0 0 20px rgba(255,255,255,0.2)'
-                  }}
-                >
-                  <img src="/logo.png" alt="Mindsoftia Logo" style={{ maxHeight: '75px', maxWidth: '85%' }} />
-                </div>
-              </div>
-              <p className="text-white-50 text-center fs-1" style={{ maxWidth: '340px' }}>
-                Plataforma contable y fiscal inteligente para Colombia.
-              </p>
-              <div className="row g-3 mt-4 w-100" style={{ maxWidth: '380px' }}>
-                {[
-                  { icon: 'fa-file-invoice-dollar', text: 'Facturación DIAN' },
-                  { icon: 'fa-users',               text: 'Multi-empresa' },
-                  { icon: 'fa-robot',               text: 'IA Contable' },
-                  { icon: 'fa-lock',                text: 'Seguridad Bancaria' },
-                ].map(({ icon, text }) => (
-                  <div key={text} className="col-6">
-                    <div className="d-flex align-items-center gap-2"
-                      style={{ background: 'rgba(255,255,255,0.12)', borderRadius: '8px', padding: '10px 14px' }}>
-                      <span className={`fas ${icon} text-white`}></span>
-                      <span className="text-white fs--1 fw-medium">{text}</span>
+        <div className="row min-vh-100 bg-100">
+          
+          {/* Panel Izquierdo - Imagen de fondo */}
+          <div className="col-6 d-none d-lg-block position-relative">
+            <div 
+              className="bg-holder" 
+              style={{
+                backgroundImage: 'url(https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop)',
+                backgroundPosition: '50% 20%',
+                backgroundSize: 'cover'
+              }}
+            ></div>
+          </div>
+          
+          {/* Panel Derecho - Formulario Card compacto */}
+          <div className="col-sm-10 col-md-6 px-sm-0 align-self-center mx-auto py-5">
+            <div className="row justify-content-center g-0">
+              <div className="col-lg-9 col-xl-8 col-xxl-6">
+                <div className="card shadow-sm">
+                  
+                  {/* Card Header (Estilo Falcon Split) */}
+                  <div className="card-header bg-circle-shape bg-shape text-center p-3" style={{ backgroundColor: '#00B7FF' }}>
+                    <Link className="d-flex flex-column align-items-center justify-content-center z-index-1 position-relative text-decoration-none" to="/">
+                      <img 
+                        src="/logo.png" 
+                        alt="Mindsoftia Logo" 
+                        style={{ maxHeight: '55px', width: 'auto' }} 
+                      />
+                      <span className="font-sans-serif fw-bolder fs-4 text-white mt-2">Mindsoftia</span>
+                    </Link>
+                  </div>
+                  
+                  <div className="card-body p-4">
+                    <div className="row flex-between-center mb-2">
+                      <div className="col-auto">
+                        <h4 className="mb-0">Login</h4>
+                      </div>
+                      <div className="col-auto fs--1 text-600">
+                        <span className="mb-0 fw-semi-bold">¿Nuevo Usuario? </span> 
+                        <Link to="/register">Crear cuenta</Link>
+                      </div>
                     </div>
+
+                    {error && (
+                      <div className="alert alert-danger p-2 mt-3 mb-0" role="alert">
+                        <span className="fas fa-exclamation-circle me-2"></span>{error}
+                      </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="mt-4">
+                      <div className="mb-3">
+                        <label className="form-label" htmlFor="email">Correo electrónico</label>
+                        <input
+                          id="email"
+                          name="email"
+                          type="email"
+                          className="form-control"
+                          value={form.email}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="mb-3">
+                        <label className="form-label" htmlFor="password">Contraseña</label>
+                        <input
+                          id="password"
+                          name="password"
+                          type="password"
+                          className="form-control"
+                          value={form.password}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="row flex-between-center mb-4">
+                        <div className="col-auto">
+                          <div className="form-check mb-0">
+                            <input className="form-check-input" type="checkbox" id="split-checkbox" />
+                            <label className="form-check-label" htmlFor="split-checkbox">Recordarme</label>
+                          </div>
+                        </div>
+                        <div className="col-auto">
+                          <a className="fs--1" href="/forgot-password">¿Olvidaste la contraseña?</a>
+                        </div>
+                      </div>
+
+                      <button 
+                        type="submit" 
+                        className="btn btn-primary d-block w-100" 
+                        disabled={loading} 
+                        style={{ backgroundColor: '#00B7FF', border: 'none' }}
+                      >
+                        {loading ? 'Ingresando...' : 'Iniciar Sesión'}
+                      </button>
+                    </form>
                   </div>
-                ))}
+                </div>
               </div>
             </div>
           </div>
-
-          {/* Panel derecho — Formulario */}
-          <div className="col-sm-10 col-md-8 col-lg-6 col-xl-5 col-xxl-4 px-4 px-sm-5">
-            <div className="text-center mb-5">
-              <a href="/" className="d-inline-flex align-items-center mb-4">
-                <img src="/logo.png" alt="Mindsoftia Logo" style={{ maxHeight: '55px', width: 'auto' }} />
-              </a>
-              <p className="text-700">Ingresa a tu cuenta para continuar</p>
-            </div>
-
-            {error && (
-              <div className="alert alert-danger d-flex align-items-center gap-2" role="alert">
-                <span className="fas fa-exclamation-circle"></span>
-                <span>{error}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} noValidate>
-              <div className="mb-3">
-                <label className="form-label" htmlFor="email">
-                  Correo electrónico
-                </label>
-                <div className="input-group">
-                  <span className="input-group-text">
-                    <span className="fas fa-envelope text-primary"></span>
-                  </span>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    className="form-control"
-                    placeholder="correo@empresa.com"
-                    value={form.email}
-                    onChange={handleChange}
-                    autoComplete="email"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label" htmlFor="password">
-                  Contraseña
-                </label>
-                <div className="input-group">
-                  <span className="input-group-text">
-                    <span className="fas fa-lock text-primary"></span>
-                  </span>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    className="form-control"
-                    placeholder="Tu contraseña"
-                    value={form.password}
-                    onChange={handleChange}
-                    autoComplete="current-password"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="row flex-between-center mb-4">
-                <div className="col-auto">
-                  <div className="form-check mb-0">
-                    <input className="form-check-input" type="checkbox" id="rememberMe" />
-                    <label className="form-check-label" htmlFor="rememberMe">
-                      Recordarme
-                    </label>
-                  </div>
-                </div>
-                <div className="col-auto">
-                  <a className="fs--1" href="/forgot-password">
-                    ¿Olvidaste tu contraseña?
-                  </a>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="btn btn-primary w-100"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Ingresando...
-                  </>
-                ) : (
-                  <>
-                    <span className="fas fa-sign-in-alt me-2"></span>
-                    Iniciar Sesión
-                  </>
-                )}
-              </button>
-            </form>
-
-            <hr className="my-4" />
-
-            <p className="text-center fs--1 text-700">
-              ¿No tienes cuenta?{' '}
-              <Link to="/register" className="fw-semibold">
-                Regístrate gratis
-              </Link>
-            </p>
-          </div>
-
+          
         </div>
       </div>
     </main>

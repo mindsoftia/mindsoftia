@@ -67,13 +67,13 @@ function SettingsPanel() {
         <div className="offcanvas-header bg-shape bg-primary text-white d-flex align-items-start">
           <div className="d-flex flex-column">
             <h5 className="offcanvas-title text-white d-flex align-items-center mb-1" id="settings-offcanvas-label">
-              <span className="fas fa-palette me-2 fs-0"></span> Settings
+              <span className="fas fa-palette me-2 fs-0"></span> Configuración
             </h5>
-            <p className="mb-0 fs--1 text-white opacity-75">Set your own customized style</p>
+            <p className="mb-0 fs--1 text-white opacity-75">Define tu propio estilo personalizado</p>
           </div>
           <div>
             <button className="btn btn-sm btn-light btn-opacity-75 bg-transparent border-white text-white me-2" style={{opacity: 0.8}} onClick={handleReset}>
-              <span className="fas fa-redo-alt me-1 fs--2"></span>Reset
+              <span className="fas fa-redo-alt me-1 fs--2"></span>Restablecer
             </button>
             <button type="button" className="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
@@ -82,8 +82,8 @@ function SettingsPanel() {
           
           <div className="d-flex justify-content-between align-items-center mb-3">
             <div>
-              <h6 className="fs--1 mb-0"><span className="fas fa-arrows-alt-h me-2"></span>Fluid Layout</h6>
-              <p className="fs--2 mb-0 text-500">Toggle container layout system</p>
+              <h6 className="fs--1 mb-0"><span className="fas fa-arrows-alt-h me-2"></span>Diseño Fluido</h6>
+              <p className="fs--2 mb-0 text-500">Alternar el ancho máximo del contenedor</p>
             </div>
             <div className="form-check form-switch mb-0">
               <input className="form-check-input" type="checkbox" checked={isFluid} onChange={handleFluidChange} />
@@ -92,15 +92,15 @@ function SettingsPanel() {
 
           <hr className="bg-200" />
 
-          <h6 className="fs--1 mb-1 mt-4">Vertical Navbar Style</h6>
-          <p className="fs--2 text-500 mb-3">Switch between styles for your vertical navbar</p>
+          <h6 className="fs--1 mb-1 mt-4">Estilo del Menú Lateral</h6>
+          <p className="fs--2 text-500 mb-3">Cambia entre los diferentes diseños visuales</p>
           
           <div className="row g-2">
             <div className="col-6">
               <input type="radio" className="btn-check" name="navbar-style" id="navbar-transparent" checked={navbarStyle === 'transparent'} onChange={() => handleNavbarStyleChange('transparent')} />
               <label className="btn btn-outline-primary w-100 p-2" htmlFor="navbar-transparent">
                 <div className="bg-200 rounded-1 w-100 mb-2" style={{height: '60px', opacity: 0.5}}></div>
-                Transparent
+                Transparente
               </label>
             </div>
             <div className="col-6">
@@ -110,7 +110,7 @@ function SettingsPanel() {
                   <div className="bg-dark rounded-start-1" style={{height: '60px', width: '30%'}}></div>
                   <div className="bg-200 rounded-end-1" style={{height: '60px', width: '70%', opacity: 0.5}}></div>
                 </div>
-                Inverted
+                Invertido
               </label>
             </div>
             <div className="col-6">
@@ -120,7 +120,7 @@ function SettingsPanel() {
                   <div className="bg-white rounded-1 shadow-sm" style={{height: '52px', width: '30%'}}></div>
                   <div className="bg-transparent" style={{height: '52px', width: '70%'}}></div>
                 </div>
-                Card
+                Tarjeta
               </label>
             </div>
             <div className="col-6">
@@ -130,7 +130,7 @@ function SettingsPanel() {
                   <div className="bg-primary rounded-start-1" style={{height: '60px', width: '30%'}}></div>
                   <div className="bg-200 rounded-end-1" style={{height: '60px', width: '70%', opacity: 0.5}}></div>
                 </div>
-                Vibrant
+                Vibrante
               </label>
             </div>
           </div>
