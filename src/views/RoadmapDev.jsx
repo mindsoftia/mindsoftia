@@ -3,6 +3,7 @@ import ReactECharts from 'echarts-for-react';
 
 function RoadmapDev() {
   const [activeTab, setActiveTab] = useState(1);
+  const [activeTabReportes, setActiveTabReportes] = useState(1);
   const [tasks, setTasks] = useState([
     // MES 1: Núcleo SaaS
     { id: 'todo-1', month: 1, text: 'Autenticación y Multi-Tenancy (Multiempresa)', checked: true, detail: 'Refinar el Login, registro y selección de la empresa con la que el usuario va a operar.' },
@@ -253,142 +254,167 @@ function RoadmapDev() {
         {/* Columna 2: Actividades Recientes (Reportes Ejecutivos) */}
         <div className="col-lg-6">
           <div className="card h-100">
-            <div className="card-header bg-light">
-              <h5 className="mb-0">Reportes Ejecutivos (Completado)</h5>
+            <div className="card-header bg-light d-flex justify-content-between align-items-center p-0">
+              <ul className="nav nav-tabs border-bottom-0 w-100" id="reportesTab" role="tablist">
+                {monthsKeys.map((month) => (
+                  <li className="nav-item flex-1 text-center" role="presentation" key={`rep-tab-${month}`}>
+                    <button
+                      className={`nav-link w-100 fw-semi-bold ${activeTabReportes === month ? 'active' : ''}`}
+                      id={`tab-rep-mes-${month}`}
+                      type="button"
+                      role="tab"
+                      onClick={() => setActiveTabReportes(month)}
+                      style={{ cursor: 'pointer', borderRadius: '0' }}
+                    >
+                      Mes {month}
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="card-body p-0 scrollbar" style={{ maxHeight: '500px', overflowY: 'auto' }}>
-              
-              <div className="accordion" id="accordionReportes">
-                
-                {/* Reporte Hoy: 19 de Junio 2026 */}
-                <div className="accordion-item border-top-0 border-x-0">
-                  <h2 className="accordion-header" id="headingToday">
-                    <button className="accordion-button shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToday" aria-expanded="true" aria-controls="collapseToday">
-                      <span className="fas fa-file-invoice text-primary me-2"></span> Resumen de Avances: 19 Jun, 2026
-                    </button>
-                  </h2>
-                  <div className="accordion-collapse collapse show" id="collapseToday" aria-labelledby="headingToday" data-bs-parent="#accordionReportes">
-                    <div className="accordion-body pt-0 pb-3">
-                      <div className="ps-3 border-start border-3 border-primary mt-2">
-                        
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Arquitectura Superadmin (Multi-Tenant)</h6>
-                        <p className="fs--1 mb-3 text-600">Diseño y maquetación de la estructura del Backoffice, aislando la gestión global del SaaS. Se creó una barra lateral con módulos de Empresas, Facturación y App Store.</p>
-                        
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 2. Tablero de Certificados DIAN (.p12)</h6>
-                        <p className="fs--1 mb-3 text-600">Creación de un panel vital con semaforización para monitorear vencimientos de firmas digitales de clientes, previniendo caídas en la facturación electrónica.</p>
-                        
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 3. App Store y Feature Toggles</h6>
-                        <p className="fs--1 mb-3 text-600">Interfaz de App Store para activar/desactivar submódulos (Nómina, CRM, ERP) por tenant, unificando el diseño visual bajo una sola marca premium.</p>
+              <div className="tab-content" id="reportesTabContent">
+                {monthsKeys.map((month) => (
+                  <div 
+                    key={`rep-pane-${month}`} 
+                    className={`tab-pane fade ${activeTabReportes === month ? 'show active' : ''}`} 
+                    id={`pane-rep-mes-${month}`} 
+                    role="tabpanel"
+                  >
+                    <div className="p-3 bg-light border-bottom">
+                      <h6 className="mb-0 text-primary"><span className="fas fa-file-invoice me-2"></span>Reportes de {monthTitles[month].split(':')[0]}</h6>
+                    </div>
+                    
+                    <div className="accordion" id={`accordionReportes-${month}`}>
+                      {month === 1 ? (
+                        <>
+                          {/* Reporte Hoy: 19 de Junio 2026 */}
+                          <div className="accordion-item border-top-0 border-x-0">
+                            <h2 className="accordion-header" id="headingToday">
+                              <button className="accordion-button shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToday" aria-expanded="true" aria-controls="collapseToday">
+                                <span className="fas fa-check-circle text-success me-2"></span> Resumen de Avances: 19 Jun, 2026
+                              </button>
+                            </h2>
+                            <div className="accordion-collapse collapse show" id="collapseToday" aria-labelledby="headingToday" data-bs-parent={`#accordionReportes-${month}`}>
+                              <div className="accordion-body pt-0 pb-3 ps-5">
+                                <div className="border-start border-3 border-primary ps-3 mt-2">
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Arquitectura Superadmin (Multi-Tenant)</h6>
+                                  <p className="fs--1 mb-3 text-600">Diseño y maquetación de la estructura del Backoffice, aislando la gestión global del SaaS. Se creó una barra lateral con módulos de Empresas, Facturación y App Store.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 2. Tablero de Certificados DIAN (.p12)</h6>
+                                  <p className="fs--1 mb-3 text-600">Creación de un panel vital con semaforización para monitorear vencimientos de firmas digitales de clientes, previniendo caídas en la facturación electrónica.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 3. App Store y Feature Toggles</h6>
+                                  <p className="fs--1 mb-3 text-600">Interfaz de App Store para activar/desactivar submódulos (Nómina, CRM, ERP) por tenant, unificando el diseño visual bajo una sola marca premium.</p>
 
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Gestión de Suscripciones (Billing)</h6>
-                        <p className="fs--1 mb-3 text-600">Implementación del módulo financiero con vistas dedicadas para Suscripciones Activas, Planes y Precios, Historial de Pagos y Cupones promocionales.</p>
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Gestión de Suscripciones (Billing)</h6>
+                                  <p className="fs--1 mb-3 text-600">Implementación del módulo financiero con vistas dedicadas para Suscripciones Activas, Planes y Precios, Historial de Pagos y Cupones promocionales.</p>
 
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 5. Enrutamiento Frontend</h6>
-                        <p className="fs--1 mb-0 text-600">Resolución de conflictos en el React Router DOM, estabilizando rutas profundas (`/empresas/directorio`) y creando marcadores (Próximamente) para funciones futuras.</p>
-                      </div>
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 5. Enrutamiento Frontend</h6>
+                                  <p className="fs--1 mb-0 text-600">Resolución de conflictos en el React Router DOM, estabilizando rutas profundas (`/empresas/directorio`) y creando marcadores (Próximamente) para funciones futuras.</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Reporte: 18 de Junio 2026 */}
+                          <div className="accordion-item border-top-0 border-x-0">
+                            <h2 className="accordion-header" id="heading18">
+                              <button className="accordion-button collapsed shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse18" aria-expanded="false" aria-controls="collapse18">
+                                <span className="fas fa-check-circle text-success me-2"></span> Resumen de Avances: 18 Jun, 2026
+                              </button>
+                            </h2>
+                            <div className="accordion-collapse collapse" id="collapse18" aria-labelledby="heading18" data-bs-parent={`#accordionReportes-${month}`}>
+                              <div className="accordion-body pt-0 pb-3 ps-5">
+                                <div className="border-start border-3 border-primary ps-3 mt-2">
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Despliegue en Producción y Seguridad SSL</h6>
+                                  <p className="fs--1 mb-3 text-600">Implementación exitosa de Certbot en el servidor VPS Ubuntu, garantizando que todo el tráfico de la API y el frontend se cifre bajo protocolo HTTPS estricto.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 2. Arquitectura de Base de Datos Multitenant</h6>
+                                  <p className="fs--1 mb-3 text-600">Resolución de conflictos de puertos con el Connection Pooler de Supabase (Port 6543 vs 5432). Creación e integración de la tabla central `empresas` en el esquema relacional conectada a los `users`.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 3. Aislamiento Lógico (Global Scopes)</h6>
+                                  <p className="fs--1 mb-3 text-600">Desarrollo del trait `Multitenantable` en Laravel. Esto asegura que todas las consultas (Libro Diario, Terceros) inyecten automáticamente la restricción `empresa_id`, eliminando fugas de información entre cuentas comerciales.</p>
+
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Sincronización Auth de Supabase a Laravel</h6>
+                                  <p className="fs--1 mb-3 text-600">Actualización crítica del Middleware `VerifySupabaseToken` para que desencripte el JWT de Supabase Auth en cada petición y loguee la sesión silenciosa en Laravel, conectando la identidad con su `empresa_id`.</p>
+
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 5. Frontend UI/UX: Panel Superadmin</h6>
+                                  <p className="fs--1 mb-0 text-600">Diseño en React del submódulo de Tenants para superadministradores. Incluye gestión de subdominios, validaciones de API, y un modelo modular compacto preparado para la estructura funcional SaaS 2026 (Nómina Auto, Facturación DIAN, IA).</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Reporte 2: 17 de Junio 2026 */}
+                          <div className="accordion-item border-top-0 border-x-0">
+                            <h2 className="accordion-header" id="headingTwo">
+                              <button className="accordion-button collapsed shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <span className="fas fa-check-circle text-success me-2"></span> Resumen de Avances: 17 Jun, 2026
+                              </button>
+                            </h2>
+                            <div className="accordion-collapse collapse" id="collapseTwo" aria-labelledby="headingTwo" data-bs-parent={`#accordionReportes-${month}`}>
+                              <div className="accordion-body pt-0 pb-3 ps-5">
+                                <div className="border-start border-3 border-primary ps-3 mt-2">
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Infraestructura VPS y API Separada</h6>
+                                  <p className="fs--1 mb-3 text-600">Transición del entorno local a producción en el VPS (Ubuntu 26.04). Apache configurado para enrutar el frontend estático (`dist`) y el backend Laravel (`backend/public`). Corrección de enrutamiento SPA mediante archivo `.htaccess` en public.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 2. Desarrollo del Backend Contable (PUC)</h6>
+                                  <p className="fs--1 mb-3 text-600">Implementación de esquema para el Plan Único de Cuentas (PUC). Migración y Modelo `Account.php` creados con soporte para jerarquías (padre-hijo), naturaleza contable y aislamiento Multitenant.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 3. Seeding de Seguridad</h6>
+                                  <p className="fs--1 mb-3 text-600">Creación de `RolSeeder.php` integrado en `DatabaseSeeder.php`. Poblamiento de la tabla `cnf_roles` con 6 perfiles base de sistema (Super Administrador, Propietario, Analista de Cartera, Director de Marketing, Vendedor, Auditor Externo).</p>
+
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Refactorización React UI (Usuarios)</h6>
+                                  <p className="fs--1 mb-3 text-600">Actualización de `Users.jsx` aplicando tablas avanzadas auténticas de Falcon (avatares, selección). Integración de botón flotante (FAB) y modal con estilo propio Mindsoftia. Conexión directa del CRUD Frontend a Supabase.</p>
+
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 5. Gestión de Repositorio Segura</h6>
+                                  <p className="fs--1 mb-0 text-600">Bloqueos de GitHub resueltos al remover archivos de tokens expuestos (`tokengit`). Flujo de despliegue estabilizado permitiendo actualizaciones rápidas mediante `git pull` y `npm run build` en el servidor.</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Reporte 1: 16 de Junio 2026 */}
+                          <div className="accordion-item border-top-0 border-x-0 border-bottom-0">
+                            <h2 className="accordion-header" id="headingOne">
+                              <button className="accordion-button collapsed shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                <span className="fas fa-check-circle text-success me-2"></span> Resumen de Avances: 16 Jun, 2026
+                              </button>
+                            </h2>
+                            <div className="accordion-collapse collapse" id="collapseOne" aria-labelledby="headingOne" data-bs-parent={`#accordionReportes-${month}`}>
+                              <div className="accordion-body pt-0 pb-3 ps-5">
+                                <div className="border-start border-3 border-primary ps-3 mt-2">
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Seguridad Multi-Tenant</h6>
+                                  <p className="fs--1 mb-3 text-600">Base de datos PostgreSQL en Supabase. Custom JWT Hook encriptado e inmutable. Middlewares en Laravel (VerifySupabaseToken, CheckPermission).</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 2. Módulo de Permisología Integral</h6>
+                                  <p className="fs--1 mb-3 text-600">Diseño de tablas modulares. API REST RolePermissionController. Matriz visual en React con switches dinámicos y protección a Super Admin.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 3. Optimización UI Falcon</h6>
+                                  <p className="fs--1 mb-3 text-600">Manejo de estado global (Zustand). TopNav limpio sin búsqueda. Tema configurado a 'Collapsed', modo 'Card' y ancho 'Fluid'. Cierre de sesión seguro.</p>
+
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Sincronización Servidores</h6>
+                                  <p className="fs--1 mb-0 text-600">Archivos .env estabilizados. Apache configurado (mindsoftia.conf y .htaccess) para convivir React y Laravel en la misma ruta sin conflictos.</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        /* Futuros reportes para otros meses */
+                        <div className="accordion-item border-x-0 border-top-0 border-bottom-0">
+                          <h2 className="accordion-header" id={`headingFuture-${month}`}>
+                            <button className="accordion-button collapsed shadow-none text-500 py-3" type="button" data-bs-toggle="collapse" data-bs-target={`#collapseFuture-${month}`} aria-expanded="false" aria-controls={`collapseFuture-${month}`} disabled>
+                              <span className="fas fa-hourglass-half me-2"></span> Próximos reportes se registrarán aquí...
+                            </button>
+                          </h2>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-
-                {/* Reporte: 18 de Junio 2026 */}
-                <div className="accordion-item border-top-0 border-x-0">
-                  <h2 className="accordion-header" id="heading18">
-                    <button className="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse18" aria-expanded="false" aria-controls="collapse18">
-                      <span className="fas fa-file-invoice text-primary me-2"></span> Resumen de Avances: 18 Jun, 2026
-                    </button>
-                  </h2>
-                  <div className="accordion-collapse collapse" id="collapse18" aria-labelledby="heading18" data-bs-parent="#accordionReportes">
-                    <div className="accordion-body pt-0 pb-3">
-                      <div className="ps-3 border-start border-3 border-primary mt-2">
-                        
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Despliegue en Producción y Seguridad SSL</h6>
-                        <p className="fs--1 mb-3 text-600">Implementación exitosa de Certbot en el servidor VPS Ubuntu, garantizando que todo el tráfico de la API y el frontend se cifre bajo protocolo HTTPS estricto.</p>
-                        
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 2. Arquitectura de Base de Datos Multitenant</h6>
-                        <p className="fs--1 mb-3 text-600">Resolución de conflictos de puertos con el Connection Pooler de Supabase (Port 6543 vs 5432). Creación e integración de la tabla central `empresas` en el esquema relacional conectada a los `users`.</p>
-                        
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 3. Aislamiento Lógico (Global Scopes)</h6>
-                        <p className="fs--1 mb-3 text-600">Desarrollo del trait `Multitenantable` en Laravel. Esto asegura que todas las consultas (Libro Diario, Terceros) inyecten automáticamente la restricción `empresa_id`, eliminando fugas de información entre cuentas comerciales.</p>
-
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Sincronización Auth de Supabase a Laravel</h6>
-                        <p className="fs--1 mb-3 text-600">Actualización crítica del Middleware `VerifySupabaseToken` para que desencripte el JWT de Supabase Auth en cada petición y loguee la sesión silenciosa en Laravel, conectando la identidad con su `empresa_id`.</p>
-
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 5. Frontend UI/UX: Panel Superadmin</h6>
-                        <p className="fs--1 mb-0 text-600">Diseño en React del submódulo de Tenants para superadministradores. Incluye gestión de subdominios, validaciones de API, y un modelo modular compacto preparado para la estructura funcional SaaS 2026 (Nómina Auto, Facturación DIAN, IA).</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Reporte 2: 17 de Junio 2026 */}
-                <div className="accordion-item border-top-0 border-x-0">
-                  <h2 className="accordion-header" id="headingTwo">
-                    <button className="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                      <span className="fas fa-file-invoice text-primary me-2"></span> Resumen de Avances: 17 Jun, 2026
-                    </button>
-                  </h2>
-                  <div className="accordion-collapse collapse" id="collapseTwo" aria-labelledby="headingTwo" data-bs-parent="#accordionReportes">
-                    <div className="accordion-body pt-0 pb-3">
-                      <div className="ps-3 border-start border-3 border-primary mt-2">
-                        
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Infraestructura VPS y API Separada</h6>
-                        <p className="fs--1 mb-3 text-600">Transición del entorno local a producción en el VPS (Ubuntu 26.04). Apache configurado para enrutar el frontend estático (`dist`) y el backend Laravel (`backend/public`). Corrección de enrutamiento SPA mediante archivo `.htaccess` en public.</p>
-                        
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 2. Desarrollo del Backend Contable (PUC)</h6>
-                        <p className="fs--1 mb-3 text-600">Implementación de esquema para el Plan Único de Cuentas (PUC). Migración y Modelo `Account.php` creados con soporte para jerarquías (padre-hijo), naturaleza contable y aislamiento Multitenant.</p>
-                        
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 3. Seeding de Seguridad</h6>
-                        <p className="fs--1 mb-3 text-600">Creación de `RolSeeder.php` integrado en `DatabaseSeeder.php`. Poblamiento de la tabla `cnf_roles` con 6 perfiles base de sistema (Super Administrador, Propietario, Analista de Cartera, Director de Marketing, Vendedor, Auditor Externo).</p>
-
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Refactorización React UI (Usuarios)</h6>
-                        <p className="fs--1 mb-3 text-600">Actualización de `Users.jsx` aplicando tablas avanzadas auténticas de Falcon (avatares, selección). Integración de botón flotante (FAB) y modal con estilo propio Mindsoftia. Conexión directa del CRUD Frontend a Supabase.</p>
-
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 5. Gestión de Repositorio Segura</h6>
-                        <p className="fs--1 mb-0 text-600">Bloqueos de GitHub resueltos al remover archivos de tokens expuestos (`tokengit`). Flujo de despliegue estabilizado permitiendo actualizaciones rápidas mediante `git pull` y `npm run build` en el servidor.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Reporte 1: 16 de Junio 2026 */}
-                <div className="accordion-item border-top-0 border-x-0">
-                  <h2 className="accordion-header" id="headingOne">
-                    <button className="accordion-button collapsed shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                      <span className="fas fa-file-invoice text-primary me-2"></span> Resumen de Avances: 16 Jun, 2026
-                    </button>
-                  </h2>
-                  <div className="accordion-collapse collapse" id="collapseOne" aria-labelledby="headingOne" data-bs-parent="#accordionReportes">
-                    <div className="accordion-body pt-0 pb-3">
-                      <div className="ps-3 border-start border-3 border-primary mt-2">
-                        
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Seguridad Multi-Tenant</h6>
-                        <p className="fs--1 mb-3 text-600">Base de datos PostgreSQL en Supabase. Custom JWT Hook encriptado e inmutable. Middlewares en Laravel (VerifySupabaseToken, CheckPermission).</p>
-                        
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 2. Módulo de Permisología Integral</h6>
-                        <p className="fs--1 mb-3 text-600">Diseño de tablas modulares. API REST RolePermissionController. Matriz visual en React con switches dinámicos y protección a Super Admin.</p>
-                        
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 3. Optimización UI Falcon</h6>
-                        <p className="fs--1 mb-3 text-600">Manejo de estado global (Zustand). TopNav limpio sin búsqueda. Tema configurado a 'Collapsed', modo 'Card' y ancho 'Fluid'. Cierre de sesión seguro.</p>
-
-                        <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Sincronización Servidores</h6>
-                        <p className="fs--1 mb-0 text-600">Archivos .env estabilizados. Apache configurado (mindsoftia.conf y .htaccess) para convivir React y Laravel en la misma ruta sin conflictos.</p>
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Futuro reporte */}
-                <div className="accordion-item border-x-0">
-                  <h2 className="accordion-header" id="headingThree">
-                    <button className="accordion-button collapsed shadow-none text-500" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree" disabled>
-                      <span className="fas fa-hourglass-half me-2"></span> Próximos reportes se registrarán aquí...
-                    </button>
-                  </h2>
-                </div>
-
+                ))}
               </div>
-
             </div>
           </div>
         </div>
