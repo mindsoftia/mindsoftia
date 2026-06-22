@@ -220,6 +220,14 @@ function Sidebar() {
               })}
             </li>
           </ul>
+          
+          <div className="settings mb-3 px-3">
+            <div className="card shadow-none text-center p-3 bg-transparent border-0">
+              <img src="/logo.png" alt="Mindsoftia Logo" className="mx-auto mb-2" style={{ maxHeight: '45px', width: 'auto', filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.1))' }} />
+              <p className="fs--2 mt-2 mb-0 text-500 font-sans-serif fw-bold">Mindsoftia</p>
+            </div>
+          </div>
+          
         </div>
       </div>
     </nav>

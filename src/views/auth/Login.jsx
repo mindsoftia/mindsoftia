@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
+import Swal from 'sweetalert2';
 
 function Login() {
   const navigate  = useNavigate();
@@ -27,7 +28,28 @@ function Login() {
     setLoading(false);
 
     if (result.success) {
-      navigate('/');
+      Swal.fire({
+        html: `
+          <div class="d-flex flex-column align-items-center justify-content-center my-3">
+            <div class="preloader-content" style="width: 140px; height: 140px; margin: 0 auto;">
+              <div class="preloader-spinner" style="border-width: 3px;"></div>
+              <img src="/logo.png" alt="Mindsoftia" class="preloader-logo" style="width: 90px; margin-bottom: 0;" />
+            </div>
+            <h4 class="mt-4 mb-2 text-primary font-sans-serif fw-bold">Bienvenido a Mindsoftia</h4>
+            <span class="text-600" style="color: #9D4DFF !important">Preparando tu espacio de trabajo...</span>
+          </div>
+        `,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        background: 'transparent',
+        backdrop: 'rgba(11, 23, 39, 0.85)' // Un fondo oscuro elegante
+      });
+
+      setTimeout(() => {
+        Swal.close();
+        navigate('/');
+      }, 1500);
     } else {
       setError(result.error || 'Credenciales incorrectas. Inténtalo de nuevo.');
     }

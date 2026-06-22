@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
+// Updater PWA
+import UpdaterPWA from './components/common/UpdaterPWA';
+
 // Layouts
 import DashboardLayout from './layouts/DashboardLayout';
 
@@ -56,6 +59,7 @@ function App() {
 
   return (
     <Router>
+      <UpdaterPWA />
       <Routes>
 
         {/* ── Rutas Públicas ─────────────────────────────────────────── */}

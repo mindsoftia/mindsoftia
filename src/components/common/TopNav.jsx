@@ -15,16 +15,21 @@ function TopNav() {
     e.preventDefault();
     
     Swal.fire({
-      title: 'Saliendo de MINDSOFTIA',
-      html: '<span style="color: #9D4DFF">Cerrando sesión segura...</span>',
+      html: `
+        <div class="d-flex flex-column align-items-center justify-content-center my-3">
+          <div class="preloader-content" style="width: 140px; height: 140px; margin: 0 auto;">
+            <div class="preloader-spinner" style="border-width: 3px;"></div>
+            <img src="/logo.png" alt="Mindsoftia" class="preloader-logo" style="width: 90px; margin-bottom: 0;" />
+          </div>
+          <h4 class="mt-4 mb-2 text-primary font-sans-serif fw-bold">Mindsoftia</h4>
+          <span class="text-600" style="color: #9D4DFF !important">Cerrando sesión segura...</span>
+        </div>
+      `,
       allowOutsideClick: false,
       allowEscapeKey: false,
       showConfirmButton: false,
-      color: '#00B7FF',
-      backdrop: 'rgba(0, 183, 255, 0.15)', // Un fondo semi-transparente del color primario
-      didOpen: () => {
-        Swal.showLoading();
-      }
+      background: 'transparent',
+      backdrop: 'rgba(11, 23, 39, 0.85)' // Un fondo oscuro elegante
     });
 
     await logout();
