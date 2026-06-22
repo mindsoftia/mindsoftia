@@ -54,7 +54,10 @@ class VerifySupabaseToken
                 $empresaId = $decoded->app_metadata->empresa_id ?? $decoded->app_metadata->tenant_id ?? null;
             }
 
-            if (!$empresaId && !$request->is('api/onboarding')) {
+            $superAdmins = ['enbucaramangapp@gmail.com', 'amadomora@gmail.com'];
+            $isSuperAdmin = in_array($decoded->email ?? '', $superAdmins);
+
+            if (!$empresaId && !$isSuperAdmin && !$request->is('api/onboarding')) {
                 return response()->json([
                     'error'   => 'Acceso denegado',
                     'message' => 'El usuario no tiene una empresa asignada. Por favor completa el Onboarding.'
@@ -63,8 +66,12 @@ class VerifySupabaseToken
 
             $request->attributes->set('empresa_id', $empresaId);
 
-            // Extraer el rol del usuario si existe
-            $role = $decoded->app_metadata->role ?? 'asistente';
+            // Asignar rol
+            if ($isSuperAdmin) {
+                $role = 'admin';
+            } else {
+                $role = $decoded->app_metadata->role ?? 'asistente';
+            }
             $request->attributes->set('auth_role', $role);
 
         } catch (Exception $e) {

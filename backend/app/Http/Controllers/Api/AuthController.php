@@ -16,7 +16,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         $userId = $request->attributes->get('auth_user_id');
-        $tenantId = $request->attributes->get('tenant_id');
+        $tenantId = $request->attributes->get('empresa_id');
         $roleName = $request->attributes->get('auth_role');
 
         $permisos = [];
