@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import useAuthStore from '../../store/authStore';
 
 function Sidebar() {
   const location = useLocation();
-  
-  const menuItems = [
+  const { role } = useAuthStore();
+
+  const superAdminMenu = [
     {
       title: 'Dashboard y Analíticas',
       icon: 'fas fa-chart-pie',
@@ -15,22 +17,10 @@ function Sidebar() {
       icon: 'fas fa-building',
       id: 'empresasMenu',
       children: [
-        {
-          title: 'Directorio Global',
-          path: '/empresas/directorio'
-        },
-        {
-          title: 'Certificados DIAN (.p12)',
-          path: '/empresas/certificados'
-        },
-        {
-          title: 'Solicitudes de Alta',
-          path: '/empresas/solicitudes'
-        },
-        {
-          title: 'Métricas de Consumo',
-          path: '/empresas/metricas'
-        }
+        { title: 'Directorio Global', path: '/empresas/directorio' },
+        { title: 'Certificados DIAN (.p12)', path: '/empresas/certificados' },
+        { title: 'Solicitudes de Alta', path: '/empresas/solicitudes' },
+        { title: 'Métricas de Consumo', path: '/empresas/metricas' }
       ]
     },
     {
@@ -38,22 +28,10 @@ function Sidebar() {
       icon: 'fas fa-credit-card',
       id: 'billingMenu',
       children: [
-        {
-          title: 'Suscripciones Activas',
-          path: '/facturacion/suscripciones'
-        },
-        {
-          title: 'Planes y Precios',
-          path: '/facturacion/planes'
-        },
-        {
-          title: 'Historial de Pagos',
-          path: '/facturacion/historial'
-        },
-        {
-          title: 'Cupones y Descuentos',
-          path: '/facturacion/cupones'
-        }
+        { title: 'Suscripciones Activas', path: '/facturacion/suscripciones' },
+        { title: 'Planes y Precios', path: '/facturacion/planes' },
+        { title: 'Historial de Pagos', path: '/facturacion/historial' },
+        { title: 'Cupones y Descuentos', path: '/facturacion/cupones' }
       ]
     },
     {
@@ -71,18 +49,9 @@ function Sidebar() {
       icon: 'fas fa-cog',
       id: 'configuracionMenu',
       children: [
-        {
-          title: 'Ajustes Generales',
-          path: '/configuracion'
-        },
-        {
-          title: 'Integraciones Maestras',
-          path: '/integraciones'
-        },
-        {
-          title: 'Roles y Permisos',
-          path: '/permisos'
-        }
+        { title: 'Ajustes Generales', path: '/configuracion' },
+        { title: 'Integraciones Maestras', path: '/integraciones' },
+        { title: 'Roles y Permisos', path: '/permisos' }
       ]
     },
     {
@@ -91,6 +60,66 @@ function Sidebar() {
       path: '/roadmap'
     }
   ];
+
+  const tenantMenu = [
+    {
+      title: 'Tablero Gerencial',
+      icon: 'fas fa-chart-pie',
+      path: '/'
+    },
+    {
+      title: 'Ventas e Ingresos',
+      icon: 'fas fa-file-invoice-dollar',
+      id: 'ventasMenu',
+      children: [
+        { title: 'Facturación DIAN', path: '/ventas/facturas' },
+        { title: 'Cotizaciones', path: '/ventas/cotizaciones' },
+        { title: 'Cuentas por Cobrar', path: '/ventas/cartera' }
+      ]
+    },
+    {
+      title: 'Punto de Venta',
+      icon: 'fas fa-store',
+      path: '/pos'
+    },
+    {
+      title: 'Contactos',
+      icon: 'fas fa-users',
+      path: '/contactos'
+    },
+    {
+      title: 'Inventario',
+      icon: 'fas fa-boxes',
+      path: '/inventario'
+    },
+    {
+      title: 'Compras y Gastos',
+      icon: 'fas fa-shopping-cart',
+      path: '/compras'
+    },
+    {
+      title: 'Contabilidad',
+      icon: 'fas fa-book',
+      id: 'contabilidadMenu',
+      children: [
+        { title: 'Plan Único de Cuentas', path: '/contabilidad/puc' },
+        { title: 'Comprobantes', path: '/contabilidad/comprobantes' },
+        { title: 'Reportes Financieros', path: '/contabilidad/reportes' }
+      ]
+    },
+    {
+      title: 'Ajustes',
+      icon: 'fas fa-cog',
+      id: 'tenantConfig',
+      children: [
+        { title: 'Perfil de Empresa', path: '/ajustes/perfil' },
+        { title: 'Usuarios y Roles', path: '/ajustes/usuarios' }
+      ]
+    }
+  ];
+
+  // Si el rol es admin (Superadmin) cargamos su menú, de lo contrario cargamos el menú de la empresa inquilina.
+  const menuItems = role === 'admin' ? superAdminMenu : tenantMenu;
 
   const handleToggle = (e) => {
     e.preventDefault();
