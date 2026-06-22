@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ReactECharts from 'echarts-for-react';
+import RoadmapCalendar from '../components/widgets/RoadmapCalendar';
 
 function RoadmapDev() {
   const [activeTab, setActiveTab] = useState(1);
@@ -139,6 +140,12 @@ function RoadmapDev() {
               </h5>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="row g-3 mb-3">
+        <div className="col-12">
+          <RoadmapCalendar />
         </div>
       </div>
 
