@@ -4,7 +4,7 @@ import useAuthStore from '../../store/authStore';
 
 function Sidebar() {
   const location = useLocation();
-  const { role } = useAuthStore();
+  const { role, user } = useAuthStore();
 
   const superAdminMenu = [
     {
@@ -118,8 +118,12 @@ function Sidebar() {
     }
   ];
 
-  // Si el rol es admin (Superadmin) cargamos su menú, de lo contrario cargamos el menú de la empresa inquilina.
-  const menuItems = role === 'admin' ? superAdminMenu : tenantMenu;
+  // Si el rol es admin (Superadmin) o si es tu correo de propietario, cargamos su menú.
+  const isSuperAdmin = role === 'admin' || 
+                       user?.email === 'amadomora@gmail.com' || 
+                       user?.email === 'enbucaramangapp@gmail.com';
+
+  const menuItems = isSuperAdmin ? superAdminMenu : tenantMenu;
 
   const handleToggle = (e) => {
     e.preventDefault();
