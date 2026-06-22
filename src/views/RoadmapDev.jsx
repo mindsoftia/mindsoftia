@@ -2,30 +2,41 @@ import React, { useState } from 'react';
 import ReactECharts from 'echarts-for-react';
 
 function RoadmapDev() {
+  const [activeTab, setActiveTab] = useState(1);
   const [tasks, setTasks] = useState([
-    { id: 'todo-1', month: 1, text: 'Arquitectura de Datos (PostgreSQL, RLS multi-tenant)', checked: true },
-    { id: 'todo-2', month: 1, text: 'Accesos y Roles (Matriz de Permisología)', checked: true },
-    { id: 'todo-3', month: 1, text: 'Motor Transaccional (Carga del PUC y Partida Doble)', checked: false },
-    { id: 'todo-4', month: 2, text: 'Inventarios (Costo Promedio Ponderado en tiempo real)', checked: false },
-    { id: 'todo-5', month: 2, text: 'POS Expreso (Interfaz táctil y consecutivos)', checked: false, badge: 'Offline-first', badgeColor: 'success' },
-    { id: 'todo-6', month: 3, text: 'Emisión Electrónica (Generador XML UBL y firma digital)', checked: false },
-    { id: 'todo-7', month: 3, text: 'Contingencia Estatal (Colas asíncronas para caídas DIAN)', checked: false },
-    { id: 'todo-8', month: 3, text: 'Control de Efectivo (Módulo CxC/CxP y conciliación bancaria)', checked: false },
-    { id: 'todo-9', month: 4, text: 'Nómina Electrónica Legal', checked: false },
-    { id: 'todo-10', month: 4, text: 'Tributación (Borradores Retefuente, IVA, ICA e Inf. Exógena)', checked: false },
-    { id: 'todo-11', month: 4, text: 'Analítica e Indicadores NIIF (Liquidez, Rentabilidad, Endeudamiento)', checked: false },
-    { id: 'todo-12', month: 5, text: 'IA y Extracción (Integración NLP para lectura de facturas y sugerencia de gastos)', checked: false, badge: 'Semana 17', badgeColor: 'primary' },
-    { id: 'todo-13', month: 5, text: 'Habilitación Estatal (Superación de pruebas de validación oficial y notas a EE.FF)', checked: false, badge: 'Semana 18', badgeColor: 'primary' },
-    { id: 'todo-14', month: 5, text: 'APIs y Estrés (Apertura OpenAPI y pruebas de carga masiva en BD)', checked: false, badge: 'Semana 19', badgeColor: 'primary' },
-    { id: 'todo-15', month: 5, text: 'Despliegue Comercial (Paso a producción y activación de contadores)', checked: false, badge: 'Semana 20', badgeColor: 'success' }
+    // MES 1: Núcleo SaaS
+    { id: 'todo-1', month: 1, text: 'Autenticación y Multi-Tenancy (Multiempresa)', checked: true, detail: 'Refinar el Login, registro y selección de la empresa con la que el usuario va a operar.' },
+    { id: 'todo-2', month: 1, text: 'Gestión de Planes y Suscripciones', checked: true, detail: 'Configuración para que las empresas puedan elegir su plan SaaS y facturación interna.' },
+    { id: 'todo-3', month: 1, text: 'Dashboard Gerencial (BI)', checked: false, detail: 'Crear la pantalla principal con gráficos modernos mostrando indicadores clave (Ventas, Utilidad, Cartera).' },
+    
+    // MES 2: Facturación y POS
+    { id: 'todo-4', month: 2, text: 'Facturación Electrónica DIAN', checked: false, badge: 'Alta Prioridad', badgeColor: 'danger', detail: 'Formularios de creación de facturas, cotizaciones y notas de crédito con un flujo rápido e intuitivo.' },
+    { id: 'todo-5', month: 2, text: 'POS Cloud Offline-first', checked: false, badge: 'Offline', badgeColor: 'success', detail: 'Interfaz rápida para ventas de mostrador compatible con PWA sin internet.' },
+    { id: 'todo-6', month: 2, text: 'Cuentas por Cobrar (Cartera)', checked: false, detail: 'Tabla de control de cartera, riesgo de mora y recordatorios de pago automáticos.' },
+
+    // MES 3: Contabilidad Total
+    { id: 'todo-7', month: 3, text: 'Plan Único de Cuentas (PUC)', checked: false, badge: 'Core', badgeColor: 'primary', detail: 'Árbol contable dinámico, NIIF y centros de costos.' },
+    { id: 'todo-8', month: 3, text: 'Comprobantes y Asientos Contables', checked: false, detail: 'Pantalla de digitación contable optimizada para velocidad (atajos de teclado).' },
+    { id: 'todo-9', month: 3, text: 'Tesorero y Cuentas por Pagar', checked: false, detail: 'Gestión de bancos, caja chica, proveedores, y proyección de flujo de efectivo.' },
+    { id: 'todo-10', month: 3, text: 'Portal del Contador', checked: false, detail: 'Acceso especial y reportes oficiales (Balances, NIIF, Estados de Resultados).' },
+
+    // MES 4: Operaciones y RRHH
+    { id: 'todo-11', month: 4, text: 'Inventarios Inteligentes', checked: false, detail: 'Entradas, salidas, Kardex (Costo Promedio Ponderado), lotes y traslados.' },
+    { id: 'todo-12', month: 4, text: 'Nómina Electrónica DIAN', checked: false, detail: 'Liquidación automática, parafiscales, prestaciones y generación de desprendibles.' },
+    { id: 'todo-13', month: 4, text: 'Portal del Empleado y Docs', checked: false, detail: 'Área de autoservicio para el equipo y repositorio de gestión documental en la nube.' },
+
+    // MES 5: Revolución IA
+    { id: 'todo-14', month: 5, text: 'Analista Financiero IA', checked: false, badge: 'GTM', badgeColor: 'info', detail: 'Integrar un chat de IA para que el gerente pregunte en lenguaje natural por sus finanzas.' },
+    { id: 'todo-15', month: 5, text: 'Automatizaciones IA', checked: false, badge: 'Diferenciador', badgeColor: 'warning', detail: 'Sugerencias de compras, clasificación de gastos y predicción de cierre en CRM.' },
+    { id: 'todo-16', month: 5, text: 'Despliegue Comercial y QA', checked: false, detail: 'Paso a producción final y activación masiva de empresas y contadores.' }
   ]);
 
   const monthTitles = {
-    1: 'Mes 1: Cimiento Contable y Autenticación',
-    2: 'Mes 2: Ventas, Kardex y POS Offline',
-    3: 'Mes 3: Validación Fiscal y Control de Efectivo',
-    4: 'Mes 4: Nómina, Tributación y Analítica',
-    5: 'Mes 5: Inteligencia Artificial, Certificación y GTM'
+    1: 'Fase 1: Núcleo SaaS y Tablero Gerencial',
+    2: 'Fase 2: Facturación y Punto de Venta',
+    3: 'Fase 3: Contabilidad Total y Fiscal',
+    4: 'Fase 4: Operaciones y Recursos Humanos',
+    5: 'Fase 5: Inteligencia Artificial y GTM'
   };
 
   const handleCheck = (id) => {
@@ -158,54 +169,79 @@ function RoadmapDev() {
         {/* Columna 1: To-Do List */}
         <div className="col-lg-6">
           <div className="card h-100">
-            <div className="card-header bg-light d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">Ruta de Desarrollo</h5>
+            <div className="card-header bg-light d-flex justify-content-between align-items-center p-0">
+              <ul className="nav nav-tabs border-bottom-0 w-100" id="roadmapTab" role="tablist">
+                {monthsKeys.map((month) => (
+                  <li className="nav-item flex-1 text-center" role="presentation" key={month}>
+                    <button
+                      className={`nav-link w-100 fw-semi-bold ${activeTab === month ? 'active' : ''}`}
+                      id={`tab-mes-${month}`}
+                      type="button"
+                      role="tab"
+                      onClick={() => setActiveTab(month)}
+                      style={{ cursor: 'pointer', borderRadius: '0' }}
+                    >
+                      Mes {month}
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </div>
             <div className="card-body p-0 scrollbar" style={{ maxHeight: '500px', overflowY: 'auto' }}>
-              <div className="accordion" id="accordionRoadmap">
+              <div className="tab-content" id="roadmapTabContent">
                 {monthsKeys.map((month) => (
-                  <div key={month} className={`accordion-item border-x-0 ${month === 1 ? 'border-top-0' : ''} ${month === 5 ? 'border-bottom-0' : ''}`}>
-                    <h2 className="accordion-header" id={`headingMes${month}`}>
-                      <button 
-                        className={`accordion-button ${month !== 1 ? 'collapsed' : ''} shadow-none bg-light text-primary fw-bold`} 
-                        type="button" 
-                        data-bs-toggle="collapse" 
-                        data-bs-target={`#collapseMes${month}`} 
-                        aria-expanded={month === 1 ? "true" : "false"} 
-                        aria-controls={`collapseMes${month}`}
-                      >
-                        {monthTitles[month]}
-                      </button>
-                    </h2>
-                    <div 
-                      id={`collapseMes${month}`} 
-                      className={`accordion-collapse collapse ${month === 1 ? 'show' : ''}`} 
-                      aria-labelledby={`headingMes${month}`} 
-                      data-bs-parent="#accordionRoadmap"
-                    >
-                      <div className="accordion-body p-0">
-                        {tasks.filter(t => t.month === month).map((task, idx, arr) => (
-                          <div key={task.id} className={`d-flex align-items-center p-3 ${idx !== arr.length - 1 ? 'border-bottom border-200' : ''}`}>
-                            <div className="form-check mb-0 flex-1">
-                              <input 
-                                className="form-check-input" 
-                                type="checkbox" 
-                                id={task.id} 
-                                checked={task.checked}
-                                onChange={() => handleCheck(task.id)}
-                              />
-                              <label className="form-check-label mb-0 fw-semi-bold text-900 cursor-pointer" htmlFor={task.id}>
+                  <div 
+                    key={month} 
+                    className={`tab-pane fade ${activeTab === month ? 'show active' : ''}`} 
+                    id={`pane-mes-${month}`} 
+                    role="tabpanel"
+                  >
+                    <div className="p-3 bg-light border-bottom">
+                      <h6 className="mb-0 text-primary"><span className="fas fa-flag-checkered me-2"></span>{monthTitles[month]}</h6>
+                    </div>
+                    <div className="accordion" id={`accordion-mes-${month}`}>
+                      {tasks.filter(t => t.month === month).map((task) => (
+                        <div key={task.id} className="accordion-item border-x-0 border-top-0">
+                          <h2 className="accordion-header" id={`heading-${task.id}`}>
+                            <button 
+                              className="accordion-button collapsed shadow-none py-3" 
+                              type="button" 
+                              data-bs-toggle="collapse" 
+                              data-bs-target={`#collapse-${task.id}`} 
+                              aria-expanded="false" 
+                              aria-controls={`collapse-${task.id}`}
+                            >
+                              <div className="d-flex align-items-center w-100 pe-3">
+                                <input 
+                                  className="form-check-input me-3 mt-0" 
+                                  type="checkbox" 
+                                  checked={task.checked}
+                                  onChange={(e) => { e.stopPropagation(); handleCheck(task.id); }}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span className={`fw-semi-bold ${task.checked ? 'text-400 text-decoration-line-through' : 'text-900'}`}>
+                                  {task.text}
+                                </span>
                                 {task.badge && (
-                                  <span className={`badge badge-soft-${task.badgeColor || 'primary'} me-2`}>
+                                  <span className={`badge badge-soft-${task.badgeColor || 'primary'} ms-auto`}>
                                     {task.badge}
                                   </span>
                                 )}
-                                {task.text}
-                              </label>
+                              </div>
+                            </button>
+                          </h2>
+                          <div 
+                            id={`collapse-${task.id}`} 
+                            className="accordion-collapse collapse" 
+                            aria-labelledby={`heading-${task.id}`} 
+                            data-bs-parent={`#accordion-mes-${month}`}
+                          >
+                            <div className="accordion-body pt-0 pb-3 ps-5">
+                              <p className="mb-0 text-600 fs--1">{task.detail}</p>
                             </div>
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ))}
