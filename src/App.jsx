@@ -21,8 +21,10 @@ import Tenants    from './views/Tenants';
 import Users      from './views/Users';
 import Settings   from './views/Settings';
 import RolesPermissions from './views/RolesPermissions';
-import RoadmapDev from './views/RoadmapDev';
 import Modulos    from './views/Modulos';
+
+// Tenant Settings Views
+import UserRoles  from './views/tenant/settings/UserRoles';
 
 // Empresas Views
 import Certificados from './views/empresas/Certificados';
@@ -87,6 +89,9 @@ function App() {
           <Route path="configuracion" element={<Settings />} />
           <Route path="permisos"     element={<RolesPermissions />} />
           <Route path="roadmap"      element={<RoadmapDev />} />
+
+          {/* ── Ajustes Inquilino (Empresa) ────────────────────────── */}
+          <Route path="ajustes/usuarios" element={<UserRoles />} />
 
           {/* ── Facturación y Suscripciones ──────────────────────── */}
           <Route path="facturacion/suscripciones" element={<Suscripciones />} />
