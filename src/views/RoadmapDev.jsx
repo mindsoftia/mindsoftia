@@ -289,7 +289,36 @@ function RoadmapDev() {
                     <div className="accordion" id={`accordionReportes-${month}`}>
                       {month === 1 ? (
                         <>
-                          {/* Reporte Hoy: 19 de Junio 2026 */}
+                          {/* Reporte Hoy: 22 de Junio 2026 */}
+                          <div className="accordion-item border-top-0 border-x-0">
+                            <h2 className="accordion-header" id="heading22Jun">
+                              <button className="accordion-button shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse22Jun" aria-expanded="true" aria-controls="collapse22Jun">
+                                <span className="fas fa-check-circle text-success me-2"></span> Resumen de Avances: 22 Jun, 2026
+                              </button>
+                            </h2>
+                            <div className="accordion-collapse collapse show" id="collapse22Jun" aria-labelledby="heading22Jun" data-bs-parent={`#accordionReportes-${month}`}>
+                              <div className="accordion-body pt-0 pb-3 ps-5">
+                                <div className="border-start border-3 border-primary ps-3 mt-2">
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Flujo de Onboarding B2B Finalizado</h6>
+                                  <p className="fs--1 mb-3 text-600">Conexión exitosa del Wizard de Onboarding de React (Frontend) con el Controlador de Laravel (Backend). Cuando un nuevo inquilino se registra, el sistema inserta automáticamente su Empresa y vincula su ID de Supabase.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 2. Seguridad en Rutas y Bypass de Middleware</h6>
+                                  <p className="fs--1 mb-3 text-600">Actualización del Middleware `VerifySupabaseToken` para bloquear a los usuarios sin empresa asignada, redirigiéndolos forzosamente a la pantalla de Onboarding. Se creó una excepción en la ruta `/api/onboarding` para permitir el proceso de registro inicial.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 3. Aislamiento Estricto de Menús (Superadmin vs Inquilino)</h6>
+                                  <p className="fs--1 mb-3 text-600">Reingeniería del `Sidebar.jsx`. Se dividió la navegación: los dueños de Mindsoftia (`amadomora@gmail.com`) ven el panel SaaS (Gestión global, Suscripciones), y los inquilinos ven el ERP operativo (Ventas, Contabilidad, POS). Forzado estricto desde el Backend (rol `admin`).</p>
+
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Matriz de Permisos Interactiva (RBAC Tenant)</h6>
+                                  <p className="fs--1 mb-3 text-600">Creación del componente visual avanzado `UserRoles.jsx`. Las empresas ahora tienen un panel elegante para visualizar sus empleados y asignar switches tipo iOS para activar/desactivar el acceso a módulos específicos (Ventas, POS, Inventario) por rol.</p>
+
+                                  <h6 className="text-800 mb-1"><span className="fas fa-arrow-right text-warning me-1 fs--1"></span> Próximos Pasos (What's Next)</h6>
+                                  <p className="fs--1 mb-0 text-600">1. Desarrollar los endpoints en Laravel para que los switches de la matriz `UserRoles.jsx` guarden los permisos en la base de datos local (Tabla `cnf_rol_permisos`). <br/> 2. Reflejar estos permisos en los Claims (tokens) de Supabase para seguridad de última milla. <br/> 3. Iniciar el desarrollo del componente del Punto de Venta (POS).</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Reporte: 19 de Junio 2026 */}
                           <div className="accordion-item border-top-0 border-x-0">
                             <h2 className="accordion-header" id="headingToday">
                               <button className="accordion-button shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToday" aria-expanded="true" aria-controls="collapseToday">
