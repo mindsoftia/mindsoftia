@@ -41,6 +41,12 @@ class AuthController extends Controller
             }
         }
 
+        // Forzar rol de admin para los superadministradores por correo
+        $superAdmins = ['enbucaramangapp@gmail.com', 'amadomora@gmail.com'];
+        if (in_array($request->attributes->get('auth_user_email'), $superAdmins)) {
+            $roleName = 'admin';
+        }
+
         return response()->json([
             'user_id'      => $userId,
             'email'        => $request->attributes->get('auth_user_email'),
