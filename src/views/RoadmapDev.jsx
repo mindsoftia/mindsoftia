@@ -309,10 +309,7 @@ function RoadmapDev() {
                                   <p className="fs--1 mb-3 text-600">Reingeniería del `Sidebar.jsx`. Se dividió la navegación: los dueños de Mindsoftia (`amadomora@gmail.com`) ven el panel SaaS (Gestión global, Suscripciones), y los inquilinos ven el ERP operativo (Ventas, Contabilidad, POS). Forzado estricto desde el Backend (rol `admin`).</p>
 
                                   <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Matriz de Permisos Interactiva (RBAC Tenant)</h6>
-                                  <p className="fs--1 mb-3 text-600">Creación del componente visual avanzado `UserRoles.jsx`. Las empresas ahora tienen un panel elegante para visualizar sus empleados y asignar switches tipo iOS para activar/desactivar el acceso a módulos específicos (Ventas, POS, Inventario) por rol.</p>
-
-                                  <h6 className="text-800 mb-1"><span className="fas fa-arrow-right text-warning me-1 fs--1"></span> Próximos Pasos (What's Next)</h6>
-                                  <p className="fs--1 mb-0 text-600">1. Desarrollar los endpoints en Laravel para que los switches de la matriz `UserRoles.jsx` guarden los permisos en la base de datos local (Tabla `cnf_rol_permisos`). <br/> 2. Reflejar estos permisos en los Claims (tokens) de Supabase para seguridad de última milla. <br/> 3. Iniciar el desarrollo del componente del Punto de Venta (POS).</p>
+                                  <p className="fs--1 mb-0 text-600">Creación del componente visual avanzado `UserRoles.jsx`. Las empresas ahora tienen un panel elegante para visualizar sus empleados y asignar switches tipo iOS para activar/desactivar el acceso a módulos específicos (Ventas, POS, Inventario) por rol.</p>
                                 </div>
                               </div>
                             </div>
