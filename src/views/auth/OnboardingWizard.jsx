@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../../services/supabase';
 
 function OnboardingWizard() {
   const [step, setStep] = useState(1);
@@ -20,14 +21,48 @@ function OnboardingWizard() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFinish = (e) => {
+  const handleFinish = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simular llamada a la API de Laravel para crear el Tenant
-    setTimeout(() => {
+    
+    try {
+      // 1. Obtener la sesión activa de Supabase
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        throw new Error('No hay sesión activa. Por favor, inicia sesión primero.');
+      }
+
+      const token = session.access_token;
+      
+      // 2. Enviar los datos al Backend Laravel
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/onboarding`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Error al crear la empresa');
+      }
+
+      // Éxito: Simular un pequeño delay de UI para que el usuario vea el spinner de éxito
+      setTimeout(() => {
+        setIsLoading(false);
+        navigate('/');
+      }, 1500);
+
+    } catch (error) {
+      console.error('Onboarding Error:', error);
+      alert('Hubo un problema: ' + error.message);
       setIsLoading(false);
-      navigate('/');
-    }, 2500);
+    }
   };
 
   return (
