@@ -143,12 +143,6 @@ function RoadmapDev() {
         </div>
       </div>
 
-      <div className="row g-3 mb-3">
-        <div className="col-12">
-          <RoadmapCalendar />
-        </div>
-      </div>
-
       {/* Panel de Gráficas ECharts */}
       <div className="row g-3 mb-3">
         <div className="col-lg-6">
@@ -426,6 +420,12 @@ function RoadmapDev() {
           </div>
         </div>
 
+      </div>
+
+      <div className="row g-3 mb-3">
+        <div className="col-12">
+          <RoadmapCalendar />
+        </div>
       </div>
     </>
   );
