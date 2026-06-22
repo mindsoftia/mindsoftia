@@ -21,6 +21,7 @@ import Tenants    from './views/Tenants';
 import Users      from './views/Users';
 import Settings   from './views/Settings';
 import RolesPermissions from './views/RolesPermissions';
+import RoadmapDev from './views/RoadmapDev';
 import Modulos    from './views/Modulos';
 
 // Tenant Settings Views
