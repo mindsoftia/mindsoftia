@@ -29,6 +29,9 @@ Route::middleware(['supabase.auth'])->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
     });
 
+    // ── Onboarding / Setup de Tenant ────────────────────────────────────────
+    Route::post('/onboarding', [\App\Http\Controllers\OnboardingController::class, 'store']);
+
     // ── Módulo de Seguridad (Roles y Permisos) ──────────────────────────────
     // Protegido con el permiso 'seguridad.editar'
     Route::middleware(['permission:seguridad.editar'])->group(function () {

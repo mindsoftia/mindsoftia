@@ -54,10 +54,10 @@ class VerifySupabaseToken
                 $empresaId = $decoded->app_metadata->empresa_id ?? $decoded->app_metadata->tenant_id ?? null;
             }
 
-            if (!$empresaId) {
+            if (!$empresaId && !$request->is('api/onboarding')) {
                 return response()->json([
                     'error'   => 'Acceso denegado',
-                    'message' => 'El usuario no tiene una empresa asignada.'
+                    'message' => 'El usuario no tiene una empresa asignada. Por favor completa el Onboarding.'
                 ], 403);
             }
 
