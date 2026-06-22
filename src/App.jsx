@@ -13,6 +13,7 @@ import ProtectedRoute from './components/routes/ProtectedRoute';
 // Auth Views
 import Login    from './views/auth/Login';
 import Register from './views/auth/Register';
+import OnboardingWizard from './views/auth/OnboardingWizard';
 
 // Dashboard Views
 import Dashboard  from './views/Dashboard';
@@ -66,6 +67,7 @@ function App() {
         <Route path="/login"         element={<Login />} />
         <Route path="/register"      element={<Register />} />
         <Route path="/no-autorizado" element={<NoAutorizado />} />
+        <Route path="/onboarding"    element={<OnboardingWizard />} />
 
         {/* ── Rutas Privadas (requieren sesión) ──────────────────────── */}
         <Route
