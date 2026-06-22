@@ -54,7 +54,7 @@ class VerifySupabaseToken
                 $empresaId = $decoded->app_metadata->empresa_id ?? $decoded->app_metadata->tenant_id ?? null;
             }
 
-            $superAdmins = ['enbucaramangapp@gmail.com', 'amadomora@gmail.com'];
+            $superAdmins = ['amadomora@gmail.com'];
             $isSuperAdmin = in_array($decoded->email ?? '', $superAdmins);
 
             if (!$empresaId && !$isSuperAdmin && !$request->is('api/onboarding')) {

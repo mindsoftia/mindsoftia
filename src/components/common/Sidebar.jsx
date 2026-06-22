@@ -120,8 +120,7 @@ function Sidebar() {
 
   // Si el rol es admin (Superadmin) o si es tu correo de propietario, cargamos su menú.
   const isSuperAdmin = role === 'admin' || 
-                       user?.email === 'amadomora@gmail.com' || 
-                       user?.email === 'enbucaramangapp@gmail.com';
+                       user?.email === 'amadomora@gmail.com';
 
   const menuItems = isSuperAdmin ? superAdminMenu : tenantMenu;
 
