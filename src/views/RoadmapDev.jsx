@@ -309,7 +309,10 @@ function RoadmapDev() {
                                   <p className="fs--1 mb-3 text-600">Reingeniería del `Sidebar.jsx`. Se dividió la navegación: los dueños de Mindsoftia (`amadomora@gmail.com`) ven el panel SaaS (Gestión global, Suscripciones), y los inquilinos ven el ERP operativo (Ventas, Contabilidad, POS). Forzado estricto desde el Backend (rol `admin`).</p>
 
                                   <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 4. Matriz de Permisos Interactiva (RBAC Tenant)</h6>
-                                  <p className="fs--1 mb-0 text-600">Creación del componente visual avanzado `UserRoles.jsx`. Las empresas ahora tienen un panel elegante para visualizar sus empleados y asignar switches tipo iOS para activar/desactivar el acceso a módulos específicos (Ventas, POS, Inventario) por rol.</p>
+                                  <p className="fs--1 mb-3 text-600">Creación del componente visual avanzado `UserRoles.jsx`. Las empresas ahora tienen un panel elegante para visualizar sus empleados y asignar switches tipo iOS para activar/desactivar el acceso a módulos específicos (Ventas, POS, Inventario) por rol.</p>
+
+                                  <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 5. Transformación a PWA (Progressive Web App)</h6>
+                                  <p className="fs--1 mb-0 text-600">Configuración total de Service Workers y el Web App Manifest (`vite-plugin-pwa`). Mindsoftia ahora es instalable como una aplicación nativa en Windows, Mac, iOS y Android, permitiendo notificaciones push y uso del cache offline, preparándonos para el módulo POS sin conexión.</p>
                                 </div>
                               </div>
                             </div>
