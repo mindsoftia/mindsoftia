@@ -289,14 +289,43 @@ function RoadmapDev() {
                     <div className="accordion" id={`accordionReportes-${month}`}>
                       {month === 1 ? (
                         <>
+                          {/* Reporte: 23 de Junio 2026 */}
+                          <div className="accordion-item border-top-0 border-x-0">
+                            <h2 className="accordion-header" id="heading23Jun">
+                              <button className="accordion-button shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse23Jun" aria-expanded="true" aria-controls="collapse23Jun">
+                                <span className="fas fa-check-circle text-success me-2"></span> Resumen de Avances: 23 Jun, 2026
+                              </button>
+                            </h2>
+                            <div className="accordion-collapse collapse show" id="collapse23Jun" aria-labelledby="heading23Jun" data-bs-parent={`#accordionReportes-${month}`}>
+                              <div className="accordion-body pt-0 pb-3 ps-5">
+                                <div className="border-start border-3 border-primary ps-3 mt-2">
+                                  <h6 className="text-800 mb-1"><span className="fas fa-shield-alt text-success me-1 fs--1"></span> 1. Aislamiento Físico y RLS en Storage (Supabase)</h6>
+                                  <p className="fs--1 mb-3 text-600"><strong>Qué se hizo:</strong> Configuración de reglas estrictas a nivel de fila (RLS) en el bucket de Storage de Supabase.<br/><strong>Por qué:</strong> En un modelo SaaS Multi-Tenant, es crítico que la Empresa A jamás pueda acceder a los logos o documentos de la Empresa B. Al delegar esta seguridad al motor interno de Postgres, blindamos los datos desde su raíz sin depender exclusivamente del Frontend.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-key text-success me-1 fs--1"></span> 2. Inyección de JWT (tenant_id) vía Supabase Admin API</h6>
+                                  <p className="fs--1 mb-3 text-600"><strong>Qué se hizo:</strong> El controlador de Onboarding en Laravel ahora actualiza el `app_metadata` del usuario en Supabase, inyectándole el identificador de la empresa.<br/><strong>Por qué:</strong> Laravel actúa como director de orquesta. Al tener el ID de la empresa incrustado en el token JWT del usuario, todas las políticas RLS (tablas y archivos) saben automáticamente a quién pertenecen los datos en cada petición HTTP, lo que lo hace inviolable.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-cloud-upload-alt text-success me-1 fs--1"></span> 3. Servicio de Storage y Onboarding en Vivo</h6>
+                                  <p className="fs--1 mb-3 text-600"><strong>Qué se hizo:</strong> Creación del componente `StorageService` en React y su integración en el Wizard de Onboarding (para capturar el logotipo).<br/><strong>Por qué:</strong> Al forzar un refresco de la sesión JWT (`refreshSession`) inmediatamente tras registrar la empresa, el navegador del usuario "aprende" sus nuevos permisos, lo que le habilita para subir su primer archivo corporativo directo a la nube bajo su ruta privada.</p>
+
+                                  <h6 className="text-800 mb-1"><span className="fas fa-user-lock text-success me-1 fs--1"></span> 4. Seguridad de Sesión (PWA y Auto-Logout)</h6>
+                                  <p className="fs--1 mb-3 text-600"><strong>Qué se hizo:</strong> Migración de `localStorage` a `sessionStorage` para el cliente de Supabase y desarrollo de un Auto-Cierre tras 15 minutos de inactividad.<br/><strong>Por qué:</strong> Un ERP maneja la caja y los impuestos de un negocio. Si el gerente minimiza o cierra la PWA y deja su dispositivo expuesto, el sistema debe destruir la sesión o vigilar la inactividad como en el sector bancario, forzando a re-autenticar.</p>
+
+                                  <h6 className="text-800 mb-1"><span className="fas fa-chart-line text-success me-1 fs--1"></span> 5. Rediseño del Superadmin Dashboard (SaaS Control Center)</h6>
+                                  <p className="fs--1 mb-0 text-600"><strong>Qué se hizo:</strong> Transformación absoluta de `Dashboard.jsx` con métricas gerenciales (MRR, Churn, ARPU, Uso de Módulos, y Health Check API).<br/><strong>Por qué:</strong> La administración centralizada necesita tener una brújula en tiempo real para tomar decisiones. Ya no vemos plantillas estáticas; vemos la monetización (MRR), la retención (Churn) y el consumo real de nuestros servidores (Postgres, Storage).</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
                           {/* Reporte Hoy: 22 de Junio 2026 */}
                           <div className="accordion-item border-top-0 border-x-0">
                             <h2 className="accordion-header" id="heading22Jun">
-                              <button className="accordion-button shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse22Jun" aria-expanded="true" aria-controls="collapse22Jun">
+                              <button className="accordion-button collapsed shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse22Jun" aria-expanded="false" aria-controls="collapse22Jun">
                                 <span className="fas fa-check-circle text-success me-2"></span> Resumen de Avances: 22 Jun, 2026
                               </button>
                             </h2>
-                            <div className="accordion-collapse collapse show" id="collapse22Jun" aria-labelledby="heading22Jun" data-bs-parent={`#accordionReportes-${month}`}>
+                            <div className="accordion-collapse collapse" id="collapse22Jun" aria-labelledby="heading22Jun" data-bs-parent={`#accordionReportes-${month}`}>
                               <div className="accordion-body pt-0 pb-3 ps-5">
                                 <div className="border-start border-3 border-primary ps-3 mt-2">
                                   <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Flujo de Onboarding B2B Finalizado</h6>
