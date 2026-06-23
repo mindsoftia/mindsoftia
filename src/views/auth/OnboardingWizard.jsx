@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
+import { StorageService } from '../../services/storage.service';
 
 function OnboardingWizard() {
   const [step, setStep] = useState(1);
+  const [logoFile, setLogoFile] = useState(null);
   const [formData, setFormData] = useState({
     nombre: '',
     nit: '',
@@ -50,6 +52,19 @@ function OnboardingWizard() {
 
       if (!response.ok) {
         throw new Error(data.message || data.error || 'Error al crear la empresa');
+      }
+
+      // 3. Refrescar sesión en Supabase para descargar el nuevo token con el tenant_id
+      await supabase.auth.refreshSession();
+      const { data: { user } } = await supabase.auth.getUser();
+      const tenantId = user?.app_metadata?.tenant_id;
+
+      // 4. Subir el logo al Storage Seguro si el usuario seleccionó uno
+      if (logoFile && tenantId) {
+        const { error: uploadError } = await StorageService.uploadTenantFile(logoFile, tenantId, 'logos');
+        if (uploadError) {
+          console.warn('Aviso: El entorno se creó, pero falló la subida del logo.', uploadError);
+        }
       }
 
       // Éxito: Simular un pequeño delay de UI para que el usuario vea el spinner de éxito
@@ -161,6 +176,17 @@ function OnboardingWizard() {
                       placeholder="+57 300 000 0000" 
                       value={formData.telefono}
                       onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="mb-5">
+                    <label className="form-label" htmlFor="logo">Logotipo de la Empresa (Opcional)</label>
+                    <input 
+                      className="form-control form-control-lg" 
+                      id="logo" 
+                      type="file" 
+                      accept="image/*"
+                      onChange={(e) => setLogoFile(e.target.files[0])}
                     />
                   </div>
                   

@@ -218,63 +218,12 @@ Desprendibles
 Vacaciones
 Certificados laborales
 Solicitudes
-16. APP MÓVIL
-Funciones
-Facturar
-Aprobar pagos
-Consultar indicadores
-Gestionar clientes
 
-Android e iPhone.
-
-MODELO DE NEGOCIO
-PLAN EMPRENDEDOR
-Facturación electrónica
-POS
-Inventario básico
-PLAN PYME
-Contabilidad
-Facturación
-Nómina
-Inventario
-CRM
-PLAN EMPRESARIAL
-ERP completo
-BI
-IA
-Multiempresa
-API
-DIFERENCIADORES FRENTE A SIIGO, HELISA Y DATAICO
-Característica	MindSoftia
-ERP completo	✅
-Facturación electrónica	✅
-Nómina electrónica	✅
-Contabilidad avanzada	✅
-Inventario inteligente	✅
-CRM integrado	✅
-BI gerencial	✅
-IA integrada	✅
-Multiempresa	✅
-Multi sucursal	✅
-App móvil	✅
-API abierta	✅
-Automatización avanzada	✅
 SLOGAN CORPORATIVO
 Opción 1
 
 "MindSoftia: La inteligencia que impulsa tu empresa."
 
-Opción 2
-
-"Gestiona, automatiza y crece."
-
-Opción 3
-
-"Todo tu negocio. Una sola plataforma."
-
-Opción 4 (recomendada)
-
-"MindSoftia ERP Cloud: Más inteligencia, más control, más crecimiento."
 
 Conclusión Estratégica
 

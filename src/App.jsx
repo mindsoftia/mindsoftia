@@ -61,6 +61,38 @@ function App() {
     }
   }, []);
 
+  // Temporizador de inactividad para cierre de sesión automático (15 minutos)
+  useEffect(() => {
+    let timeoutId;
+    
+    const logoutUser = async () => {
+      try {
+        const { supabase } = await import('./services/supabase');
+        await supabase.auth.signOut();
+        window.location.href = '/login';
+      } catch (error) {
+        console.error("Error al cerrar sesión por inactividad", error);
+      }
+    };
+
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      // 15 minutos de inactividad = 900000 milisegundos
+      timeoutId = setTimeout(logoutUser, 900000); 
+    };
+
+    // Eventos que reinician el temporizador indicando que el usuario sigue ahí
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => document.addEventListener(event, resetTimer));
+    
+    resetTimer(); // Iniciar la primera vez
+
+    return () => {
+      clearTimeout(timeoutId);
+      events.forEach(event => document.removeEventListener(event, resetTimer));
+    };
+  }, []);
+
   return (
     <Router>
       <UpdaterPWA />

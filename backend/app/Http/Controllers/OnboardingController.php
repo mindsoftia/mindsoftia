@@ -57,8 +57,32 @@ class OnboardingController extends Controller
                 ]
             );
 
-            // TODO: En el futuro asignar rol (Ej: $user->assignRole('Propietario'))
-            // y actualizar el 'app_metadata' del JWT en Supabase con Admin API (si es necesario).
+            // 3. Inyectar el tenant_id en Supabase Auth (app_metadata)
+            // Esto es obligatorio para que las reglas de seguridad (RLS) en PostgreSQL y Storage funcionen.
+            $supabaseUrl = env('VITE_SUPABASE_URL', env('SUPABASE_URL'));
+            $serviceRoleKey = env('SUPABASE_SERVICE_ROLE_KEY');
+
+            if ($supabaseUrl && $serviceRoleKey) {
+                $response = \Illuminate\Support\Facades\Http::withHeaders([
+                    'apikey' => $serviceRoleKey,
+                    'Authorization' => 'Bearer ' . $serviceRoleKey,
+                    'Content-Type' => 'application/json'
+                ])->put($supabaseUrl . '/auth/v1/admin/users/' . $supabaseId, [
+                    'app_metadata' => [
+                        'tenant_id' => (string) $empresa->id,
+                        'role' => 'admin' // Opcional: para definir su rol principal
+                    ]
+                ]);
+
+                if ($response->failed()) {
+                    // Si falla Supabase, hacemos rollback de la empresa
+                    DB::rollBack();
+                    return response()->json([
+                        'error' => 'No se pudo vincular el entorno seguro en Supabase.',
+                        'details' => $response->body()
+                    ], 500);
+                }
+            }
 
             DB::commit();
 
