@@ -292,11 +292,11 @@ function RoadmapDev() {
                           {/* Reporte: 23 de Junio 2026 */}
                           <div className="accordion-item border-top-0 border-x-0">
                             <h2 className="accordion-header" id="heading23Jun">
-                              <button className="accordion-button shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse23Jun" aria-expanded="true" aria-controls="collapse23Jun">
+                              <button className="accordion-button collapsed shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse23Jun" aria-expanded="false" aria-controls="collapse23Jun">
                                 <span className="fas fa-check-circle text-success me-2"></span> Resumen de Avances: 23 Jun, 2026
                               </button>
                             </h2>
-                            <div className="accordion-collapse collapse show" id="collapse23Jun" aria-labelledby="heading23Jun" data-bs-parent={`#accordionReportes-${month}`}>
+                            <div className="accordion-collapse collapse" id="collapse23Jun" aria-labelledby="heading23Jun" data-bs-parent={`#accordionReportes-${month}`}>
                               <div className="accordion-body pt-0 pb-3 ps-5">
                                 <div className="border-start border-3 border-primary ps-3 mt-2">
                                   <h6 className="text-800 mb-1"><span className="fas fa-shield-alt text-success me-1 fs--1"></span> 1. Aislamiento Físico y RLS en Storage (Supabase)</h6>
@@ -350,11 +350,11 @@ function RoadmapDev() {
                           {/* Reporte: 19 de Junio 2026 */}
                           <div className="accordion-item border-top-0 border-x-0">
                             <h2 className="accordion-header" id="headingToday">
-                              <button className="accordion-button shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToday" aria-expanded="true" aria-controls="collapseToday">
+                              <button className="accordion-button collapsed shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseToday" aria-expanded="false" aria-controls="collapseToday">
                                 <span className="fas fa-check-circle text-success me-2"></span> Resumen de Avances: 19 Jun, 2026
                               </button>
                             </h2>
-                            <div className="accordion-collapse collapse show" id="collapseToday" aria-labelledby="headingToday" data-bs-parent={`#accordionReportes-${month}`}>
+                            <div className="accordion-collapse collapse" id="collapseToday" aria-labelledby="headingToday" data-bs-parent={`#accordionReportes-${month}`}>
                               <div className="accordion-body pt-0 pb-3 ps-5">
                                 <div className="border-start border-3 border-primary ps-3 mt-2">
                                   <h6 className="text-800 mb-1"><span className="fas fa-check-circle text-success me-1 fs--1"></span> 1. Arquitectura Superadmin (Multi-Tenant)</h6>
