@@ -189,7 +189,7 @@ function RoadmapDev() {
                 ))}
               </ul>
             </div>
-            <div className="card-body p-0 scrollbar" style={{ maxHeight: '500px', overflowY: 'auto' }}>
+            <div className="card-body p-0 scrollbar" style={{ maxHeight: '400px', overflowY: 'auto' }}>
               <div className="tab-content" id="roadmapTabContent">
                 {monthsKeys.map((month) => (
                   <div 
@@ -273,7 +273,7 @@ function RoadmapDev() {
                 ))}
               </ul>
             </div>
-            <div className="card-body p-0 scrollbar" style={{ maxHeight: '500px', overflowY: 'auto' }}>
+            <div className="card-body p-0 scrollbar" style={{ maxHeight: '400px', overflowY: 'auto' }}>
               <div className="tab-content" id="reportesTabContent">
                 {monthsKeys.map((month) => (
                   <div 
