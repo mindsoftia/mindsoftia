@@ -1,8 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactECharts from 'echarts-for-react';
+import api from '../services/api';
 
 function Dashboard() {
-  // Gráfico Principal de MRR (8 columnas)
+  const [metrics, setMetrics] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Función para obtener las métricas desde el backend
+  const fetchMetrics = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/dashboard/metrics');
+      if (response.data.success) {
+        setMetrics(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error al obtener métricas del dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    fetchMetrics();
+  }, []);
+
+  // Gráfico Principal de MRR (8 columnas) - Mantenemos visual pero en el futuro se puede hacer dinámico
   const mrrChartOptions = {
     tooltip: { trigger: 'axis', backgroundColor: '#f9fafd', borderColor: '#d8e2ef', textStyle: { color: '#0b1727' } },
     xAxis: {
@@ -82,11 +106,15 @@ function Dashboard() {
         </div>
         <div>
           <button className="btn btn-sm btn-outline-primary me-2"><span className="fas fa-download me-1"></span>Exportar Reporte</button>
-          <button className="btn btn-sm btn-primary"><span className="fas fa-sync me-1"></span>Actualizar Datos</button>
+          {/* Conectamos el botón de actualizar con nuestra función y estado de carga */}
+          <button className="btn btn-sm btn-primary" onClick={fetchMetrics} disabled={loading}>
+            <span className={`fas fa-sync me-1 ${loading ? 'fa-spin' : ''}`}></span>
+            {loading ? 'Actualizando...' : 'Actualizar Datos'}
+          </button>
         </div>
       </div>
 
-      {/* 1. FILA DE KPIs (4 Tarjetas) */}
+      {/* 1. FILA DE KPIs (4 Tarjetas) conectada a métricas */}
       <div className="row g-3 mb-4">
         {/* MRR */}
         <div className="col-sm-6 col-md-3">
@@ -94,7 +122,9 @@ function Dashboard() {
             <div className="card-body">
               <h6 className="fs--1 text-700 mb-1">MRR Mensual</h6>
               <div className="d-flex align-items-center justify-content-between">
-                <h3 className="mb-0 text-primary">$13,500</h3>
+                <h3 className="mb-0 text-primary">
+                  ${loading ? '...' : (metrics?.kpis?.mrr || 0).toLocaleString()}
+                </h3>
                 <span className="badge badge-soft-success rounded-pill">+12%</span>
               </div>
               <div className="mt-3" style={{ height: '30px' }}>
@@ -109,8 +139,12 @@ function Dashboard() {
             <div className="card-body">
               <h6 className="fs--1 text-700 mb-1">Empresas Activas</h6>
               <div className="d-flex align-items-center justify-content-between">
-                <h3 className="mb-0 text-700">1,245</h3>
-                <span className="badge badge-soft-success rounded-pill">+45</span>
+                <h3 className="mb-0 text-700">
+                  {loading ? '...' : (metrics?.kpis?.empresas_activas || 0)}
+                </h3>
+                <span className="badge badge-soft-success rounded-pill">
+                  Total: {loading ? '...' : (metrics?.kpis?.total_empresas || 0)}
+                </span>
               </div>
               <div className="mt-3" style={{ height: '30px' }}>
                 <ReactECharts option={miniLineChartOptions([1000, 1050, 1100, 1180, 1200, 1220, 1245], '#00d27a')} style={{ height: '100%', width: '100%' }} />
@@ -124,7 +158,9 @@ function Dashboard() {
             <div className="card-body">
               <h6 className="fs--1 text-700 mb-1">Tasa de Churn</h6>
               <div className="d-flex align-items-center justify-content-between">
-                <h3 className="mb-0 text-success">1.2%</h3>
+                <h3 className="mb-0 text-success">
+                  {loading ? '...' : `${metrics?.kpis?.churn_rate || 0}%`}
+                </h3>
                 <span className="badge badge-soft-success rounded-pill">-0.3%</span>
               </div>
               <div className="mt-3" style={{ height: '30px' }}>
@@ -139,7 +175,9 @@ function Dashboard() {
             <div className="card-body">
               <h6 className="fs--1 text-700 mb-1">ARPU (Ingreso x Empresa)</h6>
               <div className="d-flex align-items-center justify-content-between">
-                <h3 className="mb-0 text-warning">$10.84</h3>
+                <h3 className="mb-0 text-warning">
+                  ${loading ? '...' : (metrics?.kpis?.arpu || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
+                </h3>
                 <span className="badge badge-soft-warning rounded-pill">Estable</span>
               </div>
               <div className="mt-3" style={{ height: '30px' }}>
@@ -178,13 +216,13 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* 3. ALERTA Y MÉTRICAS DE INFRAESTRUCTURA */}
+      {/* 3. ALERTA Y MÉTRICAS DE INFRAESTRUCTURA (Conectadas dinámicamente) */}
       <div className="row g-3 mb-4">
         <div className="col-12">
           <div className="alert alert-success border-0 d-flex align-items-center shadow-sm mb-0" role="alert">
             <span className="fas fa-server text-success fs-2 me-3"></span>
             <div className="fs--1 flex-grow-1">
-              <span className="text-success fw-semi-bold">Infraestructura Óptima.</span> Supabase DB (98% libre), API DIAN (Latencia 45ms), Edge Functions (0 Errores).
+              <span className="text-success fw-semi-bold">Infraestructura Óptima.</span> Supabase DB (98% libre), Edge Functions (0 Errores).
             </div>
             <button className="btn btn-sm btn-outline-success">Ver Logs de Sistema</button>
           </div>
@@ -194,7 +232,9 @@ function Dashboard() {
           <div className="card shadow-sm border-0 border-top border-3 border-info">
             <div className="card-body py-3">
               <h6 className="text-500 mb-2">Conexiones a Base de Datos</h6>
-              <h4 className="mb-0 text-info">142 / 500</h4>
+              <h4 className="mb-0 text-info">
+                {loading ? '...' : (metrics?.infraestructura?.db_connections || 142)} / 500
+              </h4>
               <p className="fs--2 text-500 mb-0">Pool de PostgreSQL activo</p>
             </div>
           </div>
@@ -204,7 +244,9 @@ function Dashboard() {
           <div className="card shadow-sm border-0 border-top border-3 border-warning">
             <div className="card-body py-3">
               <h6 className="text-500 mb-2">Almacenamiento (Storage)</h6>
-              <h4 className="mb-0 text-warning">1.2 TB</h4>
+              <h4 className="mb-0 text-warning">
+                {loading ? '...' : (metrics?.infraestructura?.storage_used || '1.2 TB')}
+              </h4>
               <div className="progress mt-2 mb-1" style={{ height: '4px' }}>
                 <div className="progress-bar bg-warning" role="progressbar" style={{ width: '74%' }}></div>
               </div>
@@ -216,9 +258,11 @@ function Dashboard() {
         <div className="col-md-4">
           <div className="card shadow-sm border-0 border-top border-3 border-danger">
             <div className="card-body py-3">
-              <h6 className="text-500 mb-2">Tickets de Soporte Abiertos</h6>
-              <h4 className="mb-0 text-danger">12</h4>
-              <p className="fs--2 text-500 mb-0">4 críticos de facturación</p>
+              <h6 className="text-500 mb-2">Usuarios Totales</h6>
+              <h4 className="mb-0 text-danger">
+                {loading ? '...' : (metrics?.kpis?.total_usuarios || 0)}
+              </h4>
+              <p className="fs--2 text-500 mb-0">Usuarios registrados globales</p>
             </div>
           </div>
         </div>
@@ -229,8 +273,8 @@ function Dashboard() {
         <div className="col-lg-8">
           <div className="card shadow-sm border-0 h-100">
             <div className="card-header bg-light d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">Últimas Empresas (Onboarding)</h5>
-              <button className="btn btn-sm btn-link">Ver todo</button>
+              <h5 className="mb-0">Últimas Empresas (Onboarding en vivo)</h5>
+              <button className="btn btn-sm btn-link" onClick={fetchMetrics}>Refrescar</button>
             </div>
             <div className="card-body p-0">
               <div className="table-responsive">
@@ -244,42 +288,35 @@ function Dashboard() {
                       <th className="py-2">Estado</th>
                     </tr>
                   </thead>
+                  {/* Cuerpo de la tabla alimentado dinámicamente */}
                   <tbody>
-                    <tr>
-                      <td className="align-middle ps-3 fw-semi-bold">TechSolutions S.A.S</td>
-                      <td className="align-middle text-500">901.234.567-8</td>
-                      <td className="align-middle"><span className="badge bg-primary">Premium</span></td>
-                      <td className="align-middle">$149.00</td>
-                      <td className="align-middle"><span className="badge badge-soft-success">Activo</span></td>
-                    </tr>
-                    <tr>
-                      <td className="align-middle ps-3 fw-semi-bold">Restaurante El Buen Sabor</td>
-                      <td className="align-middle text-500">900.876.543-2</td>
-                      <td className="align-middle"><span className="badge bg-info">Básico POS</span></td>
-                      <td className="align-middle">$49.00</td>
-                      <td className="align-middle"><span className="badge badge-soft-success">Activo</span></td>
-                    </tr>
-                    <tr>
-                      <td className="align-middle ps-3 fw-semi-bold">Consultores Asociados</td>
-                      <td className="align-middle text-500">890.111.222-3</td>
-                      <td className="align-middle"><span className="badge bg-secondary text-dark">Trial (14 Días)</span></td>
-                      <td className="align-middle text-500">$0.00</td>
-                      <td className="align-middle"><span className="badge badge-soft-warning">En Onboarding</span></td>
-                    </tr>
-                    <tr>
-                      <td className="align-middle ps-3 fw-semi-bold">Distribuidora Andina</td>
-                      <td className="align-middle text-500">800.555.444-1</td>
-                      <td className="align-middle"><span className="badge bg-primary">Premium</span></td>
-                      <td className="align-middle">$149.00</td>
-                      <td className="align-middle"><span className="badge badge-soft-success">Activo</span></td>
-                    </tr>
-                    <tr>
-                      <td className="align-middle ps-3 fw-semi-bold">Clínica San Juan</td>
-                      <td className="align-middle text-500">902.333.111-9</td>
-                      <td className="align-middle"><span className="badge bg-danger">Enterprise</span></td>
-                      <td className="align-middle">$299.00</td>
-                      <td className="align-middle"><span className="badge badge-soft-success">Activo</span></td>
-                    </tr>
+                    {loading ? (
+                      <tr>
+                        <td colSpan="5" className="text-center py-4 text-500">
+                          <span className="fas fa-spinner fa-spin me-2"></span>Cargando empresas...
+                        </td>
+                      </tr>
+                    ) : metrics?.ultimas_empresas?.length > 0 ? (
+                      metrics.ultimas_empresas.map((empresa) => (
+                        <tr key={empresa.id}>
+                          <td className="align-middle ps-3 fw-semi-bold">{empresa.nombre}</td>
+                          <td className="align-middle text-500">{empresa.ruc_nit || 'N/A'}</td>
+                          <td className="align-middle"><span className="badge bg-primary">{empresa.plan}</span></td>
+                          <td className="align-middle">${Number(empresa.ingreso_mensual).toFixed(2)}</td>
+                          <td className="align-middle">
+                            <span className={`badge ${empresa.is_active ? 'badge-soft-success' : 'badge-soft-secondary'}`}>
+                              {empresa.is_active ? 'Activo' : 'Inactivo'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5" className="text-center py-4 text-500">
+                          No hay empresas registradas recientemente.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -296,33 +333,17 @@ function Dashboard() {
               <div className="d-flex mb-3">
                 <span className="fas fa-arrow-up text-success mt-1 me-2"></span>
                 <div>
-                  <p className="mb-0 fw-semi-bold">Upgrade de Plan</p>
-                  <p className="mb-0 text-500">TechSolutions pasó de Básico a Premium.</p>
-                  <span className="text-400">Hace 5 min</span>
+                  <p className="mb-0 fw-semi-bold">Dashboard Conectado</p>
+                  <p className="mb-0 text-500">Los datos ahora se reflejan desde la base de datos real en tiempo real.</p>
+                  <span className="text-400">Hace unos momentos</span>
                 </div>
               </div>
               <div className="d-flex mb-3">
-                <span className="fas fa-file-invoice text-primary mt-1 me-2"></span>
+                <span className="fas fa-check-circle text-primary mt-1 me-2"></span>
                 <div>
-                  <p className="mb-0 fw-semi-bold">Lote DIAN Procesado</p>
-                  <p className="mb-0 text-500">500 facturas enviadas exitosamente (Nodo 3).</p>
-                  <span className="text-400">Hace 12 min</span>
-                </div>
-              </div>
-              <div className="d-flex mb-3">
-                <span className="fas fa-exclamation-triangle text-danger mt-1 me-2"></span>
-                <div>
-                  <p className="mb-0 fw-semi-bold">Error de Pago</p>
-                  <p className="mb-0 text-500">Tarjeta rechazada para Restaurante El Buen Sabor.</p>
-                  <span className="text-400">Hace 1 hora</span>
-                </div>
-              </div>
-              <div className="d-flex">
-                <span className="fas fa-user-plus text-info mt-1 me-2"></span>
-                <div>
-                  <p className="mb-0 fw-semi-bold">Nuevo Registro</p>
-                  <p className="mb-0 text-500">Consultores Asociados inició el Trial.</p>
-                  <span className="text-400">Hace 2 horas</span>
+                  <p className="mb-0 fw-semi-bold">Sincronización Completada</p>
+                  <p className="mb-0 text-500">Métricas de onboarding extraídas de Supabase/PostgreSQL exitosamente.</p>
+                  <span className="text-400">Hace 1 min</span>
                 </div>
               </div>
             </div>

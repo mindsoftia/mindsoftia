@@ -50,6 +50,7 @@ Route::middleware(['supabase.auth'])->group(function () {
         // Route::apiResource('usuarios', UserController::class);
     });
 
-    // ── Superadmin (Gestión de Tenants) ────────────────────────────────────
+    // ── Superadmin (Gestión de Tenants y Dashboard) ────────────────────────────────────
+    Route::get('/dashboard/metrics', [\App\Http\Controllers\Api\DashboardController::class, 'getMetrics']);
     Route::apiResource('empresas', \App\Http\Controllers\EmpresaController::class);
 });

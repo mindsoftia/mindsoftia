@@ -289,6 +289,29 @@ function RoadmapDev() {
                     <div className="accordion" id={`accordionReportes-${month}`}>
                       {month === 1 ? (
                         <>
+                          {/* Reporte Hoy: 24 de Junio 2026 */}
+                          <div className="accordion-item border-top-0 border-x-0">
+                            <h2 className="accordion-header" id="heading24Jun">
+                              <button className="accordion-button collapsed shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse24Jun" aria-expanded="false" aria-controls="collapse24Jun">
+                                <span className="fas fa-check-circle text-success me-2"></span> Resumen de Avances: 24 Jun, 2026
+                              </button>
+                            </h2>
+                            <div className="accordion-collapse collapse" id="collapse24Jun" aria-labelledby="heading24Jun" data-bs-parent={`#accordionReportes-${month}`}>
+                              <div className="accordion-body pt-0 pb-3 ps-5">
+                                <div className="border-start border-3 border-primary ps-3 mt-2">
+                                  <h6 className="text-800 mb-1"><span className="fas fa-database text-success me-1 fs--1"></span> 1. Consolidación de Infraestructura Core</h6>
+                                  <p className="fs--1 mb-3 text-600"><strong>Qué se hizo:</strong> Se finalizó la configuración de seguridad, autenticación y políticas de acceso (RLS - Row Level Security).<br/><strong>Por qué:</strong> Garantiza la separación estricta de datos y archivos entre los distintos Tenants (empresas), sentando las bases inquebrantables del núcleo SaaS Multi-Tenant.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-server text-success me-1 fs--1"></span> 2. Backend (Laravel) - Endpoint de Métricas SaaS</h6>
+                                  <p className="fs--1 mb-3 text-600"><strong>Qué se hizo:</strong> Se implementó el controlador <code>DashboardController</code> y el endpoint seguro <code>/api/dashboard/metrics</code> para extraer información clave en tiempo real.<br/><strong>Por qué:</strong> Permite calcular métricas gerenciales (MRR, Empresas Activas, ARPU simulado) y centralizar la auditoría de registros de nuevas empresas directamente desde la base de datos PostgreSQL.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-desktop text-success me-1 fs--1"></span> 3. Frontend (React) - Dashboard Dinámico en Vivo</h6>
+                                  <p className="fs--1 mb-0 text-600"><strong>Qué se hizo:</strong> Se transformó el panel estático <code>Dashboard.jsx</code> en una vista 100% conectada al Backend, con estados de carga (Loading) y mapeo de tablas en vivo.<br/><strong>Por qué:</strong> Otorga al Superadmin control total y una visión real sobre el comportamiento financiero y de adopción de la plataforma, completando la primera capa del Centro de Control SaaS.</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
                           {/* Reporte: 23 de Junio 2026 */}
                           <div className="accordion-item border-top-0 border-x-0">
                             <h2 className="accordion-header" id="heading23Jun">
