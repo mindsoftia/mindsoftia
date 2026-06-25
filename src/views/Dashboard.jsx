@@ -291,7 +291,7 @@ function Dashboard() {
                   {/* Cuerpo de la tabla alimentado dinámicamente */}
                   <tbody>
                     {loading ? (
-                      <tr>
+                      <tr key="loading">
                         <td colSpan="5" className="text-center py-4 text-500">
                           <span className="fas fa-spinner fa-spin me-2"></span>Cargando empresas...
                         </td>
@@ -311,7 +311,7 @@ function Dashboard() {
                         </tr>
                       ))
                     ) : (
-                      <tr>
+                      <tr key="empty">
                         <td colSpan="5" className="text-center py-4 text-500">
                           No hay empresas registradas recientemente.
                         </td>
