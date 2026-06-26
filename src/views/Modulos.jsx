@@ -21,13 +21,13 @@ function Modulos() {
       active: true
     },
     {
-      id: 'inventario',
-      name: 'Inventario Inteligente',
+      id: 'comercial-pos',
+      name: 'Gestión Comercial & POS',
       category: 'ERP Mindsoftia',
-      description: 'Control de stock automatizado, sistema POS y gestión de múltiples bodegas.',
-      icon: 'fas fa-boxes',
+      description: 'Gestión de clientes (CRM), control de inventario, facturación POS y embudos de ventas integrados.',
+      icon: 'fas fa-store',
       color: 'success',
-      active: false
+      active: true
     },
     {
       id: 'contabilidad',
@@ -39,22 +39,22 @@ function Modulos() {
       active: true
     },
     {
-      id: 'crm',
-      name: 'CRM & Ventas',
-      category: 'Marketing',
-      description: 'Gestión avanzada de prospectos, pipelines comerciales y embudos de conversión.',
-      icon: 'fas fa-funnel-dollar',
-      color: 'danger',
+      id: 'ai-n8n',
+      name: 'Inteligencia Artificial',
+      category: 'Automatización',
+      description: 'Módulo de IA integrado con n8n para el procesamiento y orquestación de múltiples solicitudes.',
+      icon: 'fas fa-brain',
+      color: 'secondary',
       active: false
     },
     {
-      id: 'email',
-      name: 'Emailing & SMS',
-      category: 'Marketing',
-      description: 'Motor para campañas masivas de correo electrónico y mensajería de texto.',
-      icon: 'fas fa-envelope-open-text',
-      color: 'secondary',
-      active: false
+      id: 'knowledge-base',
+      name: 'Base de Conocimiento',
+      category: 'Soporte & Ayuda',
+      description: 'Plataforma de aprendizaje y manuales de usuario interactivos para dominar todas las herramientas del sistema.',
+      icon: 'fas fa-book-open',
+      color: 'info',
+      active: true
     }
   ]);
 
