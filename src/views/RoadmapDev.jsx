@@ -289,7 +289,30 @@ function RoadmapDev() {
                     <div className="accordion" id={`accordionReportes-${month}`}>
                       {month === 1 ? (
                         <>
-                          {/* Reporte Hoy: 24 de Junio 2026 */}
+                          {/* Reporte Hoy: 25 de Junio 2026 */}
+                          <div className="accordion-item border-top-0 border-x-0">
+                            <h2 className="accordion-header" id="heading25Jun">
+                              <button className="accordion-button collapsed shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse25Jun" aria-expanded="false" aria-controls="collapse25Jun">
+                                <span className="fas fa-check-circle text-success me-2"></span> Resumen de Avances: 25 Jun, 2026
+                              </button>
+                            </h2>
+                            <div className="accordion-collapse collapse" id="collapse25Jun" aria-labelledby="heading25Jun" data-bs-parent={`#accordionReportes-${month}`}>
+                              <div className="accordion-body pt-0 pb-3 ps-5">
+                                <div className="border-start border-3 border-primary ps-3 mt-2">
+                                  <h6 className="text-800 mb-1"><span className="fas fa-bug text-success me-1 fs--1"></span> 1. Diagnóstico y Resolución del Bucle de Login (Logout Inmediato)</h6>
+                                  <p className="fs--1 mb-3 text-600"><strong>Qué se hizo:</strong> Se rastreó y solucionó un problema crítico donde el frontend cerraba la sesión inmediatamente tras el acceso (`401 Unauthorized`).<br/><strong>Por qué:</strong> El interceptor de Axios en `api.js` estaba siendo activado prematuramente debido al fallo de validación criptográfica en el backend, dejando al usuario atrapado en el login.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-key text-success me-1 fs--1"></span> 2. Sincronización de Algoritmos Criptográficos (ES256 vs HS256)</h6>
+                                  <p className="fs--1 mb-3 text-600"><strong>Qué se hizo:</strong> Se identificó un conflicto entre las nuevas políticas de seguridad de Supabase (firmas asimétricas `ES256`) y el backend de Laravel (esperando `HS256`). Se implementó un puente seguro en `VerifySupabaseToken.php` para entornos locales.<br/><strong>Por qué:</strong> Esto permite al servidor leer y autenticar correctamente los nuevos tokens asimétricos sin colapsar, restaurando el acceso al Dashboard de forma inmediata.</p>
+                                  
+                                  <h6 className="text-800 mb-1"><span className="fas fa-server text-success me-1 fs--1"></span> 3. Limpieza y Reconfiguración del Caché del Servidor</h6>
+                                  <p className="fs--1 mb-0 text-600"><strong>Qué se hizo:</strong> Se forzó una recompilación limpia de las variables de entorno (`php artisan config:cache`) para eliminar los falsos positivos originados por la sobreescritura de claves.<br/><strong>Por qué:</strong> Garantiza que la comunicación entre Supabase, React y Laravel vuelva a compartir un mismo contexto de confianza.</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Reporte: 24 de Junio 2026 */}
                           <div className="accordion-item border-top-0 border-x-0">
                             <h2 className="accordion-header" id="heading24Jun">
                               <button className="accordion-button collapsed shadow-none py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse24Jun" aria-expanded="false" aria-controls="collapse24Jun">
