@@ -30,6 +30,10 @@ import UserRoles  from './views/tenant/settings/UserRoles';
 // Empresas Views
 import Certificados from './views/empresas/Certificados';
 
+// ── NexoPOS: Módulo POS e Inventario ────────────────────────────────
+import POSLayout      from './views/pos/POSLayout';
+import InventarioAdmin from './views/pos/InventarioAdmin';
+
 // Facturación Views
 import Suscripciones from './views/facturacion/Suscripciones';
 import Planes from './views/facturacion/Planes';
@@ -131,6 +135,10 @@ function App() {
           <Route path="facturacion/planes"        element={<Planes />} />
           <Route path="facturacion/historial"     element={<HistorialPagos />} />
           <Route path="facturacion/cupones"       element={<Cupones />} />
+
+          {/* ── NexoPOS: Punto de Venta e Inventario ───────────────── */}
+          <Route path="pos"        element={<POSLayout />} />
+          <Route path="inventario" element={<InventarioAdmin />} />
 
           {/* ── Fase A: Contabilidad (próximas semanas) ─────────────── */}
           {/* <Route path="contabilidad/puc"      element={<PucIndex />} /> */}

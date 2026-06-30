@@ -1,0 +1,102 @@
+/**
+ * pos.css — Estilos complementarios del POS para Falcon
+ * Solo ajustes mínimos que Bootstrap/Falcon no cubre nativamente.
+ * NO se usan colores propios ni dark mode.
+ */
+
+/* Grid de productos — scroll interno */
+.pos-productos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.6rem;
+  max-height: calc(100vh - 280px);
+  overflow-y: auto;
+  align-content: start;
+  padding-right: 0.25rem;
+}
+
+/* Scrollbar sutil */
+.pos-productos-grid::-webkit-scrollbar { width: 5px; }
+.pos-productos-grid::-webkit-scrollbar-track { background: transparent; }
+.pos-productos-grid::-webkit-scrollbar-thumb { background: #dee2e6; border-radius: 4px; }
+
+/* Tarjeta de producto — hover y click */
+.pos-producto-card {
+  cursor: pointer;
+  border: 1px solid #e3e6ea;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  text-align: left;
+  width: 100%;
+}
+
+.pos-producto-card:hover {
+  border-color: #2c7be5;
+  box-shadow: 0 2px 12px rgba(44, 123, 229, 0.15);
+}
+
+.pos-producto-card:active,
+.pos-producto-card.clicked {
+  transform: scale(0.97);
+  border-color: #00d27a;
+  background: #f0fff8;
+}
+
+.pos-producto-card:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Carrito — lista con scroll */
+.pos-carrito-lista {
+  max-height: calc(100vh - 420px);
+  overflow-y: auto;
+  min-height: 80px;
+}
+
+.pos-carrito-lista::-webkit-scrollbar { width: 5px; }
+.pos-carrito-lista::-webkit-scrollbar-thumb { background: #dee2e6; border-radius: 4px; }
+
+/* Item del carrito — animación al agregar */
+.pos-carrito-item {
+  transition: background 0.2s;
+}
+
+.pos-carrito-item.new-item {
+  animation: itemPop 0.3s ease;
+}
+
+@keyframes itemPop {
+  0%   { transform: scale(0.96); background: #d8f5e9; }
+  60%  { transform: scale(1.01); }
+  100% { transform: scale(1);    background: transparent; }
+}
+
+/* Botón cobrar */
+.pos-btn-cobrar {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: transform 0.1s;
+}
+
+.pos-btn-cobrar:active { transform: scale(0.98); }
+
+/* Total grande */
+.pos-total-valor {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #2c7be5;
+}
+
+/* Pantalla de éxito post-venta */
+.pos-exito {
+  animation: fadeInUp 0.35s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

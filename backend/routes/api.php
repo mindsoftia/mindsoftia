@@ -53,4 +53,14 @@ Route::middleware(['supabase.auth'])->group(function () {
     // ── Superadmin (Gestión de Tenants y Dashboard) ────────────────────────────────────
     Route::get('/dashboard/metrics', [\App\Http\Controllers\Api\DashboardController::class, 'getMetrics']);
     Route::apiResource('empresas', \App\Http\Controllers\EmpresaController::class);
+
+    // ── NexoPOS — Módulo Inventario Multisede (Paso 3) ─────────────────────────
+    Route::prefix('inventario')->group(function () {
+        // Stock consolidado o filtrado por sede: GET /api/inventario/stock?sede_id=UUID
+        Route::get('/stock', [\App\Http\Controllers\Api\InventarioController::class, 'stockConsolidado']);
+        // Traslado entre sedes: POST /api/inventario/traslados
+        Route::post('/traslados', [\App\Http\Controllers\Api\InventarioController::class, 'traslado']);
+        // Historial de movimientos: GET /api/inventario/kardex/{productoId}?sede_id=UUID
+        Route::get('/kardex/{productoId}', [\App\Http\Controllers\Api\InventarioController::class, 'kardex']);
+    });
 });

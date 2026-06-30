@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const RoadmapCalendar = () => {
-  const [selectedDay, setSelectedDay] = useState(26); // Default to latest logic/today
+  const [selectedDay, setSelectedDay] = useState(30); // Default to latest logic/today
 
   // Datos interactivos de los reportes diarios
     const dailyReports = {
@@ -49,6 +49,16 @@ const RoadmapCalendar = () => {
       { id: 1, title: 'Refactorización UI Roadmap', desc: '<strong>1. ¿Qué se hizo?:</strong> Ampliación a ancho completo (col-lg-12) y rediseño de ECharts (barras y porcentajes).<br/><strong>2. ¿Por qué?:</strong> El diseño anterior duplicaba información y no aprovechaba el espacio, viéndose muy básico.<br/><strong>3. ¿Para qué?:</strong> Para ofrecer una visualización premium que motive el seguimiento de las fases tácticas.' },
       { id: 2, title: 'Arquitectura DB Comercial (Fase 1)', desc: '<strong>1. ¿Qué se hizo?:</strong> Diseño SQL híbrido Helisa/Dataico, unificando clientes/proveedores en crm_terceros.<br/><strong>2. ¿Por qué?:</strong> Ante la DIAN un NIT es único; separarlos generaría problemas en medios magnéticos.<br/><strong>3. ¿Para qué?:</strong> Para que el POS asiente automáticamente la contabilidad sin afectar la escalabilidad NIIF.' },
       { id: 3, title: 'Despliegue de Migraciones en Nube', desc: '<strong>1. ¿Qué se hizo?:</strong> Resolución de tipado (BigInt vs UUID), actualización llaves GPG e inyección en Supabase.<br/><strong>2. ¿Por qué?:</strong> El backend (Laravel) no lograba traducir el modelo SQL a la base de datos remota.<br/><strong>3. ¿Para qué?:</strong> Para dejar estructuradas oficialmente las primeras tablas de producción del ERP.' }
+    ],
+    29: [
+      { id: 1, title: 'Estructura DB Híbrida', desc: '<strong>1. ¿Qué se hizo?:</strong> Diseño offline-first con llaves primarias UUID.<br/><strong>2. ¿Por qué?:</strong> Evita colisiones de IDs durante sincronización si múltiples cajas facturan offline.<br/><strong>3. ¿Para qué?:</strong> Para permitir a los clientes operar ininterrumpidamente sin conexión a internet.' },
+      { id: 2, title: 'Inventario Multisede', desc: '<strong>1. ¿Qué se hizo?:</strong> Migraciones para sedes, productos, kardex y lotes PEPS.<br/><strong>2. ¿Por qué?:</strong> El comercio moderno exige separar existencias por sucursales y bodegas físicas.<br/><strong>3. ¿Para qué?:</strong> Para trazar la cadena de suministros e implementar control de mermas.' },
+      { id: 3, title: 'Motor Contable NIIF', desc: '<strong>1. ¿Qué se hizo?:</strong> Implementación de `PosVentaObserver` para asentar partida doble automática.<br/><strong>2. ¿Por qué?:</strong> Desacopla la lógica pesada del POS; si la cuenta falla, la venta no se detiene.<br/><strong>3. ¿Para qué?:</strong> Para ahorrarle horas de digitación manual al contador del cliente.' }
+    ],
+    30: [
+      { id: 1, title: 'SuperAdmin: Gestión de Empresas y POS', desc: '<strong>1. ¿Qué se hizo?:</strong> Ahora el SuperAdmin puede crear empresas, visualizarlas en el directorio y asignarles dinámicamente el módulo POS.<br/><strong>2. ¿Por qué?:</strong> Es el flujo maestro de monetización SaaS (Pay-As-You-Go).<br/><strong>3. ¿Para qué?:</strong> Para que la empresa creada herede el acceso, el tenant pueda ver el módulo en su menú y operar la caja registradora directamente.' },
+      { id: 2, title: 'Motor Offline y Unificación UI', desc: '<strong>1. ¿Qué se hizo?:</strong> Configuración de `Dexie.js` (IndexedDB) y rediseño total del POS para eliminar el Dark Mode y adaptarlo a Falcon.<br/><strong>2. ¿Por qué?:</strong> El POS debe ser ultra rápido (sin red) pero verse como parte del mismo ecosistema corporativo.<br/><strong>3. ¿Para qué?:</strong> Para cobrar en 5 milisegundos reales brindando una UX premium, limpia y coherente.' },
+      { id: 3, title: 'Hito: Despliegue de Abastecimiento', desc: '<strong>1. ¿Qué se hizo?:</strong> Al tener la caja operativa, se marca el punto de inicio para el ecosistema de suministros.<br/><strong>2. ¿Por qué?:</strong> Una caja no puede funcionar a largo plazo sin alimentar su stock y pagar sus facturas.<br/><strong>3. Próximos pasos:</strong> Catálogo de Productos, Inventario/Kardex, Gestión de Proveedores, Compras/Gastos y Reportes Z.' }
     ]
   };
 

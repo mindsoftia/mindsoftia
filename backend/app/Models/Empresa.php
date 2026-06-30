@@ -18,6 +18,19 @@ class Empresa extends Model
         'email',
         'telefono',
         'is_active',
+        // Módulos premium
+        'modulo_facturacion_electronica',
+        'modulo_nomina',
+        'modulo_pos_inventario',
+        'modulo_ia_copiloto',
+    ];
+
+    protected $casts = [
+        'is_active'                      => 'boolean',
+        'modulo_facturacion_electronica' => 'boolean',
+        'modulo_nomina'                  => 'boolean',
+        'modulo_pos_inventario'          => 'boolean',
+        'modulo_ia_copiloto'             => 'boolean',
     ];
 
     public function users()

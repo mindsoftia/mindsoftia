@@ -21,6 +21,11 @@ class EmpresaController extends Controller
             'email'      => 'nullable|email|max:255',
             'telefono'   => 'nullable|string|max:20',
             'is_active'  => 'boolean',
+            // Módulos premium
+            'modulo_facturacion_electronica' => 'boolean',
+            'modulo_nomina'                  => 'boolean',
+            'modulo_pos_inventario'          => 'boolean',
+            'modulo_ia_copiloto'             => 'boolean',
         ]);
 
         $empresa = Empresa::create($validated);
@@ -41,6 +46,11 @@ class EmpresaController extends Controller
             'email'      => 'nullable|email|max:255',
             'telefono'   => 'nullable|string|max:20',
             'is_active'  => 'boolean',
+            // Módulos premium
+            'modulo_facturacion_electronica' => 'boolean',
+            'modulo_nomina'                  => 'boolean',
+            'modulo_pos_inventario'          => 'boolean',
+            'modulo_ia_copiloto'             => 'boolean',
         ]);
 
         $empresa->update($validated);
