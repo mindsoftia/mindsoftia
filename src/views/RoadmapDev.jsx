@@ -8,9 +8,9 @@ function RoadmapDev() {
   const [tasks, setTasks] = useState([
     // MES 1: Núcleo SaaS & Fase 1
     { id: 'todo-1', month: 1, text: 'Núcleo SaaS (Multi-Tenancy y Seguridad)', checked: true, detail: 'Autenticación Supabase, protección de rutas, RBAC y aislamiento RLS.' },
-    { id: 'todo-2', month: 1, text: 'Maestros CRM y Proveedores (Fase 1)', checked: false, detail: 'CRUD completo para la creación de Clientes y Proveedores.' },
-    { id: 'todo-3', month: 1, text: 'Inventario Inteligente (Fase 1)', checked: false, detail: 'Catálogo de productos, control de stock multibodega, costeo e impuestos.' },
-    { id: 'todo-pos', month: 1, text: 'Punto de Venta POS (Fase 1)', checked: false, badge: 'Core', badgeColor: 'primary', detail: 'Interfaz Offline-first orientada a la venta rápida, conexión con lectores y generación de tickets.' },
+    { id: 'todo-2', month: 1, text: 'Maestros CRM y Proveedores (Fase 1)', checked: true, detail: 'CRUD completo para la creación de Clientes y Proveedores.' },
+    { id: 'todo-3', month: 1, text: 'Inventario Inteligente (Fase 1)', checked: true, detail: 'Catálogo de productos, control de stock multibodega, costeo e impuestos.' },
+    { id: 'todo-pos', month: 1, text: 'Punto de Venta POS (Fase 1)', checked: true, badge: 'Core', badgeColor: 'primary', detail: 'Interfaz Offline-first orientada a la venta rápida, conexión con lectores y generación de tickets.' },
     
     // MES 2: Fase 2
     { id: 'todo-4', month: 2, text: 'Plan Único de Cuentas PUC (Fase 2)', checked: false, badge: 'Finanzas', badgeColor: 'success', detail: 'Árbol dinámico de cuentas bajo normativas NIIF para Colombia.' },
