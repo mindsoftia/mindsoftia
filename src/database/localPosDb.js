@@ -12,7 +12,7 @@ posDB.version(1).stores({
   ventas_items:    'id, venta_id, producto_id',
   // Cachés locales (se sincronizan desde la nube al iniciar)
   productos_cache: 'id, codigo_barras, nombre, empresa_id',
-  clientes_cache:  'id, numero_documento, nombre',
+  terceros_cache:  'id, numero_identificacion, razon_social, nombres, apellidos, es_cliente, es_proveedor',
 });
 
 /**

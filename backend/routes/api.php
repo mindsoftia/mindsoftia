@@ -42,7 +42,7 @@ Route::middleware(['supabase.auth'])->group(function () {
 
     // ── Contabilidad (Fase A) ────────────────────────────────────────────────
     // Route::apiResource('puc', PucAccountController::class);
-    // Route::apiResource('terceros', TerceroController::class);
+    Route::apiResource('terceros', \App\Http\Controllers\Api\TerceroController::class);
     // Route::apiResource('asientos', AsientoController::class);
 
     // ── Solo Admins ─────────────────────────────────────────────────────────
@@ -56,11 +56,19 @@ Route::middleware(['supabase.auth'])->group(function () {
 
     // ── NexoPOS — Módulo Inventario Multisede (Paso 3) ─────────────────────────
     Route::prefix('inventario')->group(function () {
+        Route::apiResource('productos', \App\Http\Controllers\Api\InvProductoController::class);
         // Stock consolidado o filtrado por sede: GET /api/inventario/stock?sede_id=UUID
         Route::get('/stock', [\App\Http\Controllers\Api\InventarioController::class, 'stockConsolidado']);
+        // Ajuste de stock manual o entrada por compra: POST /api/inventario/ajuste
+        Route::post('/ajuste', [\App\Http\Controllers\Api\InventarioController::class, 'ajuste']);
         // Traslado entre sedes: POST /api/inventario/traslados
         Route::post('/traslados', [\App\Http\Controllers\Api\InventarioController::class, 'traslado']);
         // Historial de movimientos: GET /api/inventario/kardex/{productoId}?sede_id=UUID
         Route::get('/kardex/{productoId}', [\App\Http\Controllers\Api\InventarioController::class, 'kardex']);
+    });
+
+    // ── NexoPOS — Punto de Venta ─────────────────────────
+    Route::prefix('pos')->group(function () {
+        Route::post('/sync', [\App\Http\Controllers\Api\PosVentaController::class, 'sync']);
     });
 });

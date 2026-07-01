@@ -153,6 +153,94 @@ class InventarioController extends Controller
     }
 
     // ════════════════════════════════════════════════════
+    // 2.5 AJUSTE DE STOCK (Entradas por Compra / Ajustes manuales)
+    // POST /api/inventario/ajuste
+    // ════════════════════════════════════════════════════
+    public function ajuste(Request $request)
+    {
+        $request->validate([
+            'producto_id'      => 'required|uuid|exists:inv_productos,id',
+            'sede_id'          => 'required|uuid|exists:inv_sedes,id',
+            'cantidad'         => 'required|numeric|not_in:0',
+            'costo_unitario'   => 'nullable|numeric|min:0',
+            'documento_tipo'   => 'required|string|max:50', // ej. 'compra', 'ajuste_manual'
+            'observacion'      => 'nullable|string|max:500',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $productoId  = $request->producto_id;
+            $sedeId      = $request->sede_id;
+            $cantidad    = $request->cantidad;
+            $usuarioId   = auth()->id();
+            $documentoId = Str::uuid()->toString();
+
+            $producto = InvProducto::findOrFail($productoId);
+            $costoUnitario = $request->costo_unitario ?? $producto->costo_promedio;
+
+            // Bloqueamos el stock actual de la sede
+            $stockSede = InvStockSede::where('producto_id', $productoId)
+                ->where('sede_id', $sedeId)
+                ->lockForUpdate()
+                ->first();
+
+            $stockActual = $stockSede ? $stockSede->cantidad : 0;
+            
+            // Validar si es una salida y hay suficiente stock
+            if ($cantidad < 0 && $stockActual < abs($cantidad)) {
+                DB::rollBack();
+                return response()->json([
+                    'error' => 'Stock insuficiente para realizar el ajuste de salida.',
+                    'stock_disponible' => $stockActual
+                ], 422);
+            }
+
+            // Actualizar o crear stock
+            if ($stockSede) {
+                // Cannot use increment on decimal fields effectively in some cases, so we do manual
+                $stockSede->cantidad = $stockSede->cantidad + $cantidad;
+                $stockSede->save();
+                $stockResultante = $stockSede->cantidad;
+            } else {
+                $stockSede = InvStockSede::create([
+                    'producto_id' => $productoId,
+                    'sede_id'     => $sedeId,
+                    'cantidad'    => $cantidad
+                ]);
+                $stockResultante = $stockSede->cantidad;
+            }
+
+            // Registrar Kardex
+            $tipoMovimiento = $cantidad > 0 ? 'ENTRADA' : 'SALIDA';
+
+            InvKardex::create([
+                'producto_id'      => $productoId,
+                'sede_id'          => $sedeId,
+                'tipo_movimiento'  => $tipoMovimiento,
+                'cantidad'         => abs($cantidad), // Siempre positivo en el registro
+                'costo_unitario'   => $costoUnitario,
+                'costo_total'      => $costoUnitario * abs($cantidad),
+                'stock_resultante' => $stockResultante,
+                'documento_tipo'   => $request->documento_tipo,
+                'documento_id'     => $documentoId,
+                'observacion'      => $request->observacion,
+                'usuario_id'       => $usuarioId,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'message'     => 'Ajuste de inventario ejecutado correctamente.',
+                'stock_nuevo' => $stockResultante,
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    // ════════════════════════════════════════════════════
     // 3. CONSULTA DE KARDEX (Historial de movimientos)
     // GET /api/inventario/kardex/{productoId}?sede_id=UUID
     // ════════════════════════════════════════════════════

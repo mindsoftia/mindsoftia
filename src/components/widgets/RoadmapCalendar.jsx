@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const RoadmapCalendar = () => {
-  const [selectedDay, setSelectedDay] = useState(30); // Default to latest logic/today
+  const [selectedDay, setSelectedDay] = useState(31); // Default to latest logic/today
 
   // Datos interactivos de los reportes diarios
     const dailyReports = {
@@ -59,6 +59,11 @@ const RoadmapCalendar = () => {
       { id: 1, title: 'SuperAdmin: Gestión de Empresas y POS', desc: '<strong>1. ¿Qué se hizo?:</strong> Ahora el SuperAdmin puede crear empresas, visualizarlas en el directorio y asignarles dinámicamente el módulo POS.<br/><strong>2. ¿Por qué?:</strong> Es el flujo maestro de monetización SaaS (Pay-As-You-Go).<br/><strong>3. ¿Para qué?:</strong> Para que la empresa creada herede el acceso, el tenant pueda ver el módulo en su menú y operar la caja registradora directamente.' },
       { id: 2, title: 'Motor Offline y Unificación UI', desc: '<strong>1. ¿Qué se hizo?:</strong> Configuración de `Dexie.js` (IndexedDB) y rediseño total del POS para eliminar el Dark Mode y adaptarlo a Falcon.<br/><strong>2. ¿Por qué?:</strong> El POS debe ser ultra rápido (sin red) pero verse como parte del mismo ecosistema corporativo.<br/><strong>3. ¿Para qué?:</strong> Para cobrar en 5 milisegundos reales brindando una UX premium, limpia y coherente.' },
       { id: 3, title: 'Hito: Despliegue de Abastecimiento', desc: '<strong>1. ¿Qué se hizo?:</strong> Al tener la caja operativa, se marca el punto de inicio para el ecosistema de suministros.<br/><strong>2. ¿Por qué?:</strong> Una caja no puede funcionar a largo plazo sin alimentar su stock y pagar sus facturas.<br/><strong>3. Próximos pasos:</strong> Catálogo de Productos, Inventario/Kardex, Gestión de Proveedores, Compras/Gastos y Reportes Z.' }
+    ],
+    31: [
+      { id: 1, title: 'Menú de Inventario y Catálogo (UX/UI)', desc: '<strong>1. ¿Qué se hizo?:</strong> Se diseñaron las pantallas del menú de Inventario y se enlazaron los catálogos de productos y clientes. Ahora todo se guarda temporalmente en el navegador del usuario.<br/><strong>2. ¿Por qué?:</strong> Para que el cajero o supervisor pueda ver y buscar productos al instante, sin tiempos de carga por lentitud del internet.<br/><strong>3. ¿Para qué?:</strong> Para garantizar que la operación de la tienda nunca se detenga y la atención al cliente sea fluida.' },
+      { id: 2, title: 'Seguridad y Precisión de Stock (Kardex)', desc: '<strong>1. ¿Qué se hizo?:</strong> Se creó un "candado" virtual en el sistema para que cuando se venda o ajuste un producto, el descuento del inventario sea exacto y genere un recibo interno (Kardex).<br/><strong>2. ¿Por qué?:</strong> Si dos cajeros venden el último artículo al mismo tiempo, el sistema debe asignar la venta al primero y avisar al segundo.<br/><strong>3. ¿Para qué?:</strong> Para que los reportes de inventario que revisa el supervisor cuadren a la perfección, evitando pérdidas fantasma.' },
+      { id: 3, title: 'Interfaz POS Offline y Sincronización', desc: '<strong>1. ¿Qué se hizo?:</strong> Se construyó la vista completa de la Caja Registradora (POS) con un indicador visual de conexión. Si el internet se cae, el cajero sigue cobrando y un proceso invisible sube las ventas cuando la red vuelve.<br/><strong>2. ¿Por qué?:</strong> El usuario (cajero) no debe ser bloqueado por problemas de red, manteniendo la fila avanzando.<br/><strong>3. ¿Para qué?:</strong> Para brindar una experiencia de usuario (UX) premium, donde el supervisor tiene la tranquilidad de que ninguna venta se pierde.' }
     ]
   };
 
@@ -78,17 +83,17 @@ const RoadmapCalendar = () => {
       if (day === 16) baseClass += " border border-success rounded-start-pill border-end-0";
       else if (day >= 17 && day <= 21) baseClass += " border border-success border-start-0 border-end-0";
       else if (day === 22) baseClass += " border border-success border-start-0 rounded-end-pill";
-    } else if (day >= 23 && day <= 30) {
+    } else if (day >= 23 && day <= 31) {
       baseClass += " bg-soft-warning";
       if (day === 23) baseClass += " rounded-start-pill";
-      if (day === 30) baseClass += " rounded-end-pill";
+      if (day === 31) baseClass += " rounded-end-pill";
     }
 
     if (day === selectedDay) {
        return (
          <div key={`day-${day}`} style={{ width: '14%', cursor: 'pointer' }} className="d-flex justify-content-center" onClick={() => setSelectedDay(day)}>
             <div className="py-2 bg-primary text-white rounded-circle shadow-sm d-flex align-items-center justify-content-center fw-bold" style={{ width: '32px', height: '32px' }}>
-              {day}
+              {day === 31 ? 1 : day}
             </div>
          </div>
        );
@@ -102,7 +107,7 @@ const RoadmapCalendar = () => {
         onClick={() => hasReport && setSelectedDay(day)}
         title={hasReport ? "Ver reporte diario" : ""}
       >
-        {day}
+        {day === 31 ? 1 : day}
         {hasReport && <span className="position-absolute top-0 start-50 translate-middle p-1 bg-danger border border-light rounded-circle" style={{ width: '8px', height: '8px' }}></span>}
       </div>
     );
@@ -136,11 +141,10 @@ const RoadmapCalendar = () => {
                 {/* 31 May */}
                 <div className="text-400 py-2" style={{ width: '14%' }}>31</div>
                 
-                {/* Days 1 to 30 */}
-                {[...Array(30)].map((_, i) => renderDay(i + 1))}
+                {/* Days 1 to 31 */}
+                {[...Array(31)].map((_, i) => renderDay(i + 1))}
 
                 {/* Next month days */}
-                <div className="py-2 text-400" style={{ width: '14%' }}>1</div>
                 <div className="py-2 text-400" style={{ width: '14%' }}>2</div>
                 <div className="py-2 text-400" style={{ width: '14%' }}>3</div>
                 <div className="py-2 text-400" style={{ width: '14%' }}>4</div>
@@ -152,9 +156,9 @@ const RoadmapCalendar = () => {
           </div>
           <div className="col-md-6">
             <div className="p-3 h-100 d-flex flex-column bg-light">
-              <h4 className="mb-0 text-800 text-primary">Junio 2026</h4>
+              <h4 className="mb-0 text-800 text-primary">{selectedDay === 31 ? 'Julio 2026' : 'Junio 2026'}</h4>
               <p className="fs--1 text-500 mb-4 fw-semi-bold">
-                Reporte del {selectedDay} de Junio
+                Reporte del {selectedDay === 31 ? '1 de Julio' : `${selectedDay} de Junio`}
               </p>
               
               <div className="flex-1 overflow-auto pe-2 scrollbar" style={{ maxHeight: '270px' }}>

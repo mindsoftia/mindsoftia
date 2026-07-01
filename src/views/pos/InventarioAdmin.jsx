@@ -2,11 +2,24 @@
  * InventarioAdmin.jsx — Panel administrativo del módulo Inventario.
  * Muestra el stock por sede, alertas y acceso al kardex.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { useInventario } from '../../hooks/useInventario';
+import { posSyncService } from '../../services/posSyncService';
 
 export default function InventarioAdmin() {
   const { productos, alertas, cargando, error, cargarStock } = useInventario();
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleOfflineSync = async () => {
+    setIsSyncing(true);
+    const success = await posSyncService.syncMasterData();
+    setIsSyncing(false);
+    if (success) {
+      alert('Sincronización a la caja local completada.');
+    } else {
+      alert('Error en la sincronización local.');
+    }
+  };
 
   return (
     <div className="p-3">
@@ -19,9 +32,15 @@ export default function InventarioAdmin() {
           </h4>
           <p className="text-muted fs--1 mb-0">Stock en tiempo real · Kardex · Traslados</p>
         </div>
-        <button className="btn btn-sm btn-outline-primary" onClick={cargarStock}>
-          <span className="fas fa-sync-alt me-1"></span>Actualizar
-        </button>
+        <div>
+          <button className="btn btn-sm btn-outline-secondary me-2" onClick={handleOfflineSync} disabled={isSyncing}>
+            {isSyncing ? <span className="spinner-border spinner-border-sm me-1"></span> : <span className="fas fa-cloud-download-alt me-1"></span>}
+            Sync Offline
+          </button>
+          <button className="btn btn-sm btn-outline-primary" onClick={cargarStock}>
+            <span className="fas fa-sync-alt me-1"></span>Actualizar Nube
+          </button>
+        </div>
       </div>
 
       {/* Alertas de stock mínimo */}

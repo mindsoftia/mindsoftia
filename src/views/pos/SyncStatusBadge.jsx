@@ -3,6 +3,8 @@
  * Estilos: Falcon / Bootstrap 5 nativo.
  */
 import React, { useState, useEffect } from 'react';
+import { posDB } from '../../database/localPosDb';
+import { posSyncService } from '../../services/posSyncService';
 
 export default function SyncStatusBadge() {
   const [online, setOnline]       = useState(navigator.onLine);
@@ -15,12 +17,29 @@ export default function SyncStatusBadge() {
     window.addEventListener('online',  handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // TODO: Conectar a Dexie para contar pending
-    const checkPendientes = () => {
-      // Simulación temporal
-      setPendientes(0);
+    // Conectar a Dexie para contar pendientes y sincronizar
+    const checkPendientes = async () => {
+      try {
+        const count = await posDB.ventas.where('sync_status').equals('pending').count();
+        setPendientes(count);
+        
+        // Si hay conexión y pendientes, intentar sincronizar
+        if (navigator.onLine && count > 0) {
+          const synced = await posSyncService.syncVentasPendientes();
+          if (synced > 0) {
+            const newCount = await posDB.ventas.where('sync_status').equals('pending').count();
+            setPendientes(newCount);
+          }
+        }
+      } catch (err) {
+        console.error('Error verificando sync:', err);
+      }
     };
-    const interval = setInterval(checkPendientes, 5000);
+    
+    // Chequeo inicial
+    checkPendientes();
+    // Chequeo periódico cada 10 segundos
+    const interval = setInterval(checkPendientes, 10000);
 
     return () => {
       window.removeEventListener('online',  handleOnline);
