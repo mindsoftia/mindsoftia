@@ -33,6 +33,8 @@ import Certificados from './views/empresas/Certificados';
 // ── NexoPOS: Módulo POS e Inventario ────────────────────────────────
 import POSLayout      from './views/pos/POSLayout';
 import InventarioAdmin from './views/pos/InventarioAdmin';
+import CategoriasList  from './views/inventario/CategoriasList';
+import ProveedoresList from './views/contactos/ProveedoresList';
 
 // Facturación Views
 import Suscripciones from './views/facturacion/Suscripciones';
@@ -138,7 +140,11 @@ function App() {
 
           {/* ── NexoPOS: Punto de Venta e Inventario ───────────────── */}
           <Route path="pos"        element={<POSLayout />} />
-          <Route path="inventario" element={<InventarioAdmin />} />
+          <Route path="inventario/productos" element={<InventarioAdmin />} />
+          <Route path="inventario/categorias" element={<CategoriasList />} />
+          <Route path="contactos/proveedores" element={<ProveedoresList />} />
+          <Route path="inventario" element={<Navigate to="/inventario/productos" replace />} />
+          <Route path="contactos" element={<Navigate to="/contactos/proveedores" replace />} />
 
           {/* ── Fase A: Contabilidad (próximas semanas) ─────────────── */}
           {/* <Route path="contabilidad/puc"      element={<PucIndex />} /> */}

@@ -68,42 +68,60 @@ function Sidebar() {
       path: '/'
     },
     {
+      title: 'Punto de Venta',
+      icon: 'fas fa-store',
+      path: '/pos'
+    },
+    {
       title: 'Ventas e Ingresos',
       icon: 'fas fa-file-invoice-dollar',
       id: 'ventasMenu',
       children: [
         { title: 'Facturación DIAN', path: '/ventas/facturas' },
         { title: 'Cotizaciones', path: '/ventas/cotizaciones' },
+        { title: 'Recibos de Caja', path: '/ventas/recibos' },
         { title: 'Cuentas por Cobrar', path: '/ventas/cartera' }
       ]
     },
     {
-      title: 'Punto de Venta',
-      icon: 'fas fa-store',
-      path: '/pos'
-    },
-    {
-      title: 'Contactos',
-      icon: 'fas fa-users',
-      path: '/contactos'
-    },
-    {
-      title: 'Inventario',
+      title: 'Catálogo e Inventario',
       icon: 'fas fa-boxes',
-      path: '/inventario'
+      id: 'inventarioMenu',
+      children: [
+        { title: 'Productos y Servicios', path: '/inventario/productos' },
+        { title: 'Categorías y Familias', path: '/inventario/categorias' },
+        { title: 'Bodegas y Sucursales', path: '/inventario/bodegas' },
+        { title: 'Movimientos (Kardex)', path: '/inventario/movimientos' }
+      ]
     },
     {
       title: 'Compras y Gastos',
       icon: 'fas fa-shopping-cart',
-      path: '/compras'
+      id: 'comprasMenu',
+      children: [
+        { title: 'Facturas de Compra', path: '/compras/facturas' },
+        { title: 'Órdenes de Compra', path: '/compras/ordenes' },
+        { title: 'Comprobantes de Egreso', path: '/compras/egresos' }
+      ]
     },
     {
-      title: 'Contabilidad',
+      title: 'Contactos',
+      icon: 'fas fa-users',
+      id: 'contactosMenu',
+      children: [
+        { title: 'Clientes', path: '/contactos/clientes' },
+        { title: 'Proveedores', path: '/contactos/proveedores' },
+        { title: 'Empleados / Vendedores', path: '/contactos/empleados' }
+      ]
+    },
+    {
+      title: 'Finanzas y Cont.',
       icon: 'fas fa-book',
       id: 'contabilidadMenu',
       children: [
-        { title: 'Plan Único de Cuentas', path: '/contabilidad/puc' },
-        { title: 'Comprobantes', path: '/contabilidad/comprobantes' },
+        { title: 'Asientos Contables', path: '/contabilidad/asientos' },
+        { title: 'Conciliación Bancaria', path: '/contabilidad/conciliacion' },
+        { title: 'Impuestos y Retenciones', path: '/contabilidad/impuestos' },
         { title: 'Reportes Financieros', path: '/contabilidad/reportes' }
       ]
     },
@@ -113,7 +131,9 @@ function Sidebar() {
       id: 'tenantConfig',
       children: [
         { title: 'Perfil de Empresa', path: '/ajustes/perfil' },
-        { title: 'Usuarios y Roles', path: '/ajustes/usuarios' }
+        { title: 'Usuarios y Roles', path: '/ajustes/usuarios' },
+        { title: 'Configuración POS', path: '/ajustes/pos' },
+        { title: 'Sincronización', path: '/ajustes/sincronizacion' }
       ]
     }
   ];

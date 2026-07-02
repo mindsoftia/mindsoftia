@@ -35,10 +35,12 @@ export const posSyncService = {
    */
   async syncTerceros() {
     try {
-      const response = await axios.get('/api/terceros');
-      const terceros = response.data;
+      const { supabase } = await import('./supabase');
+      const { data: terceros, error } = await supabase.from('crm_terceros').select('*');
       
-      if (Array.isArray(terceros) && terceros.length > 0) {
+      if (error) throw error;
+      
+      if (Array.isArray(terceros)) {
         await posDB.transaction('rw', posDB.terceros_cache, async () => {
           await posDB.terceros_cache.clear();
           await posDB.terceros_cache.bulkAdd(terceros);
@@ -53,12 +55,38 @@ export const posSyncService = {
   },
 
   /**
+   * Descarga todas las categorías del Tenant y las guarda en Dexie (vía Supabase).
+   */
+  async syncCategorias() {
+    try {
+      // Intentamos usar Supabase directamente ya que la tabla inv_categorias tiene RLS
+      const { supabase } = await import('./supabase');
+      const { data: categorias, error } = await supabase.from('inv_categorias').select('*');
+      
+      if (error) throw error;
+
+      if (Array.isArray(categorias)) {
+        await posDB.transaction('rw', posDB.categorias_cache, async () => {
+          await posDB.categorias_cache.clear();
+          await posDB.categorias_cache.bulkAdd(categorias);
+        });
+        console.log(`[Sync] ${categorias.length} categorías sincronizadas localmente.`);
+      }
+      return true;
+    } catch (error) {
+      console.error('[Sync] Error al sincronizar categorías:', error);
+      return false;
+    }
+  },
+
+  /**
    * Ejecuta ambas sincronizaciones de datos maestros.
    */
   async syncMasterData() {
     const pSuccess = await this.syncProductos();
     const tSuccess = await this.syncTerceros();
-    return pSuccess && tSuccess;
+    const cSuccess = await this.syncCategorias();
+    return pSuccess && tSuccess && cSuccess;
   },
 
   /**

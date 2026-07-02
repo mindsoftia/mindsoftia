@@ -6,13 +6,14 @@ import Dexie from 'dexie';
 
 export const posDB = new Dexie('NexoPOS_LocalDB');
 
-posDB.version(1).stores({
+posDB.version(2).stores({
   // Tablas transaccionales (offline-first)
   ventas:          'id, caja_id, sync_status, fecha_emision_local',
   ventas_items:    'id, venta_id, producto_id',
   // Cachés locales (se sincronizan desde la nube al iniciar)
-  productos_cache: 'id, codigo_barras, nombre, empresa_id',
+  productos_cache: 'id, codigo_barras, nombre, categoria_id, empresa_id',
   terceros_cache:  'id, numero_identificacion, razon_social, nombres, apellidos, es_cliente, es_proveedor',
+  categorias_cache:'id, nombre, empresa_id, parent_id',
 });
 
 /**

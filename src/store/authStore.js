@@ -17,6 +17,8 @@ const useAuthStore = create(
       permissions: [],     // Permisos específicos del usuario (ej. ['cartera.ver'])
       isLoading: false,
       error: null,
+      loginAttempts: 0,    // Contador de intentos fallidos
+      lockoutUntil: null,  // Timestamp de bloqueo por fuerza bruta
 
       // ─── Actions ─────────────────────────────────────────────────────────────
 
@@ -46,10 +48,17 @@ const useAuthStore = create(
         }
       },
 
-      /**
-       * Inicia sesión con email y contraseña usando Supabase Auth.
-       */
       login: async (email, password) => {
+        const { loginAttempts, lockoutUntil } = get();
+
+        // 1. Verificar si el usuario está bloqueado temporalmente (Brute Force Protection)
+        if (lockoutUntil && Date.now() < lockoutUntil) {
+          const segundosRestantes = Math.ceil((lockoutUntil - Date.now()) / 1000);
+          const errorMsg = `Demasiados intentos fallidos. Intente nuevamente en ${segundosRestantes} segundos.`;
+          set({ error: errorMsg });
+          return { success: false, error: errorMsg };
+        }
+
         set({ isLoading: true, error: null });
         try {
           const { data, error } = await supabase.auth.signInWithPassword({ email, password });
@@ -58,12 +67,14 @@ const useAuthStore = create(
           const session = data.session;
           const user    = data.user;
 
-          // Primero seteamos la sesión para que las peticiones tengan token
+          // Login exitoso: Resetear contadores de seguridad y setear sesión
           set({
             session,
             user,
             isLoading: false,
             error: null,
+            loginAttempts: 0,
+            lockoutUntil: null
           });
 
           // Inmediatamente después pedimos el perfil al backend
@@ -71,8 +82,25 @@ const useAuthStore = create(
 
           return { success: true };
         } catch (err) {
-          set({ isLoading: false, error: err.message });
-          return { success: false, error: err.message };
+          // Incremento del contador de intentos fallidos
+          const newAttempts = get().loginAttempts + 1;
+          const maxAttempts = 3; // Límite estricto de intentos
+          let lockTime = null;
+          let finalError = err.message;
+
+          if (newAttempts >= maxAttempts) {
+            lockTime = Date.now() + (60 * 1000); // Bloqueo de 60 segundos
+            finalError = `Acceso bloqueado por múltiples fallos. Espere 60 segundos.`;
+          }
+
+          set({ 
+            isLoading: false, 
+            error: finalError,
+            loginAttempts: newAttempts,
+            lockoutUntil: lockTime
+          });
+          
+          return { success: false, error: finalError };
         }
       },
 
@@ -124,6 +152,8 @@ const useAuthStore = create(
         tenantId: state.tenantId,
         role:     state.role,
         permissions: state.permissions,
+        loginAttempts: state.loginAttempts,
+        lockoutUntil: state.lockoutUntil,
       }),
     }
   )
