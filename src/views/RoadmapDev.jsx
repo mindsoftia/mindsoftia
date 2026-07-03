@@ -11,10 +11,12 @@ function RoadmapDev() {
     { id: 'todo-2', month: 1, text: 'Maestros CRM y Proveedores (Fase 1)', checked: true, detail: 'CRUD completo para la creación de Clientes y Proveedores.' },
     { id: 'todo-3', month: 1, text: 'Inventario Inteligente (Fase 1)', checked: true, detail: 'Catálogo de productos, control de stock multibodega, costeo e impuestos.' },
     { id: 'todo-pos', month: 1, text: 'Punto de Venta POS (Fase 1)', checked: true, badge: 'Core', badgeColor: 'primary', detail: 'Interfaz Offline-first orientada a la venta rápida, conexión con lectores y generación de tickets.' },
+    { id: 'todo-sec1', month: 1, text: 'Blindaje de Backend y Servidor', checked: true, badge: 'Seguridad', badgeColor: 'danger', detail: 'Implementación de Global Scopes para aislamiento de inquilinos y configuración de SSL Wildcard (Hardening).' },
+    { id: 'todo-sec2', month: 1, text: 'Aislamiento de Hardware (Offline)', checked: true, badge: 'Auditoría', badgeColor: 'warning', detail: 'Reglas de inmutabilidad en la DB y destrucción criptográfica del caché en IndexedDB al cerrar sesión.' },
     
     // MES 2: Fase 2
-    { id: 'todo-4', month: 2, text: 'Plan Único de Cuentas PUC (Fase 2)', checked: true, badge: 'Finanzas', badgeColor: 'success', detail: 'Árbol dinámico de cuentas bajo normativas NIIF para Colombia.' },
-    { id: 'todo-5', month: 2, text: 'Asientos Contables Automáticos (Inmutabilidad)', checked: true, detail: 'Lógicas de backend (Append-Only) que aseguran la inmutabilidad de los comprobantes manuales y del POS.' },
+    { id: 'todo-4', month: 2, text: 'Plan Único de Cuentas PUC (Fase 2)', checked: false, badge: 'Finanzas', badgeColor: 'success', detail: 'Árbol dinámico de cuentas bajo normativas NIIF para Colombia.' },
+    { id: 'todo-5', month: 2, text: 'Asientos Contables Automáticos', checked: false, detail: 'Lógicas de backend que generan asientos automáticos por cada ticket del POS y comprobantes manuales.' },
     { id: 'todo-6', month: 2, text: 'Reportes Financieros (Fase 2)', checked: false, detail: 'Generación en tiempo real del Libro Diario, Balance de Prueba y Estado de Resultados.' },
 
     // MES 3: Fase 3
