@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use App\Traits\Multitenantable;
 
 class InvProducto extends Model
 {
-    use HasUuids;
+    use HasUuids, Multitenantable;
 
     protected $table = 'inv_productos';
     protected $fillable = [

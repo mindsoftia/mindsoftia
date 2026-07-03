@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Multitenantable;
 
 class InvStockSede extends Model
 {
+    use Multitenantable;
     protected $table = 'inv_stock_sede';
     
     protected $fillable = [

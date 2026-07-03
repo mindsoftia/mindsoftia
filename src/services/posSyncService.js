@@ -123,5 +123,49 @@ export const posSyncService = {
       console.error('[Sync] Error subiendo ventas pendientes:', error);
       return 0;
     }
+  },
+
+  /**
+   * Busca las facturas de compra offline y las envía a Supabase
+   */
+  async syncFacturasCompraPendientes() {
+    try {
+      const facturas = await posDB.facturas_compra.where('sync_status').equals('pending').toArray();
+      if (facturas.length === 0) return 0;
+
+      const { supabase } = await import('./supabase');
+      let sincronizadas = 0;
+
+      for (const f of facturas) {
+        const detalles = await posDB.facturas_compra_detalles.where('factura_id').equals(f.id).toArray();
+        
+        // 1. Preparamos el payload de cabecera removiendo campos locales
+        const { sync_status, ...facturaPayload } = f;
+        
+        const { error: fError } = await supabase.from('com_facturas').upsert(facturaPayload);
+        
+        if (!fError) {
+          // 2. Insertar detalles
+          if (detalles.length > 0) {
+            await supabase.from('com_facturas_detalles').upsert(detalles);
+          }
+          
+          // 3. Marcar como sincronizada en Dexie
+          await posDB.facturas_compra.update(f.id, { sync_status: 'synced' });
+          sincronizadas++;
+        } else {
+          console.error(`[Sync] Error subiendo factura ${f.id}:`, fError);
+        }
+      }
+
+      if (sincronizadas > 0) {
+        console.log(`[Sync] ${sincronizadas} facturas de compra subidas a Supabase.`);
+      }
+
+      return sincronizadas;
+    } catch (error) {
+      console.error('[Sync] Error subiendo facturas de compra pendientes:', error);
+      return 0;
+    }
   }
 };

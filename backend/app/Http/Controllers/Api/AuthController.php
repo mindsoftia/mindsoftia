@@ -21,6 +21,7 @@ class AuthController extends Controller
 
         $permisos = [];
         $empresaNombre = null;
+        $subdominio = null;
 
         // Si tenemos tenant_id, buscamos los permisos exactos en la base de datos
         if ($userId && $tenantId) {
@@ -37,7 +38,8 @@ class AuthController extends Controller
             }
             
             if ($usuarioEmpresa && $usuarioEmpresa->empresa) {
-                $empresaNombre = $usuarioEmpresa->empresa->nombre_empresa;
+                $empresaNombre = $usuarioEmpresa->empresa->nombre;
+                $subdominio = $usuarioEmpresa->empresa->subdominio;
             }
         }
 
@@ -52,6 +54,7 @@ class AuthController extends Controller
             'email'        => $request->attributes->get('auth_user_email'),
             'tenant_id'    => $tenantId,
             'empresa_name' => $empresaNombre,
+            'subdominio'   => $subdominio,
             'role'         => $roleName,
             'permissions'  => $permisos,
         ]);

@@ -35,6 +35,8 @@ import POSLayout      from './views/pos/POSLayout';
 import InventarioAdmin from './views/pos/InventarioAdmin';
 import CategoriasList  from './views/inventario/CategoriasList';
 import ProveedoresList from './views/contactos/ProveedoresList';
+import FacturasCompraList from './views/compras/FacturasCompraList';
+import FacturaCompraForm from './views/compras/FacturaCompraForm';
 
 // Facturación Views
 import Suscripciones from './views/facturacion/Suscripciones';
@@ -143,6 +145,8 @@ function App() {
           <Route path="inventario/productos" element={<InventarioAdmin />} />
           <Route path="inventario/categorias" element={<CategoriasList />} />
           <Route path="contactos/proveedores" element={<ProveedoresList />} />
+          <Route path="compras/facturas" element={<FacturasCompraList />} />
+          <Route path="compras/facturas/nueva" element={<FacturaCompraForm />} />
           <Route path="inventario" element={<Navigate to="/inventario/productos" replace />} />
           <Route path="contactos" element={<Navigate to="/contactos/proveedores" replace />} />
 

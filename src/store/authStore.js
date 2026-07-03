@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { supabase } from '../services/supabase';
+import { posDB } from '../database/localPosDb';
 
 /**
  * authStore — Estado global de autenticación
@@ -13,6 +14,7 @@ const useAuthStore = create(
       session: null,       // Objeto de sesión de Supabase (incluye el JWT)
       user: null,          // Datos del usuario autenticado
       tenantId: null,      // ID de la empresa activa
+      subdominio: null,    // Subdominio de la empresa
       role: null,          // Rol: 'admin' | 'contador' | 'asistente'
       permissions: [],     // Permisos específicos del usuario (ej. ['cartera.ver'])
       isLoading: false,
@@ -39,6 +41,7 @@ const useAuthStore = create(
             const profile = await res.json();
             set({
               tenantId: profile.tenant_id || null,
+              subdominio: profile.subdominio || null,
               role: profile.role || null,
               permissions: profile.permissions || []
             });
@@ -109,7 +112,16 @@ const useAuthStore = create(
        */
       logout: async () => {
         await supabase.auth.signOut();
-        set({ session: null, user: null, tenantId: null, role: null, permissions: [], error: null });
+        
+        // FASE 4: Destrucción criptográfica del caché local (Multi-Tenant Security)
+        try {
+          await Promise.all(posDB.tables.map(table => table.clear()));
+          console.log("🔒 Seguridad Multi-Tenant: Caché local (IndexedDB) purgado exitosamente.");
+        } catch (err) {
+          console.error("Error purgando IndexedDB en logout:", err);
+        }
+
+        set({ session: null, user: null, tenantId: null, subdominio: null, role: null, permissions: [], error: null });
       },
 
       /**
@@ -150,6 +162,7 @@ const useAuthStore = create(
         session:  state.session,
         user:     state.user,
         tenantId: state.tenantId,
+        subdominio: state.subdominio,
         role:     state.role,
         permissions: state.permissions,
         loginAttempts: state.loginAttempts,

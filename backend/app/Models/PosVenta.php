@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use App\Traits\Multitenantable;
 
 /**
  * PosVenta — Modelo de la factura POS.
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
  */
 class PosVenta extends Model
 {
-    use HasUuids;
+    use HasUuids, Multitenantable;
 
     protected $table = 'pos_ventas';
 

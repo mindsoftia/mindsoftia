@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use App\Traits\Multitenantable;
 
 class InvKardex extends Model
 {
-    use HasUuids;
+    use HasUuids, Multitenantable;
 
     protected $table    = 'inv_kardex';
     public $timestamps  = false; // Solo usamos fecha_movimiento
@@ -26,6 +27,22 @@ class InvKardex extends Model
         'stock_resultante' => 'decimal:3',
         'fecha_movimiento' => 'datetime',
     ];
+
+    // ── Inmutabilidad Contable (Append-Only) ────────────
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Bloquear actualizaciones
+        static::updating(function ($model) {
+            throw new \Exception("Violación de seguridad (FASE 5): El Kardex es inmutable. No se pueden modificar movimientos históricos.");
+        });
+
+        // Bloquear eliminaciones
+        static::deleting(function ($model) {
+            throw new \Exception("Violación de seguridad (FASE 5): El Kardex es inmutable. No se pueden eliminar movimientos históricos.");
+        });
+    }
 
     // ── Relaciones ──────────────────────────────────────
     public function producto()
