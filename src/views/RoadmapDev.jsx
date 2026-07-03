@@ -13,8 +13,8 @@ function RoadmapDev() {
     { id: 'todo-pos', month: 1, text: 'Punto de Venta POS (Fase 1)', checked: true, badge: 'Core', badgeColor: 'primary', detail: 'Interfaz Offline-first orientada a la venta rápida, conexión con lectores y generación de tickets.' },
     
     // MES 2: Fase 2
-    { id: 'todo-4', month: 2, text: 'Plan Único de Cuentas PUC (Fase 2)', checked: false, badge: 'Finanzas', badgeColor: 'success', detail: 'Árbol dinámico de cuentas bajo normativas NIIF para Colombia.' },
-    { id: 'todo-5', month: 2, text: 'Asientos Contables Automáticos', checked: false, detail: 'Lógicas de backend que generan asientos automáticos por cada ticket del POS y comprobantes manuales.' },
+    { id: 'todo-4', month: 2, text: 'Plan Único de Cuentas PUC (Fase 2)', checked: true, badge: 'Finanzas', badgeColor: 'success', detail: 'Árbol dinámico de cuentas bajo normativas NIIF para Colombia.' },
+    { id: 'todo-5', month: 2, text: 'Asientos Contables Automáticos (Inmutabilidad)', checked: true, detail: 'Lógicas de backend (Append-Only) que aseguran la inmutabilidad de los comprobantes manuales y del POS.' },
     { id: 'todo-6', month: 2, text: 'Reportes Financieros (Fase 2)', checked: false, detail: 'Generación en tiempo real del Libro Diario, Balance de Prueba y Estado de Resultados.' },
 
     // MES 3: Fase 3

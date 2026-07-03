@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const RoadmapCalendar = () => {
-  const [selectedDay, setSelectedDay] = useState(32); // Default to latest logic/today
+  const [selectedDay, setSelectedDay] = useState(33); // Default to latest logic/today
 
   // Datos interactivos de los reportes diarios
     const dailyReports = {
@@ -71,6 +71,12 @@ const RoadmapCalendar = () => {
       { id: 3, title: 'Bases de Datos Híbrida (RLS)', desc: '<strong>1. ¿Qué se hizo?:</strong> Ejecución de `01_categorias_proveedores.sql` con políticas RLS inyectando `tenant_id` desde JWT.<br/><strong>2. ¿Por qué?:</strong> Para blindar la información de las categorías y proveedores por empresa.<br/><strong>3. ¿Para qué?:</strong> Para que la inserción de terceros sea 100% segura en un entorno Multi-Tenant.' },
       { id: 4, title: 'Vistas React CRUD Híbridas', desc: '<strong>1. ¿Qué se hizo?:</strong> Desarrollo de `CategoriasList.jsx` y `ProveedoresList.jsx` utilizando `useLiveQuery`.<br/><strong>2. ¿Por qué?:</strong> Se necesitaban interfaces gráficas limpias (Falcon) para alimentar el sistema.<br/><strong>3. ¿Para qué?:</strong> Para clasificar clientes/proveedores inteligentemente y obligar la vinculación de cuentas PUC en los catálogos.' },
       { id: 5, title: 'Sincronizador Edge-Cloud', desc: '<strong>1. ¿Qué se hizo?:</strong> Refactorización de `posSyncService.js` eliminando llamadas ineficientes al backend de Laravel.<br/><strong>2. ¿Por qué?:</strong> Supabase ya nos provee acceso directo, rápido y seguro vía JavaScript.<br/><strong>3. ¿Para qué?:</strong> Para que al crear un dato maestro en la nube, baje a la caché local instantáneamente.' }
+    ],
+    33: [
+      { id: 1, title: 'Global Scopes (Aislamiento)', desc: '<strong>1. ¿Qué se hizo?:</strong> Inyección de Multitenantable en modelos de Eloquent.<br/><strong>2. ¿Por qué?:</strong> Para aislar automáticamente los datos por empresa sin intervención del desarrollador.<br/><strong>3. ¿Para qué?:</strong> Para blindar el backend ante fugas de información cruzada.' },
+      { id: 2, title: 'Inmutabilidad Contable', desc: '<strong>1. ¿Qué se hizo?:</strong> Bloqueo de edición y eliminación (Append-Only) en Kardex y Asientos Contables.<br/><strong>2. ¿Por qué?:</strong> El historial financiero no puede ser alterado una vez registrado.<br/><strong>3. ¿Para qué?:</strong> Para garantizar la integridad de los reportes fiscales y de inventario.' },
+      { id: 3, title: 'Autodestrucción Dexie.js', desc: '<strong>1. ¿Qué se hizo?:</strong> Purga total de la base de datos IndexedDB al ejecutar Logout.<br/><strong>2. ¿Por qué?:</strong> El sistema offline guardaba caché que podía ser visto por otro usuario en la misma PC.<br/><strong>3. ¿Para qué?:</strong> Para aislar los datos a nivel de hardware/navegador compartido.' },
+      { id: 4, title: 'Redirección Segura Login', desc: '<strong>1. ¿Qué se hizo?:</strong> Interceptación en el root para redirigir forzosamente al subdominio del inquilino.<br/><strong>2. ¿Por qué?:</strong> El login principal es exclusivo de los Superadmins.<br/><strong>3. ¿Para qué?:</strong> Para proteger la marca central y evitar accesos no autorizados al portal.' }
     ]
   };
 
@@ -90,10 +96,10 @@ const RoadmapCalendar = () => {
       if (day === 16) baseClass += " border border-success rounded-start-pill border-end-0";
       else if (day >= 17 && day <= 21) baseClass += " border border-success border-start-0 border-end-0";
       else if (day === 22) baseClass += " border border-success border-start-0 rounded-end-pill";
-    } else if (day >= 23 && day <= 32) {
+    } else if (day >= 23 && day <= 33) {
       baseClass += " bg-soft-warning";
       if (day === 23) baseClass += " rounded-start-pill";
-      if (day === 32) baseClass += " rounded-end-pill";
+      if (day === 33) baseClass += " rounded-end-pill";
     }
 
     if (day === selectedDay) {
@@ -148,11 +154,10 @@ const RoadmapCalendar = () => {
                 {/* 31 May */}
                 <div className="text-400 py-2" style={{ width: '14%' }}>31</div>
                 
-                {/* Days 1 to 32 (Includes July 1 and 2) */}
-                {[...Array(32)].map((_, i) => renderDay(i + 1))}
+                {/* Days 1 to 33 (Includes July 1, 2, 3) */}
+                {[...Array(33)].map((_, i) => renderDay(i + 1))}
 
                 {/* Next month days */}
-                <div className="py-2 text-400" style={{ width: '14%' }}>3</div>
                 <div className="py-2 text-400" style={{ width: '14%' }}>4</div>
               </div>
               <div className="text-center mt-3 fs--2 text-500">
