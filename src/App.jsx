@@ -37,6 +37,8 @@ import CategoriasList  from './views/inventario/CategoriasList';
 import ProveedoresList from './views/contactos/ProveedoresList';
 import FacturasCompraList from './views/compras/FacturasCompraList';
 import FacturaCompraForm from './views/compras/FacturaCompraForm';
+import ProductoCreate  from './views/productos/ProductoCreate';
+import ProductosList   from './views/productos/ProductosList';
 
 // Facturación Views
 import Suscripciones from './views/facturacion/Suscripciones';
@@ -142,7 +144,10 @@ function App() {
 
           {/* ── NexoPOS: Punto de Venta e Inventario ───────────────── */}
           <Route path="pos"        element={<POSLayout />} />
-          <Route path="inventario/productos" element={<InventarioAdmin />} />
+          <Route path="inventario/productos" element={<ProductosList />} />
+          <Route path="inventario/stock" element={<InventarioAdmin />} />
+          <Route path="productos" element={<Navigate to="/inventario/productos" replace />} />
+          <Route path="productos/add-product" element={<ProductoCreate />} />
           <Route path="inventario/categorias" element={<CategoriasList />} />
           <Route path="contactos/proveedores" element={<ProveedoresList />} />
           <Route path="compras/facturas" element={<FacturasCompraList />} />

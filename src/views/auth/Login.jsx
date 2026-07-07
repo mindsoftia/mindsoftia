@@ -28,47 +28,7 @@ function Login() {
     setLoading(false);
 
     if (result.success) {
-      // ── FASE DE SEGURIDAD: Control de Acceso por Subdominio ──
-      const authState = useAuthStore.getState();
-      const currentRole = authState.role;
-      const host = window.location.hostname;
-      
-      const isMainDomain = host === 'mindsoftia.com' || host === 'www.mindsoftia.com' || host === 'mindsoftia.local' || host === 'localhost';
 
-      if (isMainDomain && currentRole !== 'admin' && currentRole !== 'superadmin') {
-        const subdominio = authState.subdominio;
-        
-        // Bloquear acceso a empleados en el dominio principal
-        await authState.logout();
-        
-        if (subdominio) {
-          Swal.fire({
-            icon: 'info',
-            title: 'Redirigiendo a tu Espacio...',
-            html: `Te estamos enviando al portal exclusivo de tu empresa:<br><br><b class="text-primary fs-1">${subdominio}.mindsoftia.com</b>`,
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-          }).then(() => {
-            const redirectHost = host.includes('local') 
-                ? `http://${subdominio}.mindsoftia.local/login` 
-                : `https://${subdominio}.mindsoftia.com/login`;
-            window.location.href = redirectHost;
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Acceso Restringido',
-            text: 'Este es el portal administrativo central. Debes ingresar usando el enlace o subdominio personalizado de tu empresa.',
-            confirmButtonColor: '#e63757',
-            background: '#ffffff'
-          });
-        }
-        return;
-      }
-      // ─────────────────────────────────────────────────────────
       Swal.fire({
         html: `
           <div class="d-flex flex-column align-items-center justify-content-center my-3">

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const RoadmapCalendar = () => {
-  const [selectedDay, setSelectedDay] = useState(33); // Default to latest logic/today
+  const [selectedDay, setSelectedDay] = useState(37); // Default to latest logic/today
 
   // Datos interactivos de los reportes diarios
     const dailyReports = {
@@ -77,6 +77,15 @@ const RoadmapCalendar = () => {
       { id: 2, title: 'Inmutabilidad Contable', desc: '<strong>1. ¿Qué se hizo?:</strong> Bloqueo de edición y eliminación (Append-Only) en Kardex y Asientos Contables.<br/><strong>2. ¿Por qué?:</strong> El historial financiero no puede ser alterado una vez registrado.<br/><strong>3. ¿Para qué?:</strong> Para garantizar la integridad de los reportes fiscales y de inventario.' },
       { id: 3, title: 'Autodestrucción Dexie.js', desc: '<strong>1. ¿Qué se hizo?:</strong> Purga total de la base de datos IndexedDB al ejecutar Logout.<br/><strong>2. ¿Por qué?:</strong> El sistema offline guardaba caché que podía ser visto por otro usuario en la misma PC.<br/><strong>3. ¿Para qué?:</strong> Para aislar los datos a nivel de hardware/navegador compartido.' },
       { id: 4, title: 'Redirección Segura Login', desc: '<strong>1. ¿Qué se hizo?:</strong> Interceptación en el root para redirigir forzosamente al subdominio del inquilino.<br/><strong>2. ¿Por qué?:</strong> El login principal es exclusivo de los Superadmins.<br/><strong>3. ¿Para qué?:</strong> Para proteger la marca central y evitar accesos no autorizados al portal.' }
+    ],
+    36: [
+      { id: 1, title: 'Enrutamiento Multi-Tenant (Auth)', desc: '<strong>1. ¿Qué se hizo?:</strong> Se eliminó la redirección forzada a subdominios en `Login.jsx`.<br/><strong>2. ¿Por qué?:</strong> Causaba conflictos de acceso para los usuarios SuperAdministradores y bloqueaba rutas directas.<br/><strong>3. ¿Para qué?:</strong> Para permitir un flujo de autenticación limpio y acceso directo al tenant correcto sin trabas arquitectónicas.' },
+      { id: 2, title: 'Preparación Arquitectura PIM', desc: '<strong>1. ¿Qué se hizo?:</strong> Auditoría de los campos faltantes en el modelo de inventario para soportar la Factura Electrónica.<br/><strong>2. ¿Por qué?:</strong> El POS requería calcular impuestos y clasificar antes de poder sincronizar la base de datos.<br/><strong>3. ¿Para qué?:</strong> Para dejar el terreno listo para la expansión del catálogo maestro.' }
+    ],
+    37: [
+      { id: 1, title: 'Catálogo PIM Falconizado', desc: '<strong>1. ¿Qué se hizo?:</strong> Rediseño total de la creación y listado de productos usando la estética Falcon UI.<br/><strong>2. ¿Por qué?:</strong> El diseño anterior era rudimentario y no separaba conceptualmente el Catálogo del Kardex físico.<br/><strong>3. ¿Para qué?:</strong> Para brindar una experiencia corporativa premium, diferenciando la identidad del producto de sus existencias reales.' },
+      { id: 2, title: 'Importación Masiva CSV (DB)', desc: '<strong>1. ¿Qué se hizo?:</strong> Desarrollo del endpoint `/api/inventario/productos/import` con inyección Batch Insert.<br/><strong>2. ¿Por qué?:</strong> Insertar productos uno a uno (en un bucle for) saturaría la red y colapsaría la memoria (Problema N+1).<br/><strong>3. ¿Para qué?:</strong> Para permitir a las empresas cargar miles de productos en milisegundos usando el motor nativo de PostgreSQL.' },
+      { id: 3, title: 'Migración: Impuestos y Categorías', desc: '<strong>1. ¿Qué se hizo?:</strong> Alteración de la DB añadiendo IVA, Stock Min/Max, y relaciones con la nueva tabla `inv_categorias`.<br/><strong>2. ¿Por qué?:</strong> Es un requisito legal indispensable de la DIAN para facturación electrónica y control logístico comercial.<br/><strong>3. ¿Para qué?:</strong> Para que el cajero en el POS calcule los totales correctamente y envíe la estructura tributaria adecuada al facturar.' }
     ]
   };
 
@@ -96,10 +105,10 @@ const RoadmapCalendar = () => {
       if (day === 16) baseClass += " border border-success rounded-start-pill border-end-0";
       else if (day >= 17 && day <= 21) baseClass += " border border-success border-start-0 border-end-0";
       else if (day === 22) baseClass += " border border-success border-start-0 rounded-end-pill";
-    } else if (day >= 23 && day <= 33) {
+    } else if (day >= 23 && day <= 37) {
       baseClass += " bg-soft-warning";
       if (day === 23) baseClass += " rounded-start-pill";
-      if (day === 33) baseClass += " rounded-end-pill";
+      if (day === 37) baseClass += " rounded-end-pill";
     }
 
     if (day === selectedDay) {
@@ -154,8 +163,8 @@ const RoadmapCalendar = () => {
                 {/* 31 May */}
                 <div className="text-400 py-2" style={{ width: '14%' }}>31</div>
                 
-                {/* Days 1 to 33 (Includes July 1, 2, 3) */}
-                {[...Array(33)].map((_, i) => renderDay(i + 1))}
+                {/* Days 1 to 37 (Includes July 1 to 7) */}
+                {[...Array(37)].map((_, i) => renderDay(i + 1))}
 
                 {/* Next month days */}
                 <div className="py-2 text-400" style={{ width: '14%' }}>4</div>

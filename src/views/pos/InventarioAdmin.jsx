@@ -25,7 +25,11 @@ export default function InventarioAdmin() {
     tipo: 'fisico',
     precio_venta: '',
     costo_promedio: '',
-    categoria_id: ''
+    categoria_id: '',
+    stock_minimo: '',
+    stock_maximo: '',
+    tarifa_impuesto: '',
+    etiquetas: ''
   });
 
   const handleOfflineSync = async () => {
@@ -54,7 +58,11 @@ export default function InventarioAdmin() {
         tipo: formData.tipo,
         precio_venta: parseFloat(formData.precio_venta || 0),
         costo_promedio: parseFloat(formData.costo_promedio || 0),
-        categoria_id: formData.categoria_id || null
+        categoria_id: formData.categoria_id || null,
+        stock_minimo: parseFloat(formData.stock_minimo || 0),
+        stock_maximo: parseFloat(formData.stock_maximo || 0),
+        tarifa_impuesto: parseFloat(formData.tarifa_impuesto || 0),
+        etiquetas: formData.etiquetas ? formData.etiquetas.split(',').map(t => t.trim()) : []
       };
 
       const { error: err } = await supabase.from('inv_productos').insert([payload]);
@@ -64,7 +72,7 @@ export default function InventarioAdmin() {
       await cargarStock(); // Actualiza el UI desde Laravel/Supabase
       
       setShowModal(false);
-      setFormData({ codigo_sku: '', nombre: '', tipo: 'fisico', precio_venta: '', costo_promedio: '', categoria_id: '' });
+      setFormData({ codigo_sku: '', nombre: '', tipo: 'fisico', precio_venta: '', costo_promedio: '', categoria_id: '', stock_minimo: '', stock_maximo: '', tarifa_impuesto: '', etiquetas: '' });
     } catch (err) {
       console.error("Error al crear producto:", err);
       alert("Hubo un error al guardar: " + err.message);
@@ -227,6 +235,29 @@ export default function InventarioAdmin() {
                         <span className="input-group-text">$</span>
                         <input type="number" step="0.01" className="form-control" name="costo_promedio" value={formData.costo_promedio} onChange={handleChange} />
                       </div>
+                    </div>
+                  </div>
+                  <div className="row g-3 mb-3">
+                    <div className="col-md-4">
+                      <label className="form-label">Tarifa Impuesto (%)</label>
+                      <div className="input-group">
+                        <input type="number" step="0.01" className="form-control" name="tarifa_impuesto" placeholder="Ej. 19.00" value={formData.tarifa_impuesto} onChange={handleChange} />
+                        <span className="input-group-text">%</span>
+                      </div>
+                    </div>
+                    <div className="col-md-4">
+                      <label className="form-label">Stock Mínimo</label>
+                      <input type="number" step="0.01" className="form-control" name="stock_minimo" value={formData.stock_minimo} onChange={handleChange} />
+                    </div>
+                    <div className="col-md-4">
+                      <label className="form-label">Stock Máximo</label>
+                      <input type="number" step="0.01" className="form-control" name="stock_maximo" value={formData.stock_maximo} onChange={handleChange} />
+                    </div>
+                  </div>
+                  <div className="row g-3 mb-3">
+                    <div className="col-md-12">
+                      <label className="form-label">Etiquetas (separadas por coma)</label>
+                      <input type="text" className="form-control" name="etiquetas" placeholder="ej. promocion, nuevo, blackfriday" value={formData.etiquetas} onChange={handleChange} />
                     </div>
                   </div>
                 </div>

@@ -12,21 +12,29 @@ class InvProducto extends Model
 
     protected $table = 'inv_productos';
     protected $fillable = [
-        'empresa_id', 'referencia', 'codigo_barras', 'nombre',
-        'descripcion', 'unidad_medida', 'precio_venta',
-        'costo_promedio', 'stock_minimo', 'tipo',
-        'maneja_inventario', 'activo',
+        'empresa_id', 'categoria_id', 'referencia', 'codigo_barras', 'nombre',
+        'descripcion', 'etiquetas', 'unidad_medida', 'precio_venta',
+        'costo_promedio', 'tarifa_impuesto', 'stock_minimo', 'stock_maximo', 
+        'tipo', 'maneja_inventario', 'activo',
     ];
 
     protected $casts = [
         'precio_venta'   => 'decimal:2',
         'costo_promedio' => 'decimal:2',
+        'tarifa_impuesto'=> 'decimal:2',
         'stock_minimo'   => 'decimal:3',
+        'stock_maximo'   => 'decimal:3',
         'maneja_inventario' => 'boolean',
         'activo'         => 'boolean',
+        'etiquetas'      => 'array',
     ];
 
     // ── Relaciones ──────────────────────────────────────
+    public function categoria()
+    {
+        return $this->belongsTo(InvCategoria::class, 'categoria_id');
+    }
+
     public function stockSedes()
     {
         return $this->hasMany(InvStockSede::class, 'producto_id');

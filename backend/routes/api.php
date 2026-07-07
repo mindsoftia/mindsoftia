@@ -56,6 +56,8 @@ Route::middleware(['supabase.auth'])->group(function () {
 
     // ── NexoPOS — Módulo Inventario Multisede (Paso 3) ─────────────────────────
     Route::prefix('inventario')->group(function () {
+        Route::post('productos/import', [\App\Http\Controllers\Api\InvProductoController::class, 'import']);
+        Route::apiResource('categorias', \App\Http\Controllers\Api\InvCategoriaController::class);
         Route::apiResource('productos', \App\Http\Controllers\Api\InvProductoController::class);
         // Stock consolidado o filtrado por sede: GET /api/inventario/stock?sede_id=UUID
         Route::get('/stock', [\App\Http\Controllers\Api\InventarioController::class, 'stockConsolidado']);

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\InvProducto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class InvProductoController extends Controller
 {
@@ -18,7 +20,7 @@ class InvProductoController extends Controller
             return response()->json(['error' => 'Tenant no especificado'], 400);
         }
 
-        $productos = InvProducto::where('empresa_id', $empresaId)->get();
+        $productos = InvProducto::with('categoria')->where('empresa_id', $empresaId)->get();
         return response()->json($productos);
     }
 
@@ -33,6 +35,7 @@ class InvProductoController extends Controller
         }
 
         $validated = $request->validate([
+            'categoria_id' => 'nullable|uuid|exists:inv_categorias,id',
             'referencia' => 'nullable|string|max:50',
             'codigo_barras' => 'nullable|string|max:100',
             'nombre' => 'required|string|max:255',
@@ -40,9 +43,12 @@ class InvProductoController extends Controller
             'unidad_medida' => 'nullable|string|max:20',
             'precio_venta' => 'required|numeric|min:0',
             'costo_promedio' => 'required|numeric|min:0',
+            'tarifa_impuesto' => 'numeric|min:0',
             'stock_minimo' => 'numeric|min:0',
+            'stock_maximo' => 'numeric|min:0',
             'tipo' => 'nullable|string|max:50',
             'maneja_inventario' => 'boolean',
+            'etiquetas' => 'nullable|array',
         ]);
 
         $validated['empresa_id'] = $empresaId;
@@ -56,7 +62,7 @@ class InvProductoController extends Controller
      */
     public function show(string $id)
     {
-        $producto = InvProducto::findOrFail($id);
+        $producto = InvProducto::with('categoria')->findOrFail($id);
         return response()->json($producto);
     }
 
@@ -68,6 +74,7 @@ class InvProductoController extends Controller
         $producto = InvProducto::findOrFail($id);
 
         $validated = $request->validate([
+            'categoria_id' => 'nullable|uuid|exists:inv_categorias,id',
             'referencia' => 'nullable|string|max:50',
             'codigo_barras' => 'nullable|string|max:100',
             'nombre' => 'sometimes|required|string|max:255',
@@ -75,9 +82,12 @@ class InvProductoController extends Controller
             'unidad_medida' => 'nullable|string|max:20',
             'precio_venta' => 'sometimes|required|numeric|min:0',
             'costo_promedio' => 'sometimes|required|numeric|min:0',
+            'tarifa_impuesto' => 'numeric|min:0',
             'stock_minimo' => 'numeric|min:0',
+            'stock_maximo' => 'numeric|min:0',
             'tipo' => 'nullable|string|max:50',
             'maneja_inventario' => 'boolean',
+            'etiquetas' => 'nullable|array',
             'activo' => 'boolean'
         ]);
 
@@ -93,5 +103,64 @@ class InvProductoController extends Controller
         $producto = InvProducto::findOrFail($id);
         $producto->update(['activo' => false]);
         return response()->json(['message' => 'Producto inactivo']);
+    }
+
+    /**
+     * Import products in bulk via CSV (Supabase Batch Insert)
+     */
+    public function import(Request $request)
+    {
+        $empresaId = $request->header('X-Tenant-ID');
+        if (!$empresaId) {
+            return response()->json(['error' => 'Tenant no especificado'], 400);
+        }
+
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:5120', // Max 5MB
+        ]);
+
+        $file = $request->file('file');
+        $csvData = file_get_contents($file->getRealPath());
+        $rows = array_map('str_getcsv', explode("\n", $csvData));
+        $header = array_shift($rows);
+
+        // Expected headers: nombre, codigo_sku, codigo_barras, precio_venta, costo_promedio, tipo
+        $recordsToInsert = [];
+        $now = now();
+
+        foreach ($rows as $row) {
+            if (count($row) !== count($header)) continue;
+            
+            $data = array_combine($header, $row);
+            
+            // Basic validation for mandatory fields in CSV
+            if (empty(trim($data['nombre'] ?? ''))) continue;
+
+            $recordsToInsert[] = [
+                'id'             => Str::uuid()->toString(),
+                'empresa_id'     => $empresaId,
+                'nombre'         => trim($data['nombre']),
+                'codigo_sku'     => trim($data['codigo_sku'] ?? ''),
+                'codigo_barras'  => trim($data['codigo_barras'] ?? ''),
+                'precio_venta'   => (float) ($data['precio_venta'] ?? 0),
+                'costo_promedio' => (float) ($data['costo_promedio'] ?? 0),
+                'tarifa_impuesto'=> (float) ($data['tarifa_impuesto'] ?? 0),
+                'tipo'           => trim($data['tipo'] ?? 'fisico'),
+                'created_at'     => $now,
+                'updated_at'     => $now,
+            ];
+        }
+
+        if (count($recordsToInsert) === 0) {
+            return response()->json(['error' => 'No se encontraron registros válidos para importar.'], 400);
+        }
+
+        // Batch Insert leveraging PostgreSQL/Supabase raw power for high performance
+        DB::table('inv_productos')->insert($recordsToInsert);
+
+        return response()->json([
+            'success' => true,
+            'message' => count($recordsToInsert) . ' productos importados exitosamente.',
+        ]);
     }
 }

@@ -75,16 +75,27 @@ class VerifySupabaseToken
             $request->attributes->set('auth_role', $role);
 
         } catch (Exception $e) {
-            \Illuminate\Support\Facades\Log::error('JWT Error: ' . $e->getMessage());
+            $headerDump = 'unknown';
+            $parts = explode('.', $token);
+            if (count($parts) === 3) {
+                $headerDump = base64_decode(strtr($parts[0], '-_', '+/'));
+            }
+            \Illuminate\Support\Facades\Log::error('JWT Error: ' . $e->getMessage() . ' | Header: ' . $headerDump);
             
             // Si el error es por algoritmo ES256, hacer decodificación manual TEMPORALMENTE (Solo para desarrollo)
             if (strpos($e->getMessage(), 'Incorrect key') !== false) {
                 $parts = explode('.', $token);
                 if (count($parts) === 3) {
-                    $header = json_decode(base64_decode($parts[0]));
+                    $headerStr = base64_decode(strtr($parts[0], '-_', '+/'));
+                    $header = json_decode($headerStr);
                     if (isset($header->alg) && $header->alg === 'ES256') {
-                        $decoded = json_decode(base64_decode($parts[1]));
+                        $payloadStr = base64_decode(strtr($parts[1], '-_', '+/'));
+                        $decoded = json_decode($payloadStr);
                         
+                        if (!$decoded || !isset($decoded->sub)) {
+                            return response()->json(['error' => 'Token ES256 inválido o no decodificable'], 401);
+                        }
+
                         // Continuar con la lógica normal
                         $request->attributes->set('auth_user_id', $decoded->sub);
                         $request->attributes->set('auth_user_email', $decoded->email ?? null);
@@ -94,18 +105,24 @@ class VerifySupabaseToken
                             \Illuminate\Support\Facades\Auth::login($user);
                             $empresaId = $user->empresa_id;
                         } else {
-                            $empresaId = $decoded->app_metadata->empresa_id ?? $decoded->app_metadata->tenant_id ?? null;
+                            $app_metadata = $decoded->app_metadata ?? new \stdClass();
+                            $empresaId = $app_metadata->empresa_id ?? $app_metadata->tenant_id ?? null;
                         }
 
                         $superAdmins = ['amadomora@gmail.com'];
                         $isSuperAdmin = in_array($decoded->email ?? '', $superAdmins);
 
                         if (!$empresaId && !$isSuperAdmin && !$request->is('api/onboarding')) {
-                            return response()->json(['error' => 'Acceso denegado'], 403);
+                            return response()->json([
+                                'error' => 'Acceso denegado',
+                                'message' => 'El usuario no tiene una empresa asignada. Por favor completa el Onboarding.'
+                            ], 403);
                         }
 
                         $request->attributes->set('empresa_id', $empresaId);
-                        $role = $isSuperAdmin ? 'admin' : ($decoded->app_metadata->role ?? 'asistente');
+                        
+                        $app_metadata = $decoded->app_metadata ?? new \stdClass();
+                        $role = $isSuperAdmin ? 'admin' : ($app_metadata->role ?? 'asistente');
                         $request->attributes->set('auth_role', $role);
                         
                         return $next($request);
