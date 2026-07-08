@@ -33,7 +33,7 @@ export default function ProductoCreate({ onClose, onSuccess }) {
     // Cargar categorías y configuración de empresa
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = useAuthStore.getState().getToken();
         const headers = {
           'Authorization': `Bearer ${token}`,
           'X-Tenant-ID': tenantId

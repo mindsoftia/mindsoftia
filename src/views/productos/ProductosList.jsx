@@ -20,7 +20,7 @@ export default function ProductosList() {
   const fetchProductos = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = useAuthStore.getState().getToken();
       const response = await fetch(`${import.meta.env.VITE_API_URL}/inventario/productos`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -51,7 +51,7 @@ export default function ProductosList() {
     formData.append('file', file);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = useAuthStore.getState().getToken();
       const response = await fetch(`${import.meta.env.VITE_API_URL}/inventario/productos/import`, {
         method: 'POST',
         headers: {
