@@ -16,12 +16,15 @@ class InvCategoria extends Model
         'empresa_id',
         'nombre',
         'descripcion',
-        'color',
-        'activo',
+        'parent_id',
+        'cuenta_contable_ingreso',
+        'cuenta_contable_costo',
+        'cuenta_contable_inventario',
+        'estado',
     ];
 
     protected $casts = [
-        'activo' => 'boolean',
+        'estado' => 'boolean',
     ];
 
     public function productos()
@@ -31,6 +34,6 @@ class InvCategoria extends Model
 
     public function scopeActivas($query)
     {
-        return $query->where('activo', true);
+        return $query->where('estado', true);
     }
 }

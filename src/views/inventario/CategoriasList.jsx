@@ -1,18 +1,38 @@
-import React, { useState } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { posDB } from '../../database/localPosDb';
-import { posSyncService } from '../../services/posSyncService';
-import { supabase } from '../../services/supabase';
+import React, { useState, useEffect } from 'react';
 import useAuthStore from '../../store/authStore';
+import api from '../../services/api';
+import Swal from 'sweetalert2';
 
-function CategoriasList() {
+// ── Helpers ──────────────────────────────────────────────────────────────────
+const getTenantId = () => {
+  const s = useAuthStore.getState();
+  if (s.tenantId) return s.tenantId;
+  const m = s.user?.app_metadata;
+  return m?.empresa_id ?? m?.tenant_id ?? '';
+};
+
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+});
+
+// ── Componente Principal ──────────────────────────────────────────────────────
+export default function CategoriasList() {
   const { tenantId } = useAuthStore();
-  const categorias = useLiveQuery(() => posDB.categorias_cache.toArray(), []);
-  
+  const [categorias, setCategorias] = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [activeTab, setActiveTab]   = useState('activas'); // 'activas' | 'inactivas'
+  const [search, setSearch]         = useState('');
+
+  // Modals
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [saving, setSaving]       = useState(false);
+  
   const [formData, setFormData] = useState({
     nombre: '',
     descripcion: '',
@@ -21,37 +41,44 @@ function CategoriasList() {
     cuenta_contable_inventario: ''
   });
 
-  const handleSync = async () => {
+  // ── Fetch ────────────────────────────────────────────────────────────────────
+  const fetchCategorias = async () => {
     setLoading(true);
-    await posSyncService.syncCategorias();
-    setLoading(false);
-  };
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleEdit = (cat) => {
-    setFormData({
-      nombre: cat.nombre,
-      descripcion: cat.descripcion || '',
-      cuenta_contable_ingreso: cat.cuenta_contable_ingreso || '',
-      cuenta_contable_costo: cat.cuenta_contable_costo || '',
-      cuenta_contable_inventario: cat.cuenta_contable_inventario || ''
-    });
-    setCurrentId(cat.id);
-    setIsEditing(true);
-    setShowModal(true);
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("¿Está seguro de eliminar esta categoría? Los productos asociados quedarán sin categoría.")) return;
+    const tid = tenantId || getTenantId();
     try {
-      const { error } = await supabase.from('inv_categorias').delete().eq('id', id);
-      if (error) throw error;
-      await posSyncService.syncCategorias();
+      const res = await api.get('/inventario/categorias', {
+        headers: { 'X-Tenant-ID': tid ?? '' }
+      });
+      setCategorias(Array.isArray(res.data?.categorias) ? res.data.categorias : []);
     } catch (err) {
-      alert("Error al eliminar: " + err.message);
+      console.error('Error al cargar categorias:', err.response?.data || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchCategorias(); }, []);
+
+  // ── Handlers ────────────────────────────────────────────────────────────────
+  const handleToggle = async (c) => {
+    if (!window.confirm(`¿Deseas ${c.estado !== false ? 'desactivar' : 'activar'} la categoría "${c.nombre}"?`)) return;
+    try {
+      await api.put(`/inventario/categorias/${c.id}`, { estado: c.estado === false });
+      setCategorias(prev => prev.map(item => item.id === c.id ? { ...item, estado: c.estado === false } : item));
+      Toast.fire({ icon: 'success', title: 'Estado actualizado' });
+    } catch (err) {
+      alert('Error al cambiar estado: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleDelete = async (c) => {
+    if (!window.confirm(`¿Eliminar permanentemente "${c.nombre}"? No se puede deshacer.`)) return;
+    try {
+      await api.delete(`/inventario/categorias/${c.id}`);
+      setCategorias(prev => prev.filter(item => item.id !== c.id));
+      Toast.fire({ icon: 'success', title: 'Categoría eliminada' });
+    } catch (err) {
+      alert('Error al eliminar: ' + (err.response?.data?.error || err.response?.data?.message || err.message));
     }
   };
 
@@ -62,177 +89,257 @@ function CategoriasList() {
     setShowModal(true);
   };
 
+  const handleEdit = (c) => {
+    setFormData({
+      nombre: c.nombre,
+      descripcion: c.descripcion || '',
+      cuenta_contable_ingreso: c.cuenta_contable_ingreso || '',
+      cuenta_contable_costo: c.cuenta_contable_costo || '',
+      cuenta_contable_inventario: c.cuenta_contable_inventario || ''
+    });
+    setCurrentId(c.id);
+    setIsEditing(true);
+    setShowModal(true);
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setSaving(true);
+    const tid = tenantId || getTenantId();
     try {
-      const payload = {
-        empresa_id: tenantId,
-        nombre: formData.nombre,
-        descripcion: formData.descripcion,
-        cuenta_contable_ingreso: formData.cuenta_contable_ingreso,
-        cuenta_contable_costo: formData.cuenta_contable_costo,
-        cuenta_contable_inventario: formData.cuenta_contable_inventario
-      };
-      
-      let error;
       if (isEditing) {
-        const res = await supabase.from('inv_categorias').update(payload).eq('id', currentId);
-        error = res.error;
+        const res = await api.put(`/inventario/categorias/${currentId}`, formData, { headers: { 'X-Tenant-ID': tid }});
+        setCategorias(prev => prev.map(item => item.id === currentId ? res.data.categoria : item));
+        Toast.fire({ icon: 'success', title: 'Categoría actualizada' });
       } else {
-        const res = await supabase.from('inv_categorias').insert([payload]);
-        error = res.error;
+        const res = await api.post('/inventario/categorias', formData, { headers: { 'X-Tenant-ID': tid }});
+        setCategorias(prev => [...prev, res.data.categoria]);
+        Toast.fire({ icon: 'success', title: 'Categoría creada' });
       }
-      
-      
-      if (error) throw error;
-      
-      // Sincronizar inmediatamente tras insertar en la nube
-      await posSyncService.syncCategorias();
       setShowModal(false);
-      setFormData({ nombre: '', descripcion: '', cuenta_contable_ingreso: '', cuenta_contable_costo: '', cuenta_contable_inventario: '' });
     } catch (err) {
-      console.error("Error al guardar la categoría:", err);
-      alert("Hubo un error al guardar: " + err.message);
+      alert('Error al guardar: ' + (err.response?.data?.message || err.message));
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
+  // ── Filtros ──────────────────────────────────────────────────────────────────
+  const filtered = categorias
+    .filter(c => activeTab === 'inactivas' ? c.estado === false : c.estado !== false)
+    .filter(c => !search || c.nombre?.toLowerCase().includes(search.toLowerCase()));
+
+  const actCount   = categorias.filter(c => c.estado !== false).length;
+  const inactCount = categorias.filter(c => c.estado === false).length;
+
   return (
     <div className="container-fluid py-4" style={{ backgroundColor: '#F9FAFD', minHeight: '100vh' }}>
-      
-      {/* Header Actions */}
-      <div className="card mb-3 shadow-none border">
-        <div className="card-body p-3">
-          <div className="row flex-between-center">
-            <div className="col-sm-auto mb-2 mb-sm-0">
-              <h5 className="mb-0 fw-bold">Catálogo de Categorías</h5>
-            </div>
-            <div className="col-sm-auto">
-              <button className="btn btn-falcon-default btn-sm px-3" onClick={handleSync} disabled={loading}>
-                <span className={`fas fa-sync-alt me-1 text-primary ${loading ? 'fa-spin' : ''}`}></span> Sincronizar Caché
+
+      {/* ── Page Header ───────────────────────────────────────────── */}
+      <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <div>
+          <h4 className="mb-0 fw-bold">Catálogo de Familias y Categorías</h4>
+          <p className="text-500 fs--1 mb-0">{actCount} activas · {inactCount} inactivas</p>
+        </div>
+        <div className="d-flex gap-2 flex-wrap">
+          <button className="btn btn-primary btn-sm" onClick={openNewModal}>
+            <span className="fas fa-plus me-1" /> Nueva Categoría
+          </button>
+        </div>
+      </div>
+
+      {/* ── Card principal ────────────────────────────────────────── */}
+      <div className="card shadow-none border">
+
+        {/* Tabs + controles */}
+        <div className="card-header bg-light border-bottom p-0">
+          <div className="d-flex align-items-center justify-content-between flex-wrap px-3 pt-2 gap-2">
+            {/* Tabs */}
+            <ul className="nav nav-tabs border-0 mb-0 gap-1">
+              {[
+                { key: 'activas',     label: 'Activas',    count: actCount },
+                { key: 'inactivas',   label: 'Inactivas',  count: inactCount },
+              ].map(tab => (
+                <li className="nav-item" key={tab.key}>
+                  <button
+                    className={`nav-link border-0 fw-semibold fs--1 pb-2 ${activeTab === tab.key ? 'active text-primary' : 'text-600'}`}
+                    onClick={() => setActiveTab(tab.key)}
+                  >
+                    {tab.label}
+                    <span className={`badge ms-1 rounded-pill ${activeTab === tab.key ? 'bg-primary' : 'bg-200 text-700'}`}>
+                      {tab.count}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            {/* Controles */}
+            <div className="d-flex align-items-center gap-2 pb-2">
+              <div className="input-group input-group-sm" style={{ width: 250 }}>
+                <span className="input-group-text bg-white border-end-0"><span className="fas fa-search text-400" /></span>
+                <input
+                  type="text"
+                  className="form-control border-start-0 ps-0"
+                  placeholder="Buscar categoría..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+              </div>
+              <button className="btn btn-sm btn-falcon-default" onClick={fetchCategorias} title="Actualizar">
+                <span className="fas fa-sync-alt" />
               </button>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="card shadow-none border mb-3">
+        {/* Cuerpo */}
         <div className="card-body p-0">
           <div className="table-responsive">
-            <table className="table table-sm table-hover mb-0 fs--1">
-              <thead className="bg-200 text-900">
+            <table className="table table-sm table-hover fs--1 mb-0 align-middle">
+              <thead className="bg-200 text-uppercase text-600" style={{ fontSize: '0.7rem' }}>
                 <tr>
-                  <th className="sort pe-1 align-middle white-space-nowrap">Nombre de Familia</th>
-                  <th className="sort pe-1 align-middle white-space-nowrap">Descripción</th>
-                  <th className="sort pe-1 align-middle white-space-nowrap">Cta. Ingreso</th>
-                  <th className="sort pe-1 align-middle white-space-nowrap">Cta. Costo</th>
-                  <th className="sort pe-1 align-middle white-space-nowrap">Cta. Inventario</th>
-                  <th className="sort pe-1 align-middle text-end">Acciones</th>
+                  <th>Nombre de Familia</th>
+                  <th>Descripción</th>
+                  <th>Cta. Ingreso</th>
+                  <th>Cta. Costo</th>
+                  <th>Cta. Inventario</th>
+                  <th className="text-center">Estado</th>
+                  <th className="text-center">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="list">
-                {categorias?.length > 0 ? (
-                  categorias.map(cat => (
-                    <tr key={cat.id}>
-                      <td className="align-middle fw-bold">{cat.nombre}</td>
-                      <td className="align-middle">{cat.descripcion || '-'}</td>
-                      <td className="align-middle">
-                        <span className="badge bg-success-subtle text-success">{cat.cuenta_contable_ingreso || 'N/A'}</span>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-5">
+                      <div className="spinner-border text-primary" role="status" />
+                      <p className="mt-2 text-500 fs--1 mb-0">Cargando categorías...</p>
+                    </td>
+                  </tr>
+                ) : filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-5">
+                      <span className="fas fa-layer-group fs-3 text-300 d-block mb-2" />
+                      <p className="text-500 mb-0">No se encontraron categorías en esta lista.</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map(c => (
+                    <tr key={c.id}>
+                      <td className="fw-semibold text-900">{c.nombre}</td>
+                      <td>{c.descripcion || <span className="text-400">—</span>}</td>
+                      <td>
+                        {c.cuenta_contable_ingreso 
+                          ? <span className="badge badge-soft-success">{c.cuenta_contable_ingreso}</span>
+                          : <span className="text-400">—</span>}
                       </td>
-                      <td className="align-middle">
-                        <span className="badge bg-danger-subtle text-danger">{cat.cuenta_contable_costo || 'N/A'}</span>
+                      <td>
+                        {c.cuenta_contable_costo 
+                          ? <span className="badge badge-soft-danger">{c.cuenta_contable_costo}</span>
+                          : <span className="text-400">—</span>}
                       </td>
-                      <td className="align-middle">
-                        <span className="badge bg-info-subtle text-info">{cat.cuenta_contable_inventario || 'N/A'}</span>
+                      <td>
+                        {c.cuenta_contable_inventario 
+                          ? <span className="badge badge-soft-info">{c.cuenta_contable_inventario}</span>
+                          : <span className="text-400">—</span>}
                       </td>
-                      <td className="align-middle text-end">
-                        <button className="btn btn-link p-0 ms-2" title="Editar" onClick={() => handleEdit(cat)}>
-                          <span className="text-500 fas fa-edit"></span>
-                        </button>
-                        <button className="btn btn-link p-0 ms-2 text-danger" title="Eliminar" onClick={() => handleDelete(cat.id)}>
-                          <span className="text-500 fas fa-trash-alt"></span>
-                        </button>
+                      <td className="text-center">
+                        {c.estado !== false
+                          ? <span className="badge badge-soft-success">Activa</span>
+                          : <span className="badge badge-soft-danger">Inactiva</span>}
+                      </td>
+                      <td className="text-center">
+                        <div className="d-flex justify-content-center gap-2">
+                          <button className="btn btn-sm btn-falcon-default p-1 px-2" title="Editar" onClick={() => handleEdit(c)}>
+                            <span className="fas fa-pen text-warning" />
+                          </button>
+                          <button className="btn btn-sm btn-falcon-default p-1 px-2" title={c.estado !== false ? 'Desactivar' : 'Activar'} onClick={() => handleToggle(c)}>
+                            <span className={`fas ${c.estado !== false ? 'fa-toggle-on text-success' : 'fa-toggle-off text-secondary'}`} />
+                          </button>
+                          <button className="btn btn-sm btn-falcon-default p-1 px-2" title="Eliminar" onClick={() => handleDelete(c)}>
+                            <span className="fas fa-trash-alt text-danger" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="text-center py-4 text-muted">
-                      No hay categorías en caché. Presiona "Sincronizar" o crea una nueva.
-                    </td>
-                  </tr>
                 )}
               </tbody>
             </table>
           </div>
         </div>
+
+        {/* Footer */}
+        {!loading && (
+          <div className="card-footer bg-light border-top py-2 px-3 d-flex justify-content-between align-items-center">
+            <span className="fs--1 text-500">Mostrando {filtered.length} de {categorias.length} categorías</span>
+          </div>
+        )}
       </div>
 
-      {/* Modal para Nueva Categoría */}
+      {/* ── Modal Form ─────────────────────────────────────────────── */}
       {showModal && (
         <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(11,23,39,0.5)', zIndex: 1055 }}>
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content border-0">
+            <div className="modal-content border-0 shadow">
               <div className="modal-header bg-light">
-                <h5 className="modal-title">{isEditing ? 'Editar Categoría' : 'Crear Categoría'}</h5>
-                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+                <h5 className="modal-title"><span className={`fas ${isEditing ? 'fa-pen text-warning' : 'fa-plus text-primary'} me-2`} />{isEditing ? 'Editar Categoría' : 'Nueva Categoría'}</h5>
+                <button className="btn-close" onClick={() => setShowModal(false)} />
               </div>
-                <form onSubmit={handleSave}>
-                  <div className="modal-body">
-                    <div className="mb-3">
-                      <label className="form-label fw-bold">Nombre de la Categoría</label>
-                      <input type="text" className="form-control" name="nombre" value={formData.nombre} onChange={handleChange} required placeholder="Ej. Lácteos, Electrodomésticos" />
+              <form onSubmit={handleSave}>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label className="form-label fw-bold">Nombre de la Familia / Categoría</label>
+                    <input type="text" className="form-control" name="nombre" value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} required placeholder="Ej. Lácteos, Electrodomésticos" />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Descripción</label>
+                    <textarea className="form-control" name="descripcion" value={formData.descripcion} onChange={e => setFormData({...formData, descripcion: e.target.value})} rows="2" />
+                  </div>
+                  <hr className="my-3" />
+                  <h6 className="fs--1 text-600 mb-2">Integración Contable (Opcional)</h6>
+                  <div className="row g-2">
+                    <div className="col-md-4">
+                      <label className="form-label fs--1">Cta. Ingreso (PUC)</label>
+                      <input type="text" className="form-control form-control-sm" name="cuenta_contable_ingreso" value={formData.cuenta_contable_ingreso} onChange={e => setFormData({...formData, cuenta_contable_ingreso: e.target.value})} placeholder="Ej. 4135" />
                     </div>
-                    <div className="mb-3">
-                      <label className="form-label">Descripción</label>
-                      <textarea className="form-control" name="descripcion" value={formData.descripcion} onChange={handleChange} rows="2"></textarea>
+                    <div className="col-md-4">
+                      <label className="form-label fs--1">Cta. Costo (PUC)</label>
+                      <input type="text" className="form-control form-control-sm" name="cuenta_contable_costo" value={formData.cuenta_contable_costo} onChange={e => setFormData({...formData, cuenta_contable_costo: e.target.value})} placeholder="Ej. 6135" />
                     </div>
-                    <div className="row g-2">
-                      <div className="col-md-4">
-                        <label className="form-label fs--1">Cta. Ingreso (PUC)</label>
-                        <input type="text" className="form-control form-control-sm" name="cuenta_contable_ingreso" value={formData.cuenta_contable_ingreso} onChange={handleChange} placeholder="Ej. 4135" />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label fs--1">Cta. Costo (PUC)</label>
-                        <input type="text" className="form-control form-control-sm" name="cuenta_contable_costo" value={formData.cuenta_contable_costo} onChange={handleChange} placeholder="Ej. 6135" />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label fs--1">Cta. Inventario (PUC)</label>
-                        <input type="text" className="form-control form-control-sm" name="cuenta_contable_inventario" value={formData.cuenta_contable_inventario} onChange={handleChange} placeholder="Ej. 1435" />
-                      </div>
-                    </div>
-                    <div className="mt-2 text-muted fs--2">
-                      <i className="fas fa-info-circle me-1"></i>
-                      Asignar el PUC permitirá que el Motor Contable Invisible genere los comprobantes diarios automáticamente por cada venta.
+                    <div className="col-md-4">
+                      <label className="form-label fs--1">Cta. Inventario (PUC)</label>
+                      <input type="text" className="form-control form-control-sm" name="cuenta_contable_inventario" value={formData.cuenta_contable_inventario} onChange={e => setFormData({...formData, cuenta_contable_inventario: e.target.value})} placeholder="Ej. 1435" />
                     </div>
                   </div>
-                  <div className="modal-footer bg-light border-top-0">
-                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowModal(false)}>Cancelar</button>
-                    <button type="submit" className="btn btn-primary btn-sm px-4" disabled={loading}>
-                      {loading ? <span className="fas fa-spinner fa-spin me-2"></span> : <span className="fas fa-save me-2"></span>}
-                      {isEditing ? 'Actualizar' : 'Guardar'}
-                    </button>
+                  <div className="mt-2 text-muted fs--2">
+                    <span className="fas fa-info-circle me-1" />
+                    Asignar el PUC permitirá que el Motor Contable Invisible genere los comprobantes diarios automáticamente por cada venta.
                   </div>
-                </form>
-              </div>
+                </div>
+                <div className="modal-footer bg-light border-top-0">
+                  <button type="button" className="btn btn-sm btn-falcon-default" onClick={() => setShowModal(false)}>Cancelar</button>
+                  <button type="submit" className="btn btn-sm btn-primary px-4" disabled={saving}>
+                    {saving ? <span className="spinner-border spinner-border-sm me-1" /> : <span className="fas fa-save me-1" />}
+                    {isEditing ? 'Actualizar' : 'Guardar'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
+        </div>
       )}
 
-      {/* Floating Action Button (FAB) */}
-      <button 
-        className="btn btn-primary rounded-circle shadow d-flex align-items-center justify-content-center" 
-        style={{ position: 'fixed', bottom: '30px', right: '30px', width: '60px', height: '60px', zIndex: 1050 }}
+      {/* ── FAB ────────────────────────────────────────────────────── */}
+      <button
+        className="btn btn-primary rounded-circle shadow d-flex align-items-center justify-content-center"
+        style={{ position: 'fixed', bottom: 30, right: 30, width: 56, height: 56, zIndex: 1050 }}
         onClick={openNewModal}
-        title="Crear Categoría"
+        title="Nueva Categoría"
       >
-        <span className="fas fa-plus fs-2"></span>
+        <span className="fas fa-plus fs-1" />
       </button>
 
     </div>
   );
 }
-
-export default CategoriasList;

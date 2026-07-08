@@ -22,9 +22,10 @@ function ProtectedRoute({ children, allowedRoles }) {
   const { session, role, restoreSession } = useAuthStore();
   const location = useLocation();
 
-  // Intentar restaurar sesión desde localStorage si no existe en store
+  // Intentar restaurar sesión desde localStorage si no existe en store,
+  // o si falta el tenantId (para recuperar permisos y contexto de BD actualizados).
   useEffect(() => {
-    if (!session) {
+    if (!session || !useAuthStore.getState().tenantId) {
       restoreSession();
     }
   }, []);

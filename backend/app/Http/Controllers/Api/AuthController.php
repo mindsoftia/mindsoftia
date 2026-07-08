@@ -25,21 +25,37 @@ class AuthController extends Controller
 
         // Si tenemos tenant_id, buscamos los permisos exactos en la base de datos
         if ($userId && $tenantId) {
-            $usuarioEmpresa = UsuarioEmpresa::with(['rol.permisos', 'empresa'])
-                ->where('id_usuario', $userId)
-                ->where('id_empresa', $tenantId)
-                ->where('estado_acceso', true)
-                ->first();
+            try {
+                $usuarioEmpresa = UsuarioEmpresa::with(['rol.permisos', 'empresa'])
+                    ->where('id_usuario', $userId)
+                    ->where('id_empresa', (string)$tenantId)
+                    ->where('estado_acceso', true)
+                    ->first();
 
-            if ($usuarioEmpresa && $usuarioEmpresa->rol) {
-                // Extraemos solo el arreglo de 'codigo_permiso' (ej: ['cartera.ver', 'marketing.crear'])
-                $permisos = $usuarioEmpresa->rol->permisos->pluck('codigo_permiso')->toArray();
-                $roleName = $usuarioEmpresa->rol->nombre_rol; // Aseguramos el nombre real de BD
-            }
-            
-            if ($usuarioEmpresa && $usuarioEmpresa->empresa) {
-                $empresaNombre = $usuarioEmpresa->empresa->nombre;
-                $subdominio = $usuarioEmpresa->empresa->subdominio;
+                if ($usuarioEmpresa && $usuarioEmpresa->rol) {
+                    $permisos = $usuarioEmpresa->rol->permisos->pluck('codigo_permiso')->toArray();
+                    $roleName = $usuarioEmpresa->rol->nombre_rol;
+                }
+                
+                if ($usuarioEmpresa && $usuarioEmpresa->empresa) {
+                    $empresaNombre = $usuarioEmpresa->empresa->nombre;
+                    $subdominio = $usuarioEmpresa->empresa->subdominio;
+                } else {
+                    // Fallback to primary Empresas table if relationship is broken
+                    $emp = \App\Models\Empresa::find($tenantId);
+                    if ($emp) {
+                        $empresaNombre = $emp->nombre;
+                        $subdominio = $emp->subdominio;
+                    }
+                }
+            } catch (\Exception $e) {
+                // Ignore UUID cast errors (SQLSTATE 22P02) or other DB relation errors
+                $emp = \App\Models\Empresa::find($tenantId);
+                if ($emp) {
+                    $empresaNombre = $emp->nombre;
+                    $subdominio = $emp->subdominio;
+                }
+                $roleName = $roleName ?: 'admin'; // Default fallback
             }
         }
 

@@ -2,28 +2,51 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
 import useAuthStore from '../../store/authStore';
+import api from '../../services/api';
+import { StorageService } from '../../services/storage.service';
+import Swal from 'sweetalert2';
 
-export default function ProductoCreate({ onClose, onSuccess }) {
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+});
+
+export default function ProductoCreate({ onClose, onSuccess, initialData }) {
   const navigate = useNavigate();
   const { tenantId } = useAuthStore();
-  const [loading, setLoading] = useState(false);
   const [categorias, setCategorias] = useState([]);
   const [moneda, setMoneda] = useState('$');
   
-  // Image Upload State
   const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreview, setImagePreview] = useState(initialData?.imagen_url || null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(initialData ? {
+    nombre: initialData.nombre || '',
+    codigo_sku: initialData.codigo_sku || '',
+    codigo_barras: initialData.codigo_barras || '',
+    descripcion: initialData.descripcion || '',
+    categoria_id: initialData.categoria_id || '',
+    precio_venta_1: initialData.precio_venta_1 || '',
+    costo_promedio: initialData.costo_promedio || '',
+    tarifa_impuesto: initialData.tarifa_impuesto || '',
+    stock_actual: initialData.stock_actual || '',
+    stock_maximo: initialData.stock_maximo || '',
+    etiquetas: initialData.etiquetas ? (Array.isArray(initialData.etiquetas) ? initialData.etiquetas.join(', ') : initialData.etiquetas) : '',
+    tipo: initialData.tipo || 'fisico'
+  } : {
     nombre: '',
     codigo_sku: '',
     codigo_barras: '',
     descripcion: '',
     categoria_id: '',
-    precio_venta: '',
+    precio_venta_1: '',
     costo_promedio: '',
     tarifa_impuesto: '',
-    stock_minimo: '',
+    stock_actual: '',
     stock_maximo: '',
     etiquetas: '',
     tipo: 'fisico'
@@ -82,61 +105,68 @@ export default function ProductoCreate({ onClose, onSuccess }) {
 
   const handleSave = async (e) => {
     if(e) e.preventDefault();
-    setLoading(true);
     
     try {
-      let imageUrl = null;
+      let imageUrl = initialData?.imagen_url || null;
+      const tid = tenantId || (useAuthStore.getState().user?.app_metadata?.empresa_id);
 
-      // 1. Upload image to Supabase Storage if present
+      // 1. Upload image to Supabase Storage via StorageService (tenant_id/productos/filename)
       if (imageFile) {
-        const fileExt = imageFile.name.split('.').pop();
-        const fileName = `${tenantId}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('productos')
-          .upload(fileName, imageFile);
-          
-        if (uploadError) {
-          console.error("Error uploading image to Supabase", uploadError);
-          alert('Hubo un error subiendo la imagen, pero el producto se guardará sin ella.');
-        } else {
-          const { data: publicUrlData } = supabase.storage.from('productos').getPublicUrl(fileName);
-          imageUrl = publicUrlData.publicUrl;
+        setUploadProgress(30);
+        const uploadRes = await StorageService.uploadTenantFile(imageFile, tid, 'productos');
+
+        if (uploadRes.error) {
+          console.error('Error subiendo imagen a Supabase:', uploadRes.error);
+          Toast.fire({ icon: 'warning', title: 'No se pudo subir la imagen al storage, guardando sin ella.' });
+        } else if (uploadRes.data?.path) {
+          setUploadProgress(70);
+          imageUrl = StorageService.getPublicUrl(uploadRes.data.path);
         }
       }
 
       // 2. Prepare payload
       const payload = {
-        empresa_id: tenantId,
         nombre: formData.nombre,
         codigo_sku: formData.codigo_sku,
         codigo_barras: formData.codigo_barras,
         descripcion: formData.descripcion,
         categoria_id: formData.categoria_id || null,
-        precio_venta: parseFloat(formData.precio_venta || 0),
+        precio_venta_1: parseFloat(formData.precio_venta_1 || 0),
         costo_promedio: parseFloat(formData.costo_promedio || 0),
         tarifa_impuesto: parseFloat(formData.tarifa_impuesto || 0),
-        stock_minimo: parseFloat(formData.stock_minimo || 0),
+        stock_actual: parseFloat(formData.stock_actual || 0),
         stock_maximo: parseFloat(formData.stock_maximo || 0),
-        etiquetas: formData.etiquetas ? formData.etiquetas.split(',').map(t => t.trim()) : [],
+        etiquetas: formData.etiquetas ? (typeof formData.etiquetas === 'string' ? formData.etiquetas.split(',').map(t => t.trim()) : formData.etiquetas) : [],
         tipo: formData.tipo,
-        imagen_url: imageUrl
+        imagen_url: imageUrl,
       };
 
-      // 3. Insert product
-
-      const { error } = await supabase.from('inv_productos').insert([payload]);
-      if (error) throw error;
-      if (onSuccess) {
-        onSuccess();
+      // 3. Save via Laravel API
+      let savedProduct;
+      if (initialData?.id) {
+        const res = await api.put(`/inventario/productos/${initialData.id}`, payload, { headers: { 'X-Tenant-ID': tid } });
+        savedProduct = res.data;
       } else {
-        navigate('/productos'); // Redirigir a la lista de productos
+        const res = await api.post('/inventario/productos', payload, { headers: { 'X-Tenant-ID': tid } });
+        savedProduct = res.data;
+      }
+
+      setUploadProgress(0);
+
+      // 4. Call parent callback
+      if (onSuccess) {
+        onSuccess(savedProduct);
+      } else {
+        Toast.fire({ icon: 'success', title: 'Producto guardado exitosamente' });
+        navigate('/productos');
       }
     } catch (error) {
       console.error('Error saving product:', error);
-      alert('Error al guardar el producto');
-    } finally {
-      setLoading(false);
+      setUploadProgress(0);
+      Toast.fire({
+        icon: 'error',
+        title: 'Error: ' + (error.response?.data?.message || error.message)
+      });
     }
   };
 
@@ -150,27 +180,26 @@ export default function ProductoCreate({ onClose, onSuccess }) {
         <div className="card-body">
           <div className="row flex-between-center">
             <div className="col-md">
-              <h5 className="mb-2 mb-md-0 fw-bold">Crear Producto</h5>
+              <h5 className="mb-2 mb-md-0 fw-bold">{initialData ? 'Editar Producto' : 'Crear Producto'}</h5>
             </div>
             <div className="col-auto d-flex align-items-center">
               <button 
-                className="btn btn-falcon-default btn-sm me-2"
+                className="btn btn-primary btn-sm me-2" 
+                onClick={handleSave}
+                title="Guardar Producto"
+              >
+                <span className="fas fa-save me-1"></span> Guardar
+              </button>
+              <button 
+                className="btn btn-falcon-default btn-sm"
                 onClick={(e) => {
                   e.preventDefault();
                   if (onClose) onClose();
                   else navigate('/productos');
                 }}
-                title="Cancelar"
+                title="Cerrar"
               >
                 <span className="fas fa-times text-danger"></span>
-              </button>
-              <button 
-                className="btn btn-primary btn-sm" 
-                onClick={handleSave}
-                disabled={loading}
-                title="Guardar Producto"
-              >
-                {loading ? <span className="spinner-border spinner-border-sm"></span> : <span className="fas fa-save"></span>}
               </button>
             </div>
           </div>
@@ -213,11 +242,11 @@ export default function ProductoCreate({ onClose, onSuccess }) {
           {/* Add Images Card */}
           <div className="card mb-3 shadow-none border">
             <div className="card-header bg-light border-bottom">
-              <h6 className="mb-0 fw-semi-bold">Añadir Imágenes</h6>
+              <h6 className="mb-0 fw-semi-bold">Imagen del Producto</h6>
             </div>
             <div className="card-body text-center py-4">
               {imagePreview ? (
-                <div className="position-relative d-inline-block">
+                <div className="position-relative d-inline-block mb-2">
                   <img src={imagePreview} alt="Preview" className="img-fluid rounded border" style={{ maxHeight: '200px' }} />
                   <button 
                     type="button" 
@@ -232,13 +261,24 @@ export default function ProductoCreate({ onClose, onSuccess }) {
                 <div className="border-dashed border-2 border-300 rounded-2 py-4 bg-100 position-relative" style={{ borderStyle: 'dashed' }}>
                   <input 
                     type="file" 
-                    className="position-absolute w-100 h-100 opacity-0 cursor-pointer" 
-                    style={{ top: 0, left: 0 }} 
+                    className="position-absolute w-100 h-100 opacity-0"
+                    style={{ top: 0, left: 0, cursor: 'pointer' }} 
                     accept="image/*"
                     onChange={handleImageSelect}
                   />
-                  <span className="fas fa-cloud-upload-alt text-400 fs-3 mb-2"></span>
-                  <p className="fs--1 text-600 mb-0">Arrastra tu imagen aquí<br />o, <span className="text-primary cursor-pointer">Explorar</span></p>
+                  <span className="fas fa-cloud-upload-alt text-400 fs-3 d-block mb-2"></span>
+                  <p className="fs--1 text-600 mb-0">Arrastra tu imagen aquí<br />o, <span className="text-primary">Explorar</span></p>
+                </div>
+              )}
+              {uploadProgress > 0 && (
+                <div className="mt-3">
+                  <div className="progress" style={{ height: '6px' }}>
+                    <div 
+                      className="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                  <p className="text-500 fs--2 mt-1 mb-0">Subiendo imagen ({uploadProgress}%)...</p>
                 </div>
               )}
             </div>
@@ -314,7 +354,7 @@ export default function ProductoCreate({ onClose, onSuccess }) {
                   <label className="form-label fw-semi-bold fs--1">Precio de Venta:</label>
                   <div className="input-group input-group-sm">
                     <span className="input-group-text text-500">{moneda}</span>
-                    <input type="number" className="form-control" name="precio_venta" value={formData.precio_venta} onChange={handleChange} placeholder="0.00" />
+                    <input type="number" className="form-control" name="precio_venta_1" value={formData.precio_venta_1} onChange={handleChange} placeholder="0.00" />
                   </div>
                 </div>
                 <div className="col-6">
@@ -334,8 +374,8 @@ export default function ProductoCreate({ onClose, onSuccess }) {
               <hr className="my-3 border-300" />
               <div className="row g-2">
                 <div className="col-6">
-                  <label className="form-label fw-semi-bold fs--1">Stock Mínimo:</label>
-                  <input type="number" className="form-control form-control-sm" name="stock_minimo" value={formData.stock_minimo} onChange={handleChange} placeholder="0" />
+                  <label className="form-label fw-semi-bold fs--1">Stock Actual:</label>
+                  <input type="number" className="form-control form-control-sm" name="stock_actual" value={formData.stock_actual} onChange={handleChange} placeholder="0" />
                 </div>
                 <div className="col-6">
                   <label className="form-label fw-semi-bold fs--1">Stock Máximo:</label>

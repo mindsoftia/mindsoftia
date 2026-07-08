@@ -12,20 +12,20 @@ class InvProducto extends Model
 
     protected $table = 'inv_productos';
     protected $fillable = [
-        'empresa_id', 'categoria_id', 'referencia', 'codigo_barras', 'nombre',
-        'descripcion', 'etiquetas', 'unidad_medida', 'precio_venta',
-        'costo_promedio', 'tarifa_impuesto', 'stock_minimo', 'stock_maximo', 
-        'tipo', 'maneja_inventario', 'activo',
+        'empresa_id', 'categoria_id', 'codigo_sku', 'codigo_barras', 'nombre',
+        'descripcion', 'etiquetas', 'precio_venta_1',
+        'costo_promedio', 'tarifa_impuesto', 'stock_actual', 'stock_maximo', 
+        'tipo', 'controla_inventario', 'estado', 'imagen_url'
     ];
 
     protected $casts = [
-        'precio_venta'   => 'decimal:2',
+        'precio_venta_1' => 'decimal:2',
         'costo_promedio' => 'decimal:2',
         'tarifa_impuesto'=> 'decimal:2',
-        'stock_minimo'   => 'decimal:3',
+        'stock_actual'   => 'decimal:3',
         'stock_maximo'   => 'decimal:3',
-        'maneja_inventario' => 'boolean',
-        'activo'         => 'boolean',
+        'controla_inventario' => 'boolean',
+        'estado'         => 'boolean',
         'etiquetas'      => 'array',
     ];
 
@@ -53,7 +53,7 @@ class InvProducto extends Model
     // ── Scopes ──────────────────────────────────────────
     public function scopeActivos($query)
     {
-        return $query->where('activo', true)->where('maneja_inventario', true);
+        return $query->where('estado', true)->where('controla_inventario', true);
     }
 
     // Stock consolidado de todas las sedes

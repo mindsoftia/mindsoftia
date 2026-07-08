@@ -58,9 +58,10 @@ class VerifySupabaseToken
             $isSuperAdmin = in_array($decoded->email ?? '', $superAdmins);
 
             if (!$empresaId && !$isSuperAdmin && !$request->is('api/onboarding')) {
+                $emailDebug = $decoded->email ?? 'sin-email';
                 return response()->json([
                     'error'   => 'Acceso denegado',
-                    'message' => 'El usuario no tiene una empresa asignada. Por favor completa el Onboarding.'
+                    'message' => "El usuario ($emailDebug) no tiene una empresa asignada. Por favor completa el Onboarding."
                 ], 403);
             }
 
@@ -112,10 +113,17 @@ class VerifySupabaseToken
                         $superAdmins = ['amadomora@gmail.com'];
                         $isSuperAdmin = in_array($decoded->email ?? '', $superAdmins);
 
+                        \Illuminate\Support\Facades\Log::info('JWT Debug (ES256)', [
+                            'email' => $decoded->email ?? 'null',
+                            'empresaId' => $empresaId ?? 'null',
+                            'isSuperAdmin' => $isSuperAdmin
+                        ]);
+
                         if (!$empresaId && !$isSuperAdmin && !$request->is('api/onboarding')) {
+                            $emailDebug = $decoded->email ?? 'sin-email';
                             return response()->json([
                                 'error' => 'Acceso denegado',
-                                'message' => 'El usuario no tiene una empresa asignada. Por favor completa el Onboarding.'
+                                'message' => "El usuario ($emailDebug) no tiene una empresa asignada. Por favor completa el Onboarding."
                             ], 403);
                         }
 

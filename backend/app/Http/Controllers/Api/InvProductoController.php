@@ -15,7 +15,9 @@ class InvProductoController extends Controller
      */
     public function index(Request $request)
     {
-        $empresaId = $request->header('X-Tenant-ID');
+        // Usar empresa_id inyectado por el middleware de autenticación (fuente de verdad)
+        // Fallback al header X-Tenant-ID para compatibilidad con peticiones directas
+        $empresaId = $request->attributes->get('empresa_id') ?? $request->header('X-Tenant-ID');
         if (!$empresaId) {
             return response()->json(['error' => 'Tenant no especificado'], 400);
         }
@@ -36,19 +38,19 @@ class InvProductoController extends Controller
 
         $validated = $request->validate([
             'categoria_id' => 'nullable|uuid|exists:inv_categorias,id',
-            'referencia' => 'nullable|string|max:50',
+            'codigo_sku' => 'nullable|string|max:50',
             'codigo_barras' => 'nullable|string|max:100',
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
-            'unidad_medida' => 'nullable|string|max:20',
-            'precio_venta' => 'required|numeric|min:0',
+            'precio_venta_1' => 'required|numeric|min:0',
             'costo_promedio' => 'required|numeric|min:0',
             'tarifa_impuesto' => 'numeric|min:0',
-            'stock_minimo' => 'numeric|min:0',
+            'stock_actual' => 'numeric|min:0',
             'stock_maximo' => 'numeric|min:0',
             'tipo' => 'nullable|string|max:50',
-            'maneja_inventario' => 'boolean',
+            'controla_inventario' => 'boolean',
             'etiquetas' => 'nullable|array',
+            'imagen_url' => 'nullable|string',
         ]);
 
         $validated['empresa_id'] = $empresaId;
@@ -75,20 +77,20 @@ class InvProductoController extends Controller
 
         $validated = $request->validate([
             'categoria_id' => 'nullable|uuid|exists:inv_categorias,id',
-            'referencia' => 'nullable|string|max:50',
+            'codigo_sku' => 'nullable|string|max:50',
             'codigo_barras' => 'nullable|string|max:100',
             'nombre' => 'sometimes|required|string|max:255',
             'descripcion' => 'nullable|string',
-            'unidad_medida' => 'nullable|string|max:20',
-            'precio_venta' => 'sometimes|required|numeric|min:0',
+            'precio_venta_1' => 'sometimes|required|numeric|min:0',
             'costo_promedio' => 'sometimes|required|numeric|min:0',
             'tarifa_impuesto' => 'numeric|min:0',
-            'stock_minimo' => 'numeric|min:0',
+            'stock_actual' => 'numeric|min:0',
             'stock_maximo' => 'numeric|min:0',
             'tipo' => 'nullable|string|max:50',
-            'maneja_inventario' => 'boolean',
+            'controla_inventario' => 'boolean',
             'etiquetas' => 'nullable|array',
-            'activo' => 'boolean'
+            'estado' => 'boolean',
+            'imagen_url' => 'nullable|string',
         ]);
 
         $producto->update($validated);
@@ -101,7 +103,7 @@ class InvProductoController extends Controller
     public function destroy(string $id)
     {
         $producto = InvProducto::findOrFail($id);
-        $producto->update(['activo' => false]);
+        $producto->update(['estado' => false]);
         return response()->json(['message' => 'Producto inactivo']);
     }
 
@@ -142,7 +144,7 @@ class InvProductoController extends Controller
                 'nombre'         => trim($data['nombre']),
                 'codigo_sku'     => trim($data['codigo_sku'] ?? ''),
                 'codigo_barras'  => trim($data['codigo_barras'] ?? ''),
-                'precio_venta'   => (float) ($data['precio_venta'] ?? 0),
+                'precio_venta_1' => (float) ($data['precio_venta'] ?? 0),
                 'costo_promedio' => (float) ($data['costo_promedio'] ?? 0),
                 'tarifa_impuesto'=> (float) ($data['tarifa_impuesto'] ?? 0),
                 'tipo'           => trim($data['tipo'] ?? 'fisico'),

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const RoadmapCalendar = () => {
-  const [selectedDay, setSelectedDay] = useState(37); // Default to latest logic/today
+  const [selectedDay, setSelectedDay] = useState(38); // Default to latest logic/today
 
   // Datos interactivos de los reportes diarios
     const dailyReports = {
@@ -87,6 +87,13 @@ const RoadmapCalendar = () => {
       { id: 2, title: 'Importación Masiva CSV (DB)', desc: '<strong>1. ¿Qué se hizo?:</strong> Desarrollo del endpoint `/api/inventario/productos/import` con inyección Batch Insert.<br/><strong>2. ¿Por qué?:</strong> Insertar productos uno a uno (en un bucle for) saturaría la red y colapsaría la memoria (Problema N+1).<br/><strong>3. ¿Para qué?:</strong> Para permitir a las empresas cargar miles de productos en milisegundos usando el motor nativo de PostgreSQL.' },
       { id: 3, title: 'Migración: Impuestos y Categorías', desc: '<strong>1. ¿Qué se hizo?:</strong> Alteración de la DB añadiendo IVA, Stock Min/Max, y relaciones con la nueva tabla `inv_categorias`.<br/><strong>2. ¿Por qué?:</strong> Es un requisito legal indispensable de la DIAN para facturación electrónica y control logístico comercial.<br/><strong>3. ¿Para qué?:</strong> Para que el cajero en el POS calcule los totales correctamente y envíe la estructura tributaria adecuada al facturar.' },
       { id: 4, title: 'Configuración Financiera y UX (Sesión 2)', desc: '<strong>1. ¿Qué se hizo?:</strong> Panel Settings global, CRUD de categorías en Falcon UI, subida de imágenes a Supabase, auto-completado de IVA y verificación DNS.<br/><strong>2. ¿Por qué?:</strong> El catálogo y el POS requerían soporte para impuestos dinámicos, carga multimedia y despliegue real SaaS.<br/><strong>3. ¿Para qué?:</strong> Para asegurar que los cálculos en facturación sean legales y que el sistema multi-tenant funcione en un dominio wildcard público.' }
+    ],
+    38: [
+      { id: 1, title: 'Tablas Falcon y Categorías/Familias', desc: '<strong>1. ¿Qué se hizo?:</strong> Refactorización total de las tablas de Productos y Categorías/Familias con pestañas Activos/Inactivos y acciones en modal.<br/><strong>2. ¿Por qué?:</strong> Las tablas requerían estandarización Falcon UI premium y un único botón flotante (FAB) de creación.<br/><strong>3. ¿Para qué?:</strong> Para gestionar el catálogo de forma clara, corporativa y ágil.' },
+      { id: 2, title: 'Reactividad y Feedback Toast', desc: '<strong>1. ¿Qué se hizo?:</strong> Reemplazo de alertas invasivas por notificaciones Toast no bloqueantes y actualización reactiva por ítem.<br/><strong>2. ¿Por qué?:</strong> Las alertas modales bloqueaban la pantalla y generaban recargas innecesarias de toda la tabla.<br/><strong>3. ¿Para qué?:</strong> Para brindar una UX instantánea donde los cambios (editar, activar/desactivar) se reflejan en vivo.' },
+      { id: 3, title: 'Subida y Progreso Storage Supabase', desc: '<strong>1. ¿Qué se hizo?:</strong> Integración de subida directa de imágenes al bucket archivos_empresas con barra de progreso animada en React.<br/><strong>2. ¿Por qué?:</strong> Se eliminó el loader bloqueante de SweetAlert que provocaba colapsos del DOM al desmontar.<br/><strong>3. ¿Para qué?:</strong> Para mostrar al usuario el porcentaje de carga en tiempo real sin congelar la interfaz.' },
+      { id: 4, title: 'Desbloqueo Políticas RLS en DB', desc: '<strong>1. ¿Qué se hizo?:</strong> Rediseño de public.current_tenant_id() en PostgreSQL para consultar el tenant por auth.uid() en saas_usuarios_empresas.<br/><strong>2. ¿Por qué?:</strong> El JWT de usuarios estándar no incluía tenant_id, haciendo que RLS rechazara las subidas al Storage.<br/><strong>3. ¿Para qué?:</strong> Para que el RLS verifique el tenant con exactitud y permita almacenar archivos multi-tenant de forma segura.' },
+      { id: 5, title: 'Blindaje DOM Anti-Pantalla Blanca', desc: '<strong>1. ¿Qué se hizo?:</strong> Inyección de translate="no" en index.html y componente global ErrorBoundary en main.jsx.<br/><strong>2. ¿Por qué?:</strong> Traductores del navegador (Google Translate) alteran nodos de texto y rompen el desmontaje en React 18.<br/><strong>3. ¿Para qué?:</strong> Para garantizar el 100% de disponibilidad visual impidiendo que cualquier excepción provoque una página en blanco.' }
     ]
   };
 
@@ -106,10 +113,10 @@ const RoadmapCalendar = () => {
       if (day === 16) baseClass += " border border-success rounded-start-pill border-end-0";
       else if (day >= 17 && day <= 21) baseClass += " border border-success border-start-0 border-end-0";
       else if (day === 22) baseClass += " border border-success border-start-0 rounded-end-pill";
-    } else if (day >= 23 && day <= 37) {
+    } else if (day >= 23 && day <= 38) {
       baseClass += " bg-soft-warning";
       if (day === 23) baseClass += " rounded-start-pill";
-      if (day === 37) baseClass += " rounded-end-pill";
+      if (day === 38) baseClass += " rounded-end-pill";
     }
 
     if (day === selectedDay) {
@@ -164,8 +171,8 @@ const RoadmapCalendar = () => {
                 {/* 31 May */}
                 <div className="text-400 py-2" style={{ width: '14%' }}>31</div>
                 
-                {/* Days 1 to 37 (Includes July 1 to 7) */}
-                {[...Array(37)].map((_, i) => renderDay(i + 1))}
+                {/* Days 1 to 38 (Includes July 1 to 8) */}
+                {[...Array(38)].map((_, i) => renderDay(i + 1))}
 
                 {/* Next month days */}
                 <div className="py-2 text-400" style={{ width: '14%' }}>4</div>
