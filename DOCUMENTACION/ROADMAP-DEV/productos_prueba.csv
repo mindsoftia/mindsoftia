@@ -1,0 +1,11 @@
+nombre,codigo_sku,codigo_barras,precio_venta,costo_promedio,tarifa_impuesto,tipo
+Auriculares Bluetooth,AUD-BT01,7701234001,120000,45000,19.00,Físico
+Teclado Mecánico RGB,TEC-M02,7701234002,250000,120000,19.00,Físico
+Bebida Energética 250ml,BEB-E01,7701234003,6000,2500,19.00,Físico
+Manzana Verde (Unidad),FRU-M01,7701234004,1500,800,0.00,Físico
+Mantenimiento PC Básico,SRV-PC1,,80000,0,19.00,Servicio
+Licencia Antivirus 1 Año,SRV-ANT,,95000,30000,19.00,Servicio
+Agua Mineral 500ml,BEB-A02,7701234007,2500,1000,5.00,Físico
+Mouse Inalámbrico,MOU-IN1,7701234008,45000,15000,19.00,Físico
+Galletas de Chocolate,SNK-G01,7701234009,3000,1200,19.00,Físico
+Instalación de Redes,SRV-RED,,250000,0,19.00,Servicio

@@ -40,14 +40,14 @@ export default function ProductoCreate({ onClose, onSuccess }) {
         };
 
         // 1. Fetch Categorias
-        const catRes = await fetch(`${import.meta.env.VITE_API_URL}/api/inventario/categorias`, { headers });
+        const catRes = await fetch(`${import.meta.env.VITE_API_URL}/inventario/categorias`, { headers });
         if (catRes.ok) {
           const catData = await catRes.json();
           setCategorias(catData.categorias || []);
         }
 
         // 2. Fetch Empresa Settings para default IVA
-        const setRes = await fetch(`${import.meta.env.VITE_API_URL}/api/empresa/settings`, { headers });
+        const setRes = await fetch(`${import.meta.env.VITE_API_URL}/empresa/settings`, { headers });
         if (setRes.ok) {
           const setData = await setRes.json();
           if (setData.impuesto_defecto !== undefined) {
