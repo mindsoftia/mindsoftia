@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
+import api from '../../services/api';
 import ProductoCreate from './ProductoCreate';
 
 export default function ProductosList() {
@@ -20,17 +21,10 @@ export default function ProductosList() {
   const fetchProductos = async () => {
     setLoading(true);
     try {
-      const token = useAuthStore.getState().getToken();
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/inventario/productos`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'X-Tenant-ID': tenantId
-        }
+      const response = await api.get('/inventario/productos', {
+        headers: { 'X-Tenant-ID': tenantId }
       });
-      if (response.ok) {
-        const data = await response.json();
-        setProductos(data);
-      }
+      setProductos(response.data);
     } catch (err) {
       console.error('Error fetching productos:', err);
     } finally {
@@ -51,28 +45,21 @@ export default function ProductosList() {
     formData.append('file', file);
 
     try {
-      const token = useAuthStore.getState().getToken();
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/inventario/productos/import`, {
-        method: 'POST',
+      const response = await api.post('/inventario/productos/import', formData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'X-Tenant-ID': tenantId
-        },
-        body: formData
+          'X-Tenant-ID': tenantId,
+          'Content-Type': 'multipart/form-data'
+        }
       });
       
-      const result = await response.json();
-      if (response.ok) {
-        alert(result.message || 'Importación exitosa');
-        setShowImportModal(false);
-        setFile(null);
-        fetchProductos(); // Recargar lista
-      } else {
-        alert('Error: ' + (result.error || 'Ocurrió un problema en la importación'));
-      }
+      alert(response.data.message || 'Importación exitosa');
+      setShowImportModal(false);
+      setFile(null);
+      fetchProductos(); // Recargar lista
     } catch (err) {
       console.error('Error importing CSV:', err);
-      alert('Error de conexión al importar');
+      const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Ocurrió un problema en la importación';
+      alert('Error: ' + errorMsg);
     } finally {
       setImporting(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
