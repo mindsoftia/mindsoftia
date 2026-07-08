@@ -3,11 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
 import useAuthStore from '../../store/authStore';
 
-export default function ProductoCreate() {
+export default function ProductoCreate({ onClose, onSuccess }) {
   const navigate = useNavigate();
   const { tenantId } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [categorias, setCategorias] = useState([]);
+  const [moneda, setMoneda] = useState('$');
+  
+  // Image Upload State
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   
   const [formData, setFormData] = useState({
     nombre: '',
@@ -25,30 +30,54 @@ export default function ProductoCreate() {
   });
 
   useEffect(() => {
-    // Cargar categorías (simulado, pero debería venir de la API o Dexie si es offline first)
-    const fetchCategorias = async () => {
-      // Por ahora asumo que usamos la API para traelas si estamos online
+    // Cargar categorías y configuración de empresa
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/inventario/categorias`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'X-Tenant-ID': tenantId
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          'X-Tenant-ID': tenantId
+        };
+
+        // 1. Fetch Categorias
+        const catRes = await fetch(`${import.meta.env.VITE_API_URL}/api/inventario/categorias`, { headers });
+        if (catRes.ok) {
+          const catData = await catRes.json();
+          setCategorias(catData.categorias || []);
+        }
+
+        // 2. Fetch Empresa Settings para default IVA
+        const setRes = await fetch(`${import.meta.env.VITE_API_URL}/api/empresa/settings`, { headers });
+        if (setRes.ok) {
+          const setData = await setRes.json();
+          if (setData.impuesto_defecto !== undefined) {
+            setFormData(prev => ({ ...prev, tarifa_impuesto: setData.impuesto_defecto }));
           }
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setCategorias(data.categorias || []);
+          if (setData.moneda_defecto) {
+            let symbol = '$';
+            if (setData.moneda_defecto === 'EUR') symbol = '€';
+            else if (setData.moneda_defecto !== 'USD' && setData.moneda_defecto !== 'COP' && setData.moneda_defecto !== 'MXN') symbol = setData.moneda_defecto;
+            setMoneda(symbol);
+          }
         }
       } catch (err) {
-        console.error('Error cargando categorías', err);
+        console.error('Error fetching data', err);
       }
     };
-    if (tenantId) fetchCategorias();
+    if (tenantId) fetchData();
   }, [tenantId]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
   };
 
   const handleSave = async (e) => {
@@ -56,6 +85,27 @@ export default function ProductoCreate() {
     setLoading(true);
     
     try {
+      let imageUrl = null;
+
+      // 1. Upload image to Supabase Storage if present
+      if (imageFile) {
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${tenantId}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('productos')
+          .upload(fileName, imageFile);
+          
+        if (uploadError) {
+          console.error("Error uploading image to Supabase", uploadError);
+          alert('Hubo un error subiendo la imagen, pero el producto se guardará sin ella.');
+        } else {
+          const { data: publicUrlData } = supabase.storage.from('productos').getPublicUrl(fileName);
+          imageUrl = publicUrlData.publicUrl;
+        }
+      }
+
+      // 2. Prepare payload
       const payload = {
         empresa_id: tenantId,
         nombre: formData.nombre,
@@ -69,13 +119,19 @@ export default function ProductoCreate() {
         stock_minimo: parseFloat(formData.stock_minimo || 0),
         stock_maximo: parseFloat(formData.stock_maximo || 0),
         etiquetas: formData.etiquetas ? formData.etiquetas.split(',').map(t => t.trim()) : [],
-        tipo: formData.tipo
+        tipo: formData.tipo,
+        imagen_url: imageUrl
       };
+
+      // 3. Insert product
 
       const { error } = await supabase.from('inv_productos').insert([payload]);
       if (error) throw error;
-      
-      navigate('/productos'); // Redirigir a la lista de productos
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        navigate('/productos'); // Redirigir a la lista de productos
+      }
     } catch (error) {
       console.error('Error saving product:', error);
       alert('Error al guardar el producto');
@@ -84,30 +140,37 @@ export default function ProductoCreate() {
     }
   };
 
+  const isModal = !!onClose;
+
   return (
-    <div className="container-fluid py-4" style={{ backgroundColor: '#F9FAFD', minHeight: '100vh' }}>
+    <div className={isModal ? "" : "container-fluid py-4"} style={isModal ? {} : { backgroundColor: '#F9FAFD', minHeight: '100vh' }}>
       
       {/* Top Header - Falcon Style */}
       <div className="card mb-3 shadow-none border">
         <div className="card-body">
           <div className="row flex-between-center">
             <div className="col-md">
-              <h5 className="mb-2 mb-md-0 fw-bold">Add a product</h5>
+              <h5 className="mb-2 mb-md-0 fw-bold">Crear Producto</h5>
             </div>
-            <div className="col-auto">
+            <div className="col-auto d-flex align-items-center">
               <button 
-                className="btn btn-link text-secondary fw-semi-bold me-2 text-decoration-none"
-                onClick={() => navigate('/productos')}
+                className="btn btn-falcon-default btn-sm me-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (onClose) onClose();
+                  else navigate('/productos');
+                }}
+                title="Cancelar"
               >
-                Discard
+                <span className="fas fa-times text-danger"></span>
               </button>
               <button 
-                className="btn btn-primary btn-sm px-4" 
+                className="btn btn-primary btn-sm" 
                 onClick={handleSave}
                 disabled={loading}
+                title="Guardar Producto"
               >
-                {loading ? <span className="spinner-border spinner-border-sm me-2"></span> : null}
-                Add product
+                {loading ? <span className="spinner-border spinner-border-sm"></span> : <span className="fas fa-save"></span>}
               </button>
             </div>
           </div>
@@ -121,27 +184,27 @@ export default function ProductoCreate() {
           {/* Basic Information Card */}
           <div className="card mb-3 shadow-none border">
             <div className="card-header bg-light border-bottom">
-              <h6 className="mb-0 fw-semi-bold">Basic information</h6>
+              <h6 className="mb-0 fw-semi-bold">Información Básica</h6>
             </div>
             <div className="card-body">
               <form>
                 <div className="mb-3">
-                  <label className="form-label fw-semi-bold fs--1">Product name:</label>
-                  <input type="text" className="form-control form-control-sm" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Enter product name" />
+                  <label className="form-label fw-semi-bold fs--1">Nombre del producto:</label>
+                  <input type="text" className="form-control form-control-sm" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ej: Camiseta de Algodón" />
                 </div>
                 <div className="row mb-3 g-3">
                   <div className="col-md-6">
-                    <label className="form-label fw-semi-bold fs--1">Product Identification No. (SKU):</label>
+                    <label className="form-label fw-semi-bold fs--1">Referencia (SKU):</label>
                     <input type="text" className="form-control form-control-sm" name="codigo_sku" value={formData.codigo_sku} onChange={handleChange} placeholder="SKU-12345" />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label fw-semi-bold fs--1">Barcode (EAN/UPC):</label>
+                    <label className="form-label fw-semi-bold fs--1">Código de Barras (EAN/UPC):</label>
                     <input type="text" className="form-control form-control-sm" name="codigo_barras" value={formData.codigo_barras} onChange={handleChange} placeholder="770123456789" />
                   </div>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label fw-semi-bold fs--1">Product Summary:</label>
-                  <textarea className="form-control form-control-sm" name="descripcion" rows="3" value={formData.descripcion} onChange={handleChange} placeholder="Brief summary of the product..."></textarea>
+                  <label className="form-label fw-semi-bold fs--1">Resumen del producto:</label>
+                  <textarea className="form-control form-control-sm" name="descripcion" rows="3" value={formData.descripcion} onChange={handleChange} placeholder="Breve descripción del producto..."></textarea>
                 </div>
               </form>
             </div>
@@ -150,23 +213,44 @@ export default function ProductoCreate() {
           {/* Add Images Card */}
           <div className="card mb-3 shadow-none border">
             <div className="card-header bg-light border-bottom">
-              <h6 className="mb-0 fw-semi-bold">Add images</h6>
+              <h6 className="mb-0 fw-semi-bold">Añadir Imágenes</h6>
             </div>
-            <div className="card-body text-center py-5">
-              <div className="border-dashed border-2 border-300 rounded-2 py-4 bg-100" style={{ borderStyle: 'dashed' }}>
-                <span className="fas fa-cloud-upload-alt text-400 fs-3 mb-2"></span>
-                <p className="fs--1 text-600 mb-0">Drag your image here<br />or, <span className="text-primary cursor-pointer">Browse</span></p>
-              </div>
+            <div className="card-body text-center py-4">
+              {imagePreview ? (
+                <div className="position-relative d-inline-block">
+                  <img src={imagePreview} alt="Preview" className="img-fluid rounded border" style={{ maxHeight: '200px' }} />
+                  <button 
+                    type="button" 
+                    className="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 rounded-circle p-1"
+                    onClick={() => { setImageFile(null); setImagePreview(null); }}
+                    style={{ width: '28px', height: '28px' }}
+                  >
+                    <span className="fas fa-times"></span>
+                  </button>
+                </div>
+              ) : (
+                <div className="border-dashed border-2 border-300 rounded-2 py-4 bg-100 position-relative" style={{ borderStyle: 'dashed' }}>
+                  <input 
+                    type="file" 
+                    className="position-absolute w-100 h-100 opacity-0 cursor-pointer" 
+                    style={{ top: 0, left: 0 }} 
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                  />
+                  <span className="fas fa-cloud-upload-alt text-400 fs-3 mb-2"></span>
+                  <p className="fs--1 text-600 mb-0">Arrastra tu imagen aquí<br />o, <span className="text-primary cursor-pointer">Explorar</span></p>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Details Card */}
           <div className="card mb-3 shadow-none border">
             <div className="card-header bg-light border-bottom">
-              <h6 className="mb-0 fw-semi-bold">Details</h6>
+              <h6 className="mb-0 fw-semi-bold">Detalles</h6>
             </div>
             <div className="card-body">
-              <label className="form-label fw-semi-bold fs--1">Product description:</label>
+              <label className="form-label fw-semi-bold fs--1">Descripción detallada:</label>
               {/* Fake WYSIWYG Editor Toolbar */}
               <div className="border rounded-top p-2 bg-light d-flex gap-2 text-500">
                 <span className="fas fa-bold cursor-pointer"></span>
@@ -175,7 +259,7 @@ export default function ProductoCreate() {
                 <span className="fas fa-list-ul cursor-pointer"></span>
                 <span className="fas fa-image cursor-pointer"></span>
               </div>
-              <textarea className="form-control border-top-0 rounded-bottom" rows="5" placeholder="Detailed product description..."></textarea>
+              <textarea className="form-control border-top-0 rounded-bottom" rows="5" placeholder="Escribe todos los detalles técnicos y descripciones del producto aquí..."></textarea>
             </div>
           </div>
         </div>
@@ -186,23 +270,23 @@ export default function ProductoCreate() {
           {/* Type / Category Card */}
           <div className="card mb-3 shadow-none border">
             <div className="card-header bg-light border-bottom">
-              <h6 className="mb-0 fw-semi-bold">Type</h6>
+              <h6 className="mb-0 fw-semi-bold">Clasificación</h6>
             </div>
             <div className="card-body">
               <div className="mb-3">
-                <label className="form-label fw-semi-bold fs--1">Select category:</label>
+                <label className="form-label fw-semi-bold fs--1">Seleccionar categoría:</label>
                 <select className="form-select form-select-sm" name="categoria_id" value={formData.categoria_id} onChange={handleChange}>
-                  <option value="">Select</option>
+                  <option value="">Seleccione...</option>
                   {categorias.map(c => (
                     <option key={c.id} value={c.id}>{c.nombre}</option>
                   ))}
                 </select>
               </div>
               <div className="mb-0">
-                <label className="form-label fw-semi-bold fs--1">Product Type:</label>
+                <label className="form-label fw-semi-bold fs--1">Tipo de Producto:</label>
                 <select className="form-select form-select-sm" name="tipo" value={formData.tipo} onChange={handleChange}>
-                  <option value="fisico">Physical Product</option>
-                  <option value="servicio">Service</option>
+                  <option value="fisico">Producto Físico</option>
+                  <option value="servicio">Servicio Intangible</option>
                 </select>
               </div>
             </div>
@@ -211,44 +295,50 @@ export default function ProductoCreate() {
           {/* Tags Card */}
           <div className="card mb-3 shadow-none border">
             <div className="card-header bg-light border-bottom">
-              <h6 className="mb-0 fw-semi-bold">Tags</h6>
+              <h6 className="mb-0 fw-semi-bold">Etiquetas</h6>
             </div>
             <div className="card-body">
-              <label className="form-label fw-semi-bold fs--1">Add a keyword:</label>
-              <input type="text" className="form-control form-control-sm" name="etiquetas" value={formData.etiquetas} onChange={handleChange} placeholder="tag1, tag2, tag3" />
+              <label className="form-label fw-semi-bold fs--1">Añade palabras clave (separadas por coma):</label>
+              <input type="text" className="form-control form-control-sm" name="etiquetas" value={formData.etiquetas} onChange={handleChange} placeholder="ej: novedad, promoción, invierno" />
             </div>
           </div>
 
           {/* Pricing Card */}
           <div className="card mb-3 shadow-none border">
             <div className="card-header bg-light border-bottom">
-              <h6 className="mb-0 fw-semi-bold">Pricing & Inventory</h6>
+              <h6 className="mb-0 fw-semi-bold">Precios e Inventario</h6>
             </div>
             <div className="card-body">
               <div className="row g-2 mb-3">
                 <div className="col-6">
-                  <label className="form-label fw-semi-bold fs--1">Base Price:</label>
-                  <input type="number" className="form-control form-control-sm" name="precio_venta" value={formData.precio_venta} onChange={handleChange} placeholder="$0.00" />
+                  <label className="form-label fw-semi-bold fs--1">Precio de Venta:</label>
+                  <div className="input-group input-group-sm">
+                    <span className="input-group-text text-500">{moneda}</span>
+                    <input type="number" className="form-control" name="precio_venta" value={formData.precio_venta} onChange={handleChange} placeholder="0.00" />
+                  </div>
                 </div>
                 <div className="col-6">
-                  <label className="form-label fw-semi-bold fs--1">Average Cost:</label>
-                  <input type="number" className="form-control form-control-sm" name="costo_promedio" value={formData.costo_promedio} onChange={handleChange} placeholder="$0.00" />
+                  <label className="form-label fw-semi-bold fs--1">Costo Promedio:</label>
+                  <div className="input-group input-group-sm">
+                    <span className="input-group-text text-500">{moneda}</span>
+                    <input type="number" className="form-control" name="costo_promedio" value={formData.costo_promedio} onChange={handleChange} placeholder="0.00" />
+                  </div>
                 </div>
               </div>
               <div className="row g-2 mb-3">
                 <div className="col-12">
-                  <label className="form-label fw-semi-bold fs--1">Tax Rate (%):</label>
-                  <input type="number" className="form-control form-control-sm" name="tarifa_impuesto" value={formData.tarifa_impuesto} onChange={handleChange} placeholder="0.00" />
+                  <label className="form-label fw-semi-bold fs--1">Tarifa de Impuesto (IVA %):</label>
+                  <input type="number" className="form-control form-control-sm" name="tarifa_impuesto" value={formData.tarifa_impuesto} onChange={handleChange} placeholder="19.00" />
                 </div>
               </div>
               <hr className="my-3 border-300" />
               <div className="row g-2">
                 <div className="col-6">
-                  <label className="form-label fw-semi-bold fs--1">Min Stock:</label>
+                  <label className="form-label fw-semi-bold fs--1">Stock Mínimo:</label>
                   <input type="number" className="form-control form-control-sm" name="stock_minimo" value={formData.stock_minimo} onChange={handleChange} placeholder="0" />
                 </div>
                 <div className="col-6">
-                  <label className="form-label fw-semi-bold fs--1">Max Stock:</label>
+                  <label className="form-label fw-semi-bold fs--1">Stock Máximo:</label>
                   <input type="number" className="form-control form-control-sm" name="stock_maximo" value={formData.stock_maximo} onChange={handleChange} placeholder="0" />
                 </div>
               </div>

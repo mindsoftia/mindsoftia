@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
+import ProductoCreate from './ProductoCreate';
 
 export default function ProductosList() {
   const navigate = useNavigate();
@@ -9,7 +10,8 @@ export default function ProductosList() {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
 
-  // CSV Import State
+  // Modals State
+  const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [importing, setImporting] = useState(false);
   const [file, setFile] = useState(null);
@@ -95,12 +97,6 @@ export default function ProductosList() {
                 >
                   <span className="fas fa-file-import me-1 text-success"></span> Importar CSV
                 </button>
-                <button 
-                  className="btn btn-primary btn-sm px-3" 
-                  onClick={() => navigate('/productos/add-product')}
-                >
-                  <span className="fas fa-plus me-1"></span> Add Product
-                </button>
               </div>
             </div>
           </div>
@@ -118,14 +114,14 @@ export default function ProductosList() {
                   <option>25</option>
                   <option>50</option>
                 </select>
-                <span className="fs--1 text-600">Showing 1-{productos.length} of {productos.length} Products</span>
+                <span className="fs--1 text-600">Mostrando 1-{productos.length} de {productos.length} Productos</span>
               </div>
             </div>
             <div className="col-auto d-flex align-items-center">
-              <span className="fs--1 text-600 me-2">Sort by:</span>
+              <span className="fs--1 text-600 me-2">Ordenar por:</span>
               <select className="form-select form-select-sm me-2" style={{ width: '120px' }}>
-                <option>Price</option>
-                <option>Name</option>
+                <option>Precio</option>
+                <option>Nombre</option>
                 <option>Stock</option>
               </select>
               <button className="btn btn-sm btn-falcon-default me-2"><span className="fas fa-sort-amount-up"></span></button>
@@ -154,12 +150,12 @@ export default function ProductosList() {
         {loading ? (
           <div className="col-12 text-center py-5">
             <div className="spinner-border text-primary" role="status"></div>
-            <p className="mt-2 text-600">Loading catalog...</p>
+            <p className="mt-2 text-600">Cargando catálogo...</p>
           </div>
         ) : productos.length === 0 ? (
           <div className="col-12 text-center py-5">
-            <h5 className="text-600">No products found</h5>
-            <p className="text-500">Get started by creating a new product or importing a CSV.</p>
+            <h5 className="text-600">No se encontraron productos</h5>
+            <p className="text-500">Comienza creando un nuevo producto o importando un CSV.</p>
           </div>
         ) : (
           productos.map(p => (
@@ -197,18 +193,18 @@ export default function ProductosList() {
                         <h4 className="fw-bold text-primary mb-0">${parseFloat(p.precio_venta).toLocaleString('es-CO')}</h4>
                         {p.tarifa_impuesto > 0 && <span className="fs--2 text-500 text-decoration-line-through">${(parseFloat(p.precio_venta) * (1 + p.tarifa_impuesto/100)).toLocaleString('es-CO')} c/IVA</span>}
                         <div className="fs--1 mt-1">
-                          Tax Rate: <span className="text-900">{p.tarifa_impuesto}%</span>
+                          Impuesto: <span className="text-900">{p.tarifa_impuesto}%</span>
                         </div>
                         <div className="fs--1 mt-1">
-                          Stock: <span className={p.stock_minimo > 0 ? "text-success fw-semi-bold" : "text-danger fw-semi-bold"}>{p.stock_minimo > 0 ? 'Available' : 'Stock-Out'}</span>
+                          Stock: <span className={p.stock_minimo > 0 ? "text-success fw-semi-bold" : "text-danger fw-semi-bold"}>{p.stock_minimo > 0 ? 'Disponible' : 'Agotado'}</span>
                         </div>
                       </div>
                       <div className={viewMode === 'list' ? 'mt-md-3' : 'mt-3 w-100'}>
                         <button className="btn btn-sm btn-falcon-default w-100 mb-2">
-                          <span className="far fa-edit me-2"></span>Edit
+                          <span className="far fa-edit me-2"></span>Editar
                         </button>
                         <button className="btn btn-sm btn-primary w-100">
-                          <span className="fas fa-cart-plus me-2"></span>Add to Cart
+                          <span className="fas fa-list-alt me-2"></span>Ver Detalle
                         </button>
                       </div>
                     </div>
@@ -259,6 +255,29 @@ export default function ProductosList() {
           </div>
         </div>
       )}
+
+      {/* Add Product Modal (Replaces separate page route) */}
+      {showAddModal && (
+        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(11,23,39,0.5)', zIndex: 1055, overflowY: 'auto' }}>
+          <div className="modal-dialog modal-xl modal-dialog-centered">
+            <div className="modal-content border-0">
+               <ProductoCreate 
+                 onClose={() => setShowAddModal(false)}
+                 onSuccess={() => { setShowAddModal(false); fetchProductos(); }}
+               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Action Button (FAB) */}
+      <button 
+        className="btn btn-primary rounded-circle shadow d-flex align-items-center justify-content-center" 
+        style={{ position: 'fixed', bottom: '30px', right: '30px', width: '60px', height: '60px', zIndex: 1050 }}
+        onClick={() => setShowAddModal(true)}
+      >
+        <span className="fas fa-plus fs-2"></span>
+      </button>
 
     </div>
   );
