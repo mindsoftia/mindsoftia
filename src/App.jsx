@@ -16,7 +16,7 @@ import Register from './views/auth/Register';
 import OnboardingWizard from './views/auth/OnboardingWizard';
 
 // Dashboard Views
-import Dashboard  from './views/Dashboard';
+import DashboardRouter from './views/DashboardRouter';
 import Tenants    from './views/Tenants';
 import Users      from './views/Users';
 import Settings   from './views/Settings';
@@ -34,11 +34,15 @@ import Certificados from './views/empresas/Certificados';
 import POSLayout      from './views/pos/POSLayout';
 import InventarioAdmin from './views/pos/InventarioAdmin';
 import CategoriasList  from './views/inventario/CategoriasList';
+import BodegasList     from './views/inventario/BodegasList';
+import KardexList      from './views/inventario/KardexList';
 import ProveedoresList from './views/contactos/ProveedoresList';
+import ClientesList    from './views/contactos/ClientesList';
 import FacturasCompraList from './views/compras/FacturasCompraList';
 import FacturaCompraForm from './views/compras/FacturaCompraForm';
 import ProductoCreate  from './views/productos/ProductoCreate';
 import ProductosList   from './views/productos/ProductosList';
+import StoreFront      from './views/tienda/StoreFront';
 
 // Facturación Views
 import Suscripciones from './views/facturacion/Suscripciones';
@@ -113,6 +117,7 @@ function App() {
         <Route path="/register"      element={<Register />} />
         <Route path="/no-autorizado" element={<NoAutorizado />} />
         <Route path="/onboarding"    element={<OnboardingWizard />} />
+        <Route path="/tienda"        element={<StoreFront />} />
 
         {/* ── Rutas Privadas (requieren sesión) ──────────────────────── */}
         <Route
@@ -122,7 +127,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index        element={<Dashboard />} />
+          <Route index        element={<DashboardRouter />} />
           <Route path="empresas/directorio" element={<Tenants />} />
           <Route path="empresas/certificados" element={<Certificados />} />
           <Route path="empresas/solicitudes"  element={<div className="card m-3"><div className="card-body">Próximamente: Bandeja de Solicitudes de Alta y Onboarding</div></div>} />
@@ -134,25 +139,52 @@ function App() {
           <Route path="roadmap"      element={<RoadmapDev />} />
 
           {/* ── Ajustes Inquilino (Empresa) ────────────────────────── */}
-          <Route path="ajustes/usuarios" element={<UserRoles />} />
+          <Route element={<ProtectedRoute requiredPermission="ajustes.usuarios" />}>
+            <Route path="ajustes/usuarios" element={<UserRoles />} />
+          </Route>
 
-          {/* ── Facturación y Suscripciones ──────────────────────── */}
+          {/* ── Facturación y Suscripciones (SaaS SuperAdmin) ──────────────────────── */}
           <Route path="facturacion/suscripciones" element={<Suscripciones />} />
           <Route path="facturacion/planes"        element={<Planes />} />
           <Route path="facturacion/historial"     element={<HistorialPagos />} />
           <Route path="facturacion/cupones"       element={<Cupones />} />
 
-          {/* ── NexoPOS: Punto de Venta e Inventario ───────────────── */}
-          <Route path="pos"        element={<POSLayout />} />
-          <Route path="inventario/productos" element={<ProductosList />} />
-          <Route path="inventario/stock" element={<InventarioAdmin />} />
-          <Route path="productos" element={<Navigate to="/inventario/productos" replace />} />
-          <Route path="productos/add-product" element={<ProductoCreate />} />
-          <Route path="inventario/categorias" element={<CategoriasList />} />
+          {/* ── NexoPOS: Punto de Venta ───────────────── */}
+          <Route element={<ProtectedRoute requiredModule="pos" requiredPermission="pos.acceso" />}>
+            <Route path="pos" element={<POSLayout />} />
+          </Route>
+
+          {/* ── Catálogo e Inventario ───────────────── */}
+          <Route element={<ProtectedRoute requiredPermission="inventario.ver" />}>
+            <Route path="inventario/productos" element={<ProductosList />} />
+            <Route path="inventario/stock" element={<InventarioAdmin />} />
+            <Route path="inventario/categorias" element={<CategoriasList />} />
+            <Route path="inventario/bodegas" element={<BodegasList />} />
+            <Route path="productos" element={<Navigate to="/inventario/productos" replace />} />
+            <Route path="inventario" element={<Navigate to="/inventario/productos" replace />} />
+          </Route>
+
+          {/* Rutas de Inventario con Permisos Especiales */}
+          <Route path="inventario/movimientos" element={
+            <ProtectedRoute requiredPermission="inventario.kardex">
+              <KardexList />
+            </ProtectedRoute>
+          } />
+          <Route path="productos/add-product" element={
+            <ProtectedRoute requiredPermission="inventario.crear">
+              <ProductoCreate />
+            </ProtectedRoute>
+          } />
+
+          {/* ── Compras y Gastos ───────────────── */}
+          <Route element={<ProtectedRoute requiredModule="compras" requiredPermission="compras.ingresar" />}>
+            <Route path="compras/facturas" element={<FacturasCompraList />} />
+            <Route path="compras/facturas/nueva" element={<FacturaCompraForm />} />
+          </Route>
+
+          {/* ── Contactos ───────────────── */}
           <Route path="contactos/proveedores" element={<ProveedoresList />} />
-          <Route path="compras/facturas" element={<FacturasCompraList />} />
-          <Route path="compras/facturas/nueva" element={<FacturaCompraForm />} />
-          <Route path="inventario" element={<Navigate to="/inventario/productos" replace />} />
+          <Route path="contactos/clientes" element={<ClientesList />} />
           <Route path="contactos" element={<Navigate to="/contactos/proveedores" replace />} />
 
           {/* ── Fase A: Contabilidad (próximas semanas) ─────────────── */}

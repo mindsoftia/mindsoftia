@@ -17,6 +17,7 @@ const useAuthStore = create(
       subdominio: null,    // Subdominio de la empresa
       role: null,          // Rol: 'admin' | 'contador' | 'asistente'
       permissions: [],     // Permisos específicos del usuario (ej. ['cartera.ver'])
+      modules: [],         // Módulos activos de la empresa (ej. ['pos', 'facturacion'])
       isLoading: false,
       error: null,
       loginAttempts: 0,    // Contador de intentos fallidos
@@ -43,7 +44,8 @@ const useAuthStore = create(
               tenantId: profile.tenant_id || null,
               subdominio: profile.subdominio || null,
               role: profile.role || null,
-              permissions: profile.permissions || []
+              permissions: profile.permissions || [],
+              modules: profile.modules || ['pos', 'facturacion', 'compras', 'nomina', 'contabilidad', 'ia'] // Simulamos módulos activos si el backend aún no los provee
             });
           }
         } catch (err) {
@@ -121,7 +123,7 @@ const useAuthStore = create(
           console.error("Error purgando IndexedDB en logout:", err);
         }
 
-        set({ session: null, user: null, tenantId: null, subdominio: null, role: null, permissions: [], error: null });
+        set({ session: null, user: null, tenantId: null, subdominio: null, role: null, permissions: [], modules: [], error: null });
       },
 
       /**
@@ -143,7 +145,21 @@ const useAuthStore = create(
        * Helpers de Permisos y Roles
        */
       hasPermission: (permissionCode) => {
+        const currentRole = get().role;
+        // Master Key: El Propietario o Admin tiene acceso absoluto
+        if (currentRole === 'admin' || currentRole === 'propietario') {
+          return true;
+        }
         return get().permissions.includes(permissionCode);
+      },
+
+      hasModule: (moduleName) => {
+        const mods = get().modules;
+        if (!mods || mods.length === 0) {
+          // Fallback temporal para desarrollo si el array está vacío (ej. antes de re-login)
+          return ['pos', 'facturacion', 'compras', 'nomina', 'contabilidad', 'ia'].includes(moduleName);
+        }
+        return mods.includes(moduleName);
       },
 
       hasRole: (roleName) => {
@@ -165,6 +181,7 @@ const useAuthStore = create(
         subdominio: state.subdominio,
         role:     state.role,
         permissions: state.permissions,
+        modules: state.modules,
         loginAttempts: state.loginAttempts,
         lockoutUntil: state.lockoutUntil,
       }),

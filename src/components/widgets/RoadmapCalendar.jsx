@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const RoadmapCalendar = () => {
-  const [selectedDay, setSelectedDay] = useState(39); // Default: July 9 (Absolute Day 39)
+  const [selectedDay, setSelectedDay] = useState(43); // Default: July 13 (Absolute Day 43)
   const [currentMonthDate, setCurrentMonthDate] = useState(new Date(2026, 6, 1)); // Default: July 2026 (Month 6 is July in JS)
 
   // Datos interactivos de los reportes diarios
@@ -105,6 +105,11 @@ const RoadmapCalendar = () => {
       { id: 1, title: 'Roadmap Estratégico POS', desc: '<strong>1. ¿Qué se hizo?:</strong> Creación del documento base `Roadmap_POS_Abastecimiento.md` para priorizar el desarrollo.<br/><strong>2. ¿Por qué?:</strong> Evita la construcción de módulos huérfanos definiendo dependencias: Proveedores -> Compras -> Caja.<br/><strong>3. ¿Para qué?:</strong> Para garantizar que la inyección de stock cumpla normativas contables universales.' },
       { id: 2, title: 'Gestión Proveedores y Crédito', desc: '<strong>1. ¿Qué se hizo?:</strong> Adición de `dias_credito` y `limite_credito` a la base de datos `crm_terceros` y UI.<br/><strong>2. ¿Por qué?:</strong> Se requiere perfilar a los proveedores contablemente para proyectar cuentas por pagar.<br/><strong>3. ¿Para qué?:</strong> Para preparar el ecosistema y recibir facturas de compra a crédito con plazos reales.' },
       { id: 3, title: 'Gestión Documental B2B (RUT)', desc: '<strong>1. ¿Qué se hizo?:</strong> Subida asíncrona a Supabase de RUT, Cámara de Comercio y Banco con barras de progreso.<br/><strong>2. ¿Por qué?:</strong> La auditoría financiera requiere el soporte tributario físico de quienes venden al sistema.<br/><strong>3. ¿Para qué?:</strong> Para automatizar el cumplimiento normativo en un entorno multi-tenant sin fricciones visuales.' }
+    ],
+    43: [
+      { id: 1, title: 'Seguridad Multi-Tenant & RBAC', desc: '<strong>1. ¿Qué se hizo?:</strong> Validación estricta de módulos y corrección del enrutador React v6 (Outlet).<br/><strong>2. ¿Por qué?:</strong> El POS quedaba en blanco por fallos al anidar rutas protegidas.<br/><strong>3. ¿Para qué?:</strong> Para garantizar acceso seguro y fluido a la interfaz operativa.' },
+      { id: 2, title: 'Selector de Clientes y UX (POS)', desc: '<strong>1. ¿Qué se hizo?:</strong> Inyección de buscador local (IndexedDB) para atar terceros y rediseño a Botón Flotante en vistas base.<br/><strong>2. ¿Por qué?:</strong> Se necesitaba simplificar la UI y preparar la base para Facturación Electrónica.<br/><strong>3. ¿Para qué?:</strong> Para agilizar el cobro y cumplir requerimientos de la DIAN.' },
+      { id: 3, title: 'Cálculos Contables de Venta', desc: '<strong>1. ¿Qué se hizo?:</strong> Desglose automático de IVA (19%) y Subtotal desde el precio de venta final.<br/><strong>2. ¿Por qué?:</strong> Los totales crudos no sirven para contabilizar los ingresos fiscales ni generar reportes.<br/><strong>3. ¿Para qué?:</strong> Para asegurar compatibilidad NIIF al registrar el comprobante de diario.' }
     ]
   };
 
@@ -122,7 +127,7 @@ const RoadmapCalendar = () => {
   const prevMonth = () => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1, 1));
   const goToday = () => {
     setCurrentMonthDate(new Date(2026, 6, 1)); // Foco en el mes activo de desarrollo (Julio 2026)
-    setSelectedDay(39); // Foco en el día actual
+    setSelectedDay(43); // Foco en el día actual (13 de Julio)
   };
 
   const renderCalendarGrid = () => {

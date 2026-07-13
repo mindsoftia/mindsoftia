@@ -3,8 +3,9 @@
  * Estilos: Falcon / Bootstrap 5 nativo.
  */
 import React, { useState } from 'react';
+import ClienteSelector from './ClienteSelector';
 
-export default function CarritoPanel({ items, total, procesando, onCambiarCantidad, onCobrar, ultimaVenta }) {
+export default function CarritoPanel({ items, subtotal, impuestos, total, procesando, onCambiarCantidad, onCobrar, ultimaVenta, cliente, setCliente }) {
   const [metodo, setMetodo] = useState('efectivo');
 
   // Vista de éxito post-venta
@@ -48,6 +49,8 @@ export default function CarritoPanel({ items, total, procesando, onCambiarCantid
 
   return (
     <>
+      <ClienteSelector cliente={cliente} setCliente={setCliente} />
+      
       {/* Lista de items */}
       <div className="pos-carrito-lista pe-2 mb-3 flex-grow-1">
         {items.map(item => (
@@ -114,11 +117,21 @@ export default function CarritoPanel({ items, total, procesando, onCambiarCantid
           </div>
         </div>
 
-        <div className="d-flex justify-content-between align-items-end mb-3 bg-100 p-2 rounded">
-          <span className="text-700 fw-semi-bold">TOTAL A PAGAR</span>
-          <span className="pos-total-valor">
-            ${total.toLocaleString('es-CO')}
-          </span>
+        <div className="bg-100 p-2 rounded mb-3">
+          <div className="d-flex justify-content-between mb-1">
+            <span className="text-600 fs--1">Subtotal</span>
+            <span className="text-800 fw-semi-bold fs--1">${subtotal.toLocaleString('es-CO', {maximumFractionDigits: 2})}</span>
+          </div>
+          <div className="d-flex justify-content-between mb-2">
+            <span className="text-600 fs--1">IVA (19%)</span>
+            <span className="text-800 fw-semi-bold fs--1">${impuestos.toLocaleString('es-CO', {maximumFractionDigits: 2})}</span>
+          </div>
+          <div className="d-flex justify-content-between align-items-end pt-2 border-top border-300">
+            <span className="text-900 fw-bold">TOTAL A PAGAR</span>
+            <span className="pos-total-valor">
+              ${total.toLocaleString('es-CO')}
+            </span>
+          </div>
         </div>
 
         <button

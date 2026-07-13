@@ -4,7 +4,7 @@ import useAuthStore from '../../store/authStore';
 
 function Sidebar() {
   const location = useLocation();
-  const { role, user } = useAuthStore();
+  const { role, user, hasModule } = useAuthStore();
 
   const superAdminMenu = [
     {
@@ -68,19 +68,12 @@ function Sidebar() {
       path: '/'
     },
     {
-      title: 'Punto de Venta',
-      icon: 'fas fa-store',
-      path: '/pos'
-    },
-    {
-      title: 'Ventas e Ingresos',
-      icon: 'fas fa-file-invoice-dollar',
-      id: 'ventasMenu',
+      title: 'Contactos',
+      icon: 'fas fa-users',
+      id: 'contactosMenu',
       children: [
-        { title: 'Facturación DIAN', path: '/ventas/facturas' },
-        { title: 'Cotizaciones', path: '/ventas/cotizaciones' },
-        { title: 'Recibos de Caja', path: '/ventas/recibos' },
-        { title: 'Cuentas por Cobrar', path: '/ventas/cartera' }
+        { title: 'Clientes', path: '/contactos/clientes' },
+        { title: 'Proveedores', path: '/contactos/proveedores' }
       ]
     },
     {
@@ -93,50 +86,93 @@ function Sidebar() {
         { title: 'Bodegas y Sucursales', path: '/inventario/bodegas' },
         { title: 'Movimientos (Kardex)', path: '/inventario/movimientos' }
       ]
-    },
-    {
+    }
+  ];
+
+  if (hasModule && hasModule('pos')) {
+    tenantMenu.push({
+      title: 'Vender (POS)',
+      icon: 'fas fa-cash-register', // Icono más orientado a la acción de cobrar
+      path: '/pos'
+    });
+  }
+
+  if (hasModule && hasModule('facturacion')) {
+    tenantMenu.push({
+      title: 'Ventas',
+      icon: 'fas fa-file-invoice-dollar',
+      id: 'ventasMenu',
+      children: [
+        { title: 'Facturación Electrónica', path: '/ventas/facturas' },
+        { title: 'Historial POS (Cierres)', path: '/ventas/pos-historial' },
+        { title: 'Notas Crédito / Débito', path: '/ventas/notas' },
+        { title: 'Cotizaciones / Pedidos', path: '/ventas/cotizaciones' },
+        { title: 'Recibos de Caja', path: '/ventas/recibos' },
+        { title: 'Cartera (CxC)', path: '/ventas/cartera' },
+        { title: 'Reportes e Informes', path: '/ventas/reportes' }
+      ]
+    });
+  }
+
+  if (hasModule && hasModule('compras')) {
+    tenantMenu.push({
       title: 'Compras y Gastos',
       icon: 'fas fa-shopping-cart',
       id: 'comprasMenu',
       children: [
         { title: 'Facturas de Compra', path: '/compras/facturas' },
         { title: 'Órdenes de Compra', path: '/compras/ordenes' },
-        { title: 'Comprobantes de Egreso', path: '/compras/egresos' }
+        { title: 'Comprobantes de Egreso', path: '/compras/egresos' },
+        { title: 'Cuentas por Pagar', path: '/compras/cuentas-por-pagar' }
       ]
-    },
-    {
-      title: 'Contactos',
-      icon: 'fas fa-users',
-      id: 'contactosMenu',
-      children: [
-        { title: 'Clientes', path: '/contactos/clientes' },
-        { title: 'Proveedores', path: '/contactos/proveedores' },
-        { title: 'Empleados / Vendedores', path: '/contactos/empleados' }
-      ]
-    },
-    {
-      title: 'Finanzas y Cont.',
+    });
+  }
+
+  if (hasModule && hasModule('contabilidad')) {
+    tenantMenu.push({
+      title: 'Contabilidad Electrónica',
       icon: 'fas fa-book',
       id: 'contabilidadMenu',
       children: [
+        { title: 'Plan de Cuentas (PUC)', path: '/contabilidad/puc' },
         { title: 'Asientos Contables', path: '/contabilidad/asientos' },
         { title: 'Conciliación Bancaria', path: '/contabilidad/conciliacion' },
         { title: 'Impuestos y Retenciones', path: '/contabilidad/impuestos' },
-        { title: 'Reportes Financieros', path: '/contabilidad/reportes' }
+        { title: 'Reportes Financieros', path: '/contabilidad/reportes' },
+        { title: 'Cierre Contable', path: '/contabilidad/cierre' }
       ]
-    },
-    {
-      title: 'Ajustes',
-      icon: 'fas fa-cog',
-      id: 'tenantConfig',
+    });
+  }
+
+  if (hasModule && hasModule('nomina')) {
+    tenantMenu.push({
+      title: 'Nómina Electrónica',
+      icon: 'fas fa-users-cog',
+      id: 'nominaMenu',
       children: [
-        { title: 'Perfil de Empresa', path: '/ajustes/perfil' },
-        { title: 'Usuarios y Roles', path: '/ajustes/usuarios' },
-        { title: 'Configuración POS', path: '/ajustes/pos' },
-        { title: 'Sincronización', path: '/ajustes/sincronizacion' }
+        { title: 'Empleados', path: '/nomina/empleados' },
+        { title: 'Novedades y Préstamos', path: '/nomina/novedades' },
+        { title: 'Liquidación', path: '/nomina/liquidacion' },
+        { title: 'Transmisión DIAN', path: '/nomina/dian' },
+        { title: 'Reportes', path: '/nomina/reportes' }
       ]
-    }
-  ];
+    });
+  }
+
+  // El módulo de IA/Automatización se eliminó para que sea transparente al cliente
+
+  tenantMenu.push({
+    title: 'Ajustes',
+    icon: 'fas fa-cog',
+    id: 'tenantConfig',
+    children: [
+      { title: 'Perfil de Empresa', path: '/ajustes/perfil' },
+      { title: 'Usuarios y Roles', path: '/ajustes/usuarios' },
+      { title: 'Configuración POS', path: '/ajustes/pos' },
+      { title: 'Resoluciones DIAN', path: '/ajustes/resoluciones' },
+      { title: 'Sincronización', path: '/ajustes/sincronizacion' }
+    ]
+  });
 
   // Si el rol es admin (Superadmin) o si es tu correo de propietario, cargamos su menú.
   const isSuperAdmin = role === 'admin' || 

@@ -12,18 +12,20 @@ function UserRoles() {
   ];
 
   const permissionsMatrix = [
-    { module: 'Ventas e Ingresos', keys: ['ventas.ver', 'ventas.crear', 'ventas.anular'] },
-    { module: 'Punto de Venta (POS)', keys: ['pos.acceso', 'pos.cierre_caja', 'pos.descuentos'] },
-    { module: 'Inventario', keys: ['inventario.ver', 'inventario.ajustar', 'inventario.costos'] },
-    { module: 'Contabilidad', keys: ['contabilidad.ver', 'contabilidad.asientos', 'contabilidad.reportes'] },
-    { module: 'Ajustes de Empresa', keys: ['ajustes.ver', 'ajustes.usuarios'] },
+    { module: 'Vender (POS)', keys: ['pos.acceso', 'pos.cierre_caja', 'pos.descuentos'] },
+    { module: 'Ventas y Cartera', keys: ['ventas.facturar', 'ventas.notas_credito', 'ventas.cotizar', 'ventas.recibos', 'ventas.cartera', 'ventas.reportes'] },
+    { module: 'Catálogo e Inventario', keys: ['inventario.ver', 'inventario.crear', 'inventario.kardex', 'inventario.costos'] },
+    { module: 'Compras y Gastos', keys: ['compras.ingresar', 'compras.egresos', 'compras.cuentas_por_pagar'] },
+    { module: 'Nómina Electrónica', keys: ['nomina.ver', 'nomina.liquidar', 'nomina.transmitir'] },
+    { module: 'Contabilidad Electrónica', keys: ['contabilidad.puc', 'contabilidad.asientos', 'contabilidad.cierre', 'contabilidad.reportes'] },
+    { module: 'Ajustes de Empresa', keys: ['ajustes.perfil', 'ajustes.usuarios', 'ajustes.resoluciones'] },
   ];
 
-  // Mock estado de permisos por rol (Solo visual)
+  // Mock estado de permisos por rol (Estricto según /master-cont)
   const [rolePermissions, setRolePermissions] = useState({
-    2: ['pos.acceso', 'pos.cierre_caja'], // Cajero
-    3: ['contabilidad.ver', 'contabilidad.asientos', 'contabilidad.reportes'], // Contador
-    4: ['ventas.ver', 'ventas.crear', 'inventario.ver'], // Vendedor
+    2: ['pos.acceso', 'pos.cierre_caja', 'ventas.cotizar', 'ventas.recibos', 'inventario.ver'], // Cajero: Operación en caja, pre-ventas y visualiza stock
+    3: ['ventas.reportes', 'ventas.notas_credito', 'ventas.cartera', 'compras.egresos', 'compras.cuentas_por_pagar', 'inventario.kardex', 'inventario.costos', 'nomina.ver', 'nomina.liquidar', 'nomina.transmitir', 'contabilidad.puc', 'contabilidad.asientos', 'contabilidad.cierre', 'contabilidad.reportes', 'ajustes.resoluciones'], // Contador: Todo lo fiscal/financiero. Nada operativo de caja.
+    4: ['pos.acceso', 'ventas.facturar', 'ventas.cotizar', 'inventario.ver'], // Vendedor: Operación comercial y cotizaciones. No ve costos ni caja.
   });
 
   const handleTogglePermission = (roleId, permissionKey) => {

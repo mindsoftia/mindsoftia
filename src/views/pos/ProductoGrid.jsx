@@ -46,7 +46,7 @@ export default function ProductoGrid({ onAgregar }) {
   }, [busqueda, productos])();
 
   const handleClick = (producto) => {
-    if (!producto.activo) return;
+    if (producto.estado === false) return;
     setClickedId(producto.id);
     onAgregar(producto);
     setTimeout(() => setClickedId(null), 350);
@@ -103,7 +103,7 @@ export default function ProductoGrid({ onAgregar }) {
             <button
               key={producto.id}
               className={`pos-producto-card ${clickedId === producto.id ? 'clicked' : ''}`}
-              disabled={!producto.activo || !producto.maneja_inventario === false}
+              disabled={producto.estado === false}
               onClick={() => handleClick(producto)}
               title={producto.nombre}
             >
@@ -133,19 +133,19 @@ export default function ProductoGrid({ onAgregar }) {
               {/* Precio */}
               <div className="text-center mt-1">
                 <span className="fw-bold text-success fs--1">
-                  ${parseFloat(producto.precio_venta || 0).toLocaleString('es-CO')}
+                  ${parseFloat(producto.precio_venta_1 || producto.precio_venta || 0).toLocaleString('es-CO')}
                 </span>
               </div>
 
               {/* Referencia / código */}
-              {producto.referencia && (
+              {producto.codigo_sku && (
                 <div className="text-muted text-center fs--2 mt-1">
-                  {producto.referencia}
+                  {producto.codigo_sku}
                 </div>
               )}
 
               {/* Badge estado */}
-              {!producto.activo && (
+              {producto.estado === false && (
                 <div className="text-center mt-1">
                   <span className="badge bg-danger fs--2">Inactivo</span>
                 </div>

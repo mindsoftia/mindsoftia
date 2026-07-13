@@ -59,6 +59,7 @@ Route::middleware(['supabase.auth'])->group(function () {
         Route::post('productos/import', [\App\Http\Controllers\Api\InvProductoController::class, 'import']);
         Route::apiResource('categorias', \App\Http\Controllers\Api\InvCategoriaController::class);
         Route::apiResource('productos', \App\Http\Controllers\Api\InvProductoController::class);
+        Route::apiResource('compras', \App\Http\Controllers\Api\InvCompraController::class);
         // Stock consolidado o filtrado por sede: GET /api/inventario/stock?sede_id=UUID
         Route::get('/stock', [\App\Http\Controllers\Api\InventarioController::class, 'stockConsolidado']);
         // Ajuste de stock manual o entrada por compra: POST /api/inventario/ajuste

@@ -14,40 +14,60 @@ export default function POSLayout() {
   const [carrito, setCarrito]           = useState([]);
   const [procesando, setProcesando]     = useState(false);
   const [ultimaVenta, setUltimaVenta]   = useState(null);
+  const [cliente, setCliente]           = useState(null); // Paso 1: Vinculación de cliente
 
   // ── Agregar / acumular producto en el carrito ──────────────
   const agregarProducto = (producto) => {
     setCarrito(prev => {
       const existe = prev.find(i => i.id === producto.id);
+      const precio = parseFloat(producto.precio_venta_1 || producto.precio_venta || 0);
+      
       if (existe) {
         return prev.map(i =>
           i.id === producto.id
-            ? { ...i, cantidad: i.cantidad + 1, subtotal: (i.cantidad + 1) * parseFloat(i.precio_venta) }
+            ? { ...i, cantidad: i.cantidad + 1, subtotal: (i.cantidad + 1) * precio }
             : i
         );
       }
-      return [...prev, { ...producto, cantidad: 1, subtotal: parseFloat(producto.precio_venta), isNew: true }];
+      return [...prev, { ...producto, cantidad: 1, subtotal: precio, isNew: true }];
     });
     setTimeout(() => setCarrito(p => p.map(i => ({ ...i, isNew: false }))), 400);
   };
 
   const cambiarCantidad = (id, qty) => {
     if (qty <= 0) { setCarrito(p => p.filter(i => i.id !== id)); return; }
-    setCarrito(p => p.map(i => i.id === id ? { ...i, cantidad: qty, subtotal: qty * parseFloat(i.precio_venta) } : i));
+    setCarrito(p => p.map(i => {
+      if (i.id === id) {
+        const precio = parseFloat(i.precio_venta_1 || i.precio_venta || 0);
+        return { ...i, cantidad: qty, subtotal: qty * precio };
+      }
+      return i;
+    }));
   };
 
+  // Cálculos contables (Paso 2)
   const total = carrito.reduce((s, i) => s + i.subtotal, 0);
+  const subtotalBase = total / 1.19; // Asumiendo 19% IVA temporalmente
+  const impuestos = total - subtotalBase;
 
   const cobrar = async (metodoPago = 'efectivo') => {
     if (!carrito.length || procesando) return;
     setProcesando(true);
     const ventaId = uuidv4();
+    
+    // Identificar nombre del cliente
+    let clienteNombre = 'Consumidor Final';
+    if (cliente) {
+      clienteNombre = cliente.tipo_identificacion === 'NIT' ? cliente.razon_social : `${cliente.nombres || ''} ${cliente.apellidos || ''}`.trim();
+    }
+
     const venta = {
       id: ventaId,
       caja_id:             localStorage.getItem('pos_caja_id') || 'CAJA-01',
       sede_id:             localStorage.getItem('pos_sede_id') || 'SEDE-01',
       cajero_id:           localStorage.getItem('user_id')     || 'USER-01',
-      cliente_id:          null,
+      cliente_id:          cliente ? cliente.id : null,
+      cliente_nombre:      clienteNombre,
       total,
       metodo_pago:         metodoPago,
       sync_status:         'pending',
@@ -63,6 +83,7 @@ export default function POSLayout() {
       await guardarVentaLocal(venta, items);
       setUltimaVenta({ ...venta, items });
       setCarrito([]);
+      setCliente(null); // Resetear cliente post-venta
     } catch (err) { console.error('Error guardando venta:', err); }
     finally { setProcesando(false); }
   };
@@ -112,11 +133,15 @@ export default function POSLayout() {
             <div className="card-body p-2 d-flex flex-column">
               <CarritoPanel
                 items={carrito}
+                subtotal={subtotalBase}
+                impuestos={impuestos}
                 total={total}
                 procesando={procesando}
                 onCambiarCantidad={cambiarCantidad}
                 onCobrar={cobrar}
                 ultimaVenta={ultimaVenta}
+                cliente={cliente}
+                setCliente={setCliente}
               />
             </div>
           </div>

@@ -137,11 +137,8 @@ function ProveedoresList() {
         <div className="card-header bg-light d-flex justify-content-between align-items-center">
           <h5 className="mb-0">Directorio de Proveedores</h5>
           <div>
-            <button className="btn btn-outline-secondary btn-sm me-2" onClick={handleSync} disabled={loading}>
+            <button className="btn btn-outline-secondary btn-sm" onClick={handleSync} disabled={loading}>
               <span className={`fas fa-sync-alt me-1 ${loading ? 'fa-spin' : ''}`}></span> Sincronizar
-            </button>
-            <button className="btn btn-primary btn-sm" onClick={() => setShowModal(true)}>
-              <span className="fas fa-plus me-1"></span>Nuevo Proveedor
             </button>
           </div>
         </div>
@@ -192,6 +189,27 @@ function ProveedoresList() {
           </div>
         </div>
       </div>
+
+      {/* Botón Flotante (FAB) para crear Proveedor */}
+      <button 
+        className="btn btn-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center"
+        onClick={() => setShowModal(true)}
+        style={{
+          position: 'fixed',
+          bottom: '2rem',
+          right: '2rem',
+          width: '60px',
+          height: '60px',
+          zIndex: 1050,
+          fontSize: '1.5rem',
+          transition: 'transform 0.2s'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        title="Crear Nuevo Proveedor"
+      >
+        <span className="fas fa-plus"></span>
+      </button>
 
       {showModal && (
         <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }} tabIndex="-1">

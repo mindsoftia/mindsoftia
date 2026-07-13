@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 
 /**
@@ -18,8 +18,8 @@ import useAuthStore from '../../store/authStore';
  *     <Route path="/admin" element={<AdminPanel />} />
  *   </Route>
  */
-function ProtectedRoute({ children, allowedRoles }) {
-  const { session, role, restoreSession } = useAuthStore();
+function ProtectedRoute({ children, allowedRoles, requiredModule, requiredPermission }) {
+  const { session, role, restoreSession, hasModule, hasPermission } = useAuthStore();
   const location = useLocation();
 
   // Intentar restaurar sesión desde localStorage si no existe en store,
@@ -40,7 +40,21 @@ function ProtectedRoute({ children, allowedRoles }) {
     return <Navigate to="/no-autorizado" replace />;
   }
 
-  return children;
+  // 🛡️ Seguridad /master-sec: Bloqueo de acceso directo por URL a módulos no contratados
+  if (requiredModule && !hasModule(requiredModule)) {
+    if (role !== 'admin' && role !== 'propietario') {
+      return <Navigate to="/no-autorizado" replace />;
+    }
+  }
+
+  // 🛡️ Seguridad /master-sec: Bloqueo de acceso directo por URL si no tiene permiso RBAC
+  if (requiredPermission && !hasPermission(requiredPermission)) {
+    if (role !== 'admin' && role !== 'propietario') {
+      return <Navigate to="/no-autorizado" replace />;
+    }
+  }
+
+  return children ? children : <Outlet />;
 }
 
 export default ProtectedRoute;
