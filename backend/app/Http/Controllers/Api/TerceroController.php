@@ -52,6 +52,11 @@ class TerceroController extends Controller
             'direccion' => 'nullable|string',
             'es_cliente' => 'boolean',
             'es_proveedor' => 'boolean',
+            'dias_credito' => 'nullable|integer|min:0',
+            'limite_credito' => 'nullable|numeric|min:0',
+            'documento_rut_url' => 'nullable|string',
+            'camara_comercio_url' => 'nullable|string',
+            'certificacion_bancaria_url' => 'nullable|string'
         ]);
 
         $validated['empresa_id'] = $empresaId;
@@ -88,7 +93,12 @@ class TerceroController extends Controller
             'direccion' => 'nullable|string',
             'es_cliente' => 'boolean',
             'es_proveedor' => 'boolean',
-            'estado' => 'boolean'
+            'estado' => 'boolean',
+            'dias_credito' => 'nullable|integer|min:0',
+            'limite_credito' => 'nullable|numeric|min:0',
+            'documento_rut_url' => 'nullable|string',
+            'camara_comercio_url' => 'nullable|string',
+            'certificacion_bancaria_url' => 'nullable|string'
         ]);
 
         $tercero->update($validated);

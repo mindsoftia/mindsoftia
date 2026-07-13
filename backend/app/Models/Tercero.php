@@ -25,13 +25,20 @@ class Tercero extends Model
         'ciudad_id',
         'es_cliente',
         'es_proveedor',
-        'estado'
+        'estado',
+        'dias_credito',
+        'limite_credito',
+        'documento_rut_url',
+        'camara_comercio_url',
+        'certificacion_bancaria_url'
     ];
 
     protected $casts = [
         'es_cliente' => 'boolean',
         'es_proveedor' => 'boolean',
-        'estado' => 'boolean'
+        'estado' => 'boolean',
+        'dias_credito' => 'integer',
+        'limite_credito' => 'decimal:2'
     ];
 
     public function empresa()
