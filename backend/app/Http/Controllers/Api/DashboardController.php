@@ -19,56 +19,78 @@ class DashboardController extends Controller
     public function getMetrics(Request $request): JsonResponse
     {
         try {
-            // 1. Métricas Generales de Tenants (Empresas)
-            $totalEmpresas = Empresa::count();
-            $empresasActivas = Empresa::where('is_active', true)->count();
+            $tenantId = $request->header('X-Tenant-ID');
             
-            // 2. Simulador de MRR y Crecimiento (Hasta implementar módulo de facturación SaaS real)
-            // Asumimos un ingreso promedio por usuario (ARPU) simulado de $49 USD por empresa activa
-            $arpu = 49;
-            $mrr = $empresasActivas * $arpu;
+            if (!$tenantId) {
+                return response()->json(['success' => false, 'message' => 'Tenant ID no proporcionado'], 400);
+            }
+
+            // 1. POS Metrics
+            $ventasHoy = \App\Models\PosVenta::where('empresa_id', $tenantId)
+                ->whereDate('created_at', now()->toDateString())
+                ->sum('total_factura');
             
-            // 3. Usuarios Totales en la plataforma (Todas las empresas)
-            $totalUsuarios = User::count();
+            $ticketsHoy = \App\Models\PosVenta::where('empresa_id', $tenantId)
+                ->whereDate('created_at', now()->toDateString())
+                ->count();
 
-            // 4. Feed de Onboarding: Últimas 5 empresas registradas
-            // Obtenemos los campos clave para llenar la tabla del frontend
-            $ultimasEmpresas = Empresa::select('id', 'nombre', 'ruc_nit', 'is_active', 'created_at')
-                                      ->orderBy('created_at', 'desc')
-                                      ->take(5)
-                                      ->get()
-                                      ->map(function ($empresa) use ($arpu) {
-                                          return [
-                                              'id' => $empresa->id,
-                                              'nombre' => $empresa->nombre,
-                                              'ruc_nit' => $empresa->ruc_nit ?? 'N/A',
-                                              'plan' => 'Básico', // Simulado por ahora
-                                              'ingreso_mensual' => $arpu,
-                                              'is_active' => $empresa->is_active,
-                                              'fecha_registro' => $empresa->created_at->format('Y-m-d H:i')
-                                          ];
-                                      });
+            // 2. Inventario Metrics
+            $totalProductos = \App\Models\InvProducto::where('empresa_id', $tenantId)
+                ->where('estado', true)
+                ->count();
+            
+            // 3. Contabilidad Metrics
+            $asientosContables = 0; // Si la tabla existe la usamos, si no en 0 por ahora.
+            if (\Schema::hasTable('contab_asientos')) {
+                $asientosContables = \DB::table('contab_asientos')->where('empresa_id', $tenantId)->count();
+            }
 
-            // 5. Devolver la respuesta en formato JSON
+            $clientesActivos = 0;
+            if (\Schema::hasTable('crm_terceros')) {
+                $clientesActivos = \DB::table('crm_terceros')->where('empresa_id', $tenantId)->where('es_cliente', true)->where('estado', true)->count();
+            }
+
+            $cuentasPuc = 0;
+            if (\Schema::hasTable('accounts')) {
+                $cuentasPuc = \DB::table('accounts')->where('empresa_id', $tenantId)->where('is_active', true)->count();
+            }
+
+            // 4. Últimas Ventas POS
+            $ultimasVentas = [];
+            if (\Schema::hasTable('pos_ventas')) {
+                $ultimasVentas = \App\Models\PosVenta::where('empresa_id', $tenantId)
+                    ->orderBy('created_at', 'desc')
+                    ->take(5)
+                    ->get()
+                    ->map(function ($venta) {
+                        return [
+                            'id' => $venta->id,
+                            'ticket' => ($venta->prefijo . $venta->consecutivo) ?: 'TKT-' . substr($venta->id, 0, 5),
+                            'total' => $venta->total_factura,
+                            'estado' => $venta->estado ?? 'Completado',
+                            'fecha' => $venta->created_at->format('Y-m-d H:i')
+                        ];
+                    });
+            }
+                
+            $empresa = \App\Models\Empresa::find($tenantId);
+            $empresaNombre = $empresa ? $empresa->nombre : 'Mindsoftia ERP';
+
             return response()->json([
                 'success' => true,
                 'data' => [
+                    'empresa_nombre' => $empresaNombre,
                     'kpis' => [
-                        'total_empresas' => $totalEmpresas,
-                        'empresas_activas' => $empresasActivas,
-                        'mrr' => $mrr,
-                        'arpu' => $arpu,
-                        'total_usuarios' => $totalUsuarios,
-                        'churn_rate' => 1.2, // Simulado estático por ahora
+                        'ventas_hoy' => $ventasHoy ?? 0,
+                        'tickets_hoy' => $ticketsHoy ?? 0,
+                        'total_productos' => $totalProductos ?? 0,
+                        'asientos_contables' => $asientosContables ?? 0,
+                        'clientes_activos' => $clientesActivos ?? 0,
+                        'cuentas_puc' => $cuentasPuc ?? 0,
                     ],
-                    'ultimas_empresas' => $ultimasEmpresas,
-                    // Espacio para métricas de infraestructura (Storage, DB) si se requieren luego
-                    'infraestructura' => [
-                        'db_connections' => 142, // Se puede dinamizar consultando pg_stat_activity
-                        'storage_used' => '1.2 TB'
-                    ]
+                    'ultimas_ventas' => $ultimasVentas
                 ]
-            ], 200);
+            ]);
 
         } catch (\Exception $e) {
             \Log::error('Error al obtener métricas del dashboard: ' . $e->getMessage());

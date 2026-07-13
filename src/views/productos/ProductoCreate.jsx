@@ -14,6 +14,42 @@ const Toast = Swal.mixin({
   timerProgressBar: true,
 });
 
+// Utilidad para comprimir imágenes rápidamente en el cliente
+const compressImage = (file, maxWidth = 800, quality = 0.8) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => {
+          resolve(new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
+            type: 'image/jpeg',
+            lastModified: Date.now()
+          }));
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = (error) => reject(error);
+    };
+    reader.onerror = (error) => reject(error);
+  });
+};
+
 export default function ProductoCreate({ onClose, onSuccess, initialData }) {
   const navigate = useNavigate();
   const { tenantId } = useAuthStore();
@@ -22,6 +58,7 @@ export default function ProductoCreate({ onClose, onSuccess, initialData }) {
   
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(initialData?.imagen_url || null);
+  const [deleteExistingImage, setDeleteExistingImage] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   
   const [formData, setFormData] = useState(initialData ? {
@@ -108,12 +145,35 @@ export default function ProductoCreate({ onClose, onSuccess, initialData }) {
     
     try {
       let imageUrl = initialData?.imagen_url || null;
-      const tid = tenantId || (useAuthStore.getState().user?.app_metadata?.empresa_id);
+      const userMeta = useAuthStore.getState().user?.app_metadata;
+      const tid = tenantId || userMeta?.empresa_id || userMeta?.tenant_id;
+      
+      if (!tid) {
+        Toast.fire({ icon: 'error', title: 'No se pudo identificar la empresa (Tenant ID). Re-inicia sesión.' });
+        setUploadProgress(0);
+        return;
+      }
+
+      // Eliminar imagen anterior (Fire and forget para no bloquear)
+      const shouldDeleteOldImage = (deleteExistingImage || imageFile) && initialData?.imagen_url;
+      if (shouldDeleteOldImage) {
+        const path = initialData.imagen_url.split('/archivos_empresas/')[1];
+        if (path) {
+          StorageService.deleteFile(decodeURIComponent(path)).catch(err => console.error("Error eliminando imagen vieja:", err));
+        }
+        if (!imageFile) {
+          imageUrl = null;
+        }
+      }
 
       // 1. Upload image to Supabase Storage via StorageService (tenant_id/productos/filename)
       if (imageFile) {
-        setUploadProgress(30);
-        const uploadRes = await StorageService.uploadTenantFile(imageFile, tid, 'productos');
+        setUploadProgress(20);
+        // Compresión ultra-rápida del lado del cliente antes de subir
+        const compressedFile = await compressImage(imageFile, 1024, 0.8);
+        setUploadProgress(40);
+        
+        const uploadRes = await StorageService.uploadTenantFile(compressedFile, tid, 'productos');
 
         if (uploadRes.error) {
           console.error('Error subiendo imagen a Supabase:', uploadRes.error);
@@ -173,7 +233,7 @@ export default function ProductoCreate({ onClose, onSuccess, initialData }) {
   const isModal = !!onClose;
 
   return (
-    <div className={isModal ? "" : "container-fluid py-4"} style={isModal ? {} : { backgroundColor: '#F9FAFD', minHeight: '100vh' }}>
+    <div className={isModal ? "" : "container-fluid py-4"} style={isModal ? {} : { backgroundColor: '#F9FAFD', minHeight: '100vh' }} translate="no">
       
       {/* Top Header - Falcon Style */}
       <div className="card mb-3 shadow-none border">
@@ -251,7 +311,13 @@ export default function ProductoCreate({ onClose, onSuccess, initialData }) {
                   <button 
                     type="button" 
                     className="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 rounded-circle p-1"
-                    onClick={() => { setImageFile(null); setImagePreview(null); }}
+                    onClick={() => { 
+                      setImageFile(null); 
+                      setImagePreview(null); 
+                      if (initialData?.imagen_url) {
+                        setDeleteExistingImage(true);
+                      }
+                    }}
                     style={{ width: '28px', height: '28px' }}
                   >
                     <span className="fas fa-times"></span>
@@ -261,8 +327,8 @@ export default function ProductoCreate({ onClose, onSuccess, initialData }) {
                 <div className="border-dashed border-2 border-300 rounded-2 py-4 bg-100 position-relative" style={{ borderStyle: 'dashed' }}>
                   <input 
                     type="file" 
-                    className="position-absolute w-100 h-100 opacity-0"
-                    style={{ top: 0, left: 0, cursor: 'pointer' }} 
+                    className="position-absolute w-100 h-100"
+                    style={{ top: 0, left: 0, cursor: 'pointer', opacity: 0, zIndex: 10 }} 
                     accept="image/*"
                     onChange={handleImageSelect}
                   />

@@ -36,41 +36,66 @@ function VerModal({ producto, onClose }) {
     <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(11,23,39,0.55)', zIndex: 1060 }}>
       <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content border-0 shadow-lg">
-          <div className="modal-header bg-200 border-bottom-0 py-3">
-            <div className="d-flex align-items-center gap-3">
-              <div className="avatar avatar-xl bg-primary text-white rounded-3 d-flex align-items-center justify-content-center fs-1 fw-bold" style={{ width: 56, height: 56 }}>
-                {p.nombre?.charAt(0).toUpperCase()}
-              </div>
+          <div className="modal-header bg-light border-bottom-0 py-3">
+            <div className="d-flex align-items-center gap-4">
+              {p.imagen_url ? (
+                <div style={{ width: 84, height: 84, borderRadius: '12px', overflow: 'hidden', flexShrink: 0 }} className="shadow-sm border bg-white">
+                  <img src={p.imagen_url} alt={p.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              ) : (
+                <div className="avatar avatar-xl bg-primary text-white rounded-3 d-flex align-items-center justify-content-center fs-2 fw-bold" style={{ width: 84, height: 84, flexShrink: 0 }}>
+                  {p.nombre?.charAt(0).toUpperCase()}
+                </div>
+              )}
               <div>
-                <h5 className="mb-0 fw-bold">{p.nombre}</h5>
-                <span className="fs--1 text-500">{p.categoria?.nombre || 'Sin Categoría'} · SKU: {p.codigo_sku || '—'}</span>
+                <h4 className="mb-1 fw-bold text-900">{p.nombre}</h4>
+                <div className="fs--1 text-600 mb-2">
+                  <span className="fas fa-folder me-1 text-400"></span>{p.categoria?.nombre || 'Sin Categoría'}
+                  <span className="mx-2 text-300">|</span>
+                  <span className="fas fa-barcode me-1 text-400"></span>{p.codigo_sku || 'Sin SKU'}
+                </div>
+                <TipoBadge tipo={p.tipo} />
               </div>
             </div>
             <button className="btn-close" onClick={onClose} />
           </div>
           <div className="modal-body pt-4">
-            <div className="row g-3">
+            <div className="row g-4">
               <div className="col-md-6">
-                <h6 className="fs--1 text-uppercase text-500 mb-2">Datos Generales</h6>
-                <table className="table table-sm fs--1 mb-0">
+                <h6 className="fs--1 text-uppercase text-500 mb-3 border-bottom pb-2">Datos Generales</h6>
+                <table className="table table-sm fs--1 mb-0 border-0">
                   <tbody>
-                    <tr><td className="text-600 fw-medium">SKU</td><td>{p.codigo_sku || '—'}</td></tr>
-                    <tr><td className="text-600 fw-medium">Código de barras</td><td>{p.codigo_barras || '—'}</td></tr>
-                    <tr><td className="text-600 fw-medium">Tipo</td><td><TipoBadge tipo={p.tipo} /></td></tr>
-                    <tr><td className="text-600 fw-medium">Estado</td><td>
+                    <tr><td className="text-600 fw-medium border-0 py-2">SKU</td><td className="border-0 py-2">{p.codigo_sku || '—'}</td></tr>
+                    <tr><td className="text-600 fw-medium border-0 py-2">Cód. Barras</td><td className="border-0 py-2">{p.codigo_barras || '—'}</td></tr>
+                    <tr><td className="text-600 fw-medium border-0 py-2">Tipo</td><td className="border-0 py-2"><TipoBadge tipo={p.tipo} /></td></tr>
+                    <tr><td className="text-600 fw-medium border-0 py-2">Estado</td><td className="border-0 py-2">
                       {p.estado !== false ? <span className="badge badge-soft-success">Activo</span> : <span className="badge badge-soft-danger">Inactivo</span>}
                     </td></tr>
+                    {p.etiquetas && p.etiquetas.length > 0 && (
+                      <tr>
+                        <td className="text-600 fw-medium border-0 py-2 align-middle">Etiquetas</td>
+                        <td className="border-0 py-2">
+                          <div className="d-flex flex-wrap gap-1">
+                            {(Array.isArray(p.etiquetas) ? p.etiquetas : p.etiquetas.split(',')).map((tag, i) => (
+                              <span key={i} className="badge badge-soft-secondary">{tag.trim()}</span>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
               <div className="col-md-6">
-                <h6 className="fs--1 text-uppercase text-500 mb-2">Precios &amp; Costos</h6>
-                <table className="table table-sm fs--1 mb-0">
+                <h6 className="fs--1 text-uppercase text-500 mb-3 border-bottom pb-2">Precios &amp; Inventario</h6>
+                <table className="table table-sm fs--1 mb-0 border-0">
                   <tbody>
-                    <tr><td className="text-600 fw-medium">Precio de venta</td><td className="fw-bold text-primary">$ {fmt(p.precio_venta_1)}</td></tr>
-                    <tr><td className="text-600 fw-medium">Costo promedio</td><td>$ {fmt(p.costo_promedio)}</td></tr>
-                    <tr><td className="text-600 fw-medium">IVA / Impuesto</td><td>{p.tarifa_impuesto || 0}%</td></tr>
-                    <tr><td className="text-600 fw-medium">Stock actual</td><td>{fmt(p.stock_actual)} uds.</td></tr>
+                    <tr><td className="text-600 fw-medium border-0 py-2">Precio de venta</td><td className="fw-bold text-primary border-0 py-2 fs-0">$ {fmt(p.precio_venta_1)}</td></tr>
+                    <tr><td className="text-600 fw-medium border-0 py-2">Costo promedio</td><td className="border-0 py-2">$ {fmt(p.costo_promedio)}</td></tr>
+                    <tr><td className="text-600 fw-medium border-0 py-2">IVA / Impuesto</td><td className="border-0 py-2">{p.tarifa_impuesto || 0}%</td></tr>
+                    <tr><td className="text-600 fw-medium border-0 py-2">Stock actual</td><td className="border-0 py-2">
+                      <span className={`fw-bold ${parseFloat(p.stock_actual) > 0 ? 'text-success' : 'text-danger'}`}>{fmt(p.stock_actual)} uds.</span>
+                    </td></tr>
                   </tbody>
                 </table>
               </div>
@@ -125,9 +150,14 @@ function TablaProductos({ productos, onView, onEdit, onToggle, onDelete }) {
               <td><input type="checkbox" className="form-check-input" /></td>
               <td>
                 <div className="d-flex align-items-center gap-2">
-                  <div className="avatar avatar-s bg-soft-primary text-primary rounded-2 d-flex align-items-center justify-content-center fw-bold" style={{ width: 32, height: 32, fontSize: '0.8rem', flexShrink: 0 }}>
-                    {p.nombre?.charAt(0).toUpperCase()}
-                  </div>
+                  {p.imagen_url ? (
+                    <img src={p.imagen_url} alt={p.nombre} className="rounded-2 shadow-sm border" style={{ width: 36, height: 36, objectFit: 'cover', flexShrink: 0 }} />
+                  ) : (
+                    <div className="avatar avatar-s bg-soft-primary text-primary rounded-2 d-flex align-items-center justify-content-center fw-bold" style={{ width: 36, height: 36, fontSize: '0.8rem', flexShrink: 0 }}>
+                      {p.nombre?.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+
                   <span className="fw-semibold text-900">{p.nombre}</span>
                 </div>
               </td>
@@ -186,10 +216,14 @@ function GridProductos({ productos, onView, onEdit }) {
         <div key={p.id} className="col-sm-6 col-md-4 col-xl-3">
           <div className="card h-100 shadow-none border hover-shadow" style={{ transition: 'box-shadow .15s' }}>
             <div className="card-body p-3">
-              <div className="text-center bg-light rounded mb-3 py-3">
-                <div className="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle fw-bold fs-1" style={{ width: 64, height: 64 }}>
-                  {p.nombre?.charAt(0).toUpperCase()}
-                </div>
+              <div className="text-center bg-light rounded mb-3 py-3 position-relative border" style={{ height: 160, overflow: 'hidden' }}>
+                {p.imagen_url ? (
+                  <img src={p.imagen_url} alt={p.nombre} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'contain' }} />
+                ) : (
+                  <div className="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle fw-bold fs-1" style={{ width: 64, height: 64, marginTop: '30px' }}>
+                    {p.nombre?.charAt(0).toUpperCase()}
+                  </div>
+                )}
               </div>
               <h6 className="fw-bold mb-1 text-truncate" title={p.nombre}>{p.nombre}</h6>
               <p className="fs--2 text-500 mb-2">{p.categoria?.nombre || 'Sin Categoría'}</p>
@@ -355,7 +389,7 @@ export default function ProductosList() {
   const inactCount = productos.filter(p => p.estado === false).length;
 
   return (
-    <div className="container-fluid py-4" style={{ backgroundColor: '#F9FAFD', minHeight: '100vh' }}>
+    <div className="container-fluid py-4" style={{ backgroundColor: '#F9FAFD', minHeight: '100vh' }} translate="no">
 
       {/* ── Page Header ───────────────────────────────────────────── */}
       <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">

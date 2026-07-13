@@ -62,4 +62,18 @@ class EmpresaController extends Controller
         $empresa->delete();
         return response()->json(null, 204);
     }
+
+    public function settings(Request $request)
+    {
+        $empresaId = $request->attributes->get('empresa_id') ?? $request->header('X-Tenant-ID');
+        if (!$empresaId) {
+            return response()->json(['error' => 'Tenant no especificado'], 400);
+        }
+        $empresa = Empresa::find($empresaId);
+        
+        return response()->json([
+            'impuesto_defecto' => $empresa->impuesto_defecto ?? 19,
+            'moneda_defecto'   => $empresa->moneda_defecto ?? 'COP'
+        ]);
+    }
 }

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
 const RoadmapCalendar = () => {
-  const [selectedDay, setSelectedDay] = useState(38); // Default to latest logic/today
+  const [selectedDay, setSelectedDay] = useState(39); // Default: July 9 (Absolute Day 39)
+  const [currentMonthDate, setCurrentMonthDate] = useState(new Date(2026, 6, 1)); // Default: July 2026 (Month 6 is July in JS)
 
   // Datos interactivos de los reportes diarios
-    const dailyReports = {
+  const dailyReports = {
     16: [
       { id: 1, title: 'Seguridad Multi-Tenant', desc: '<strong>1. ¿Qué se hizo?:</strong> Configuración de PostgreSQL en Supabase con JWT y Middlewares en Laravel.<br/><strong>2. ¿Por qué?:</strong> Porque un ERP SaaS requiere bases de datos compartidas pero aisladas por inquilino.<br/><strong>3. ¿Para qué?:</strong> Para garantizar la privacidad de los datos mediante RLS (Row Level Security).' },
       { id: 2, title: 'Módulo de Permisología', desc: '<strong>1. ¿Qué se hizo?:</strong> Diseño de API REST RolePermissionController y matriz visual en React.<br/><strong>2. ¿Por qué?:</strong> El sistema necesita diferenciar entre superadmin, administradores, y cajeros operativos.<br/><strong>3. ¿Para qué?:</strong> Para controlar qué ve cada usuario y evitar operaciones no autorizadas.' },
@@ -94,127 +95,203 @@ const RoadmapCalendar = () => {
       { id: 3, title: 'Subida y Progreso Storage Supabase', desc: '<strong>1. ¿Qué se hizo?:</strong> Integración de subida directa de imágenes al bucket archivos_empresas con barra de progreso animada en React.<br/><strong>2. ¿Por qué?:</strong> Se eliminó el loader bloqueante de SweetAlert que provocaba colapsos del DOM al desmontar.<br/><strong>3. ¿Para qué?:</strong> Para mostrar al usuario el porcentaje de carga en tiempo real sin congelar la interfaz.' },
       { id: 4, title: 'Desbloqueo Políticas RLS en DB', desc: '<strong>1. ¿Qué se hizo?:</strong> Rediseño de public.current_tenant_id() en PostgreSQL para consultar el tenant por auth.uid() en saas_usuarios_empresas.<br/><strong>2. ¿Por qué?:</strong> El JWT de usuarios estándar no incluía tenant_id, haciendo que RLS rechazara las subidas al Storage.<br/><strong>3. ¿Para qué?:</strong> Para que el RLS verifique el tenant con exactitud y permita almacenar archivos multi-tenant de forma segura.' },
       { id: 5, title: 'Blindaje DOM Anti-Pantalla Blanca', desc: '<strong>1. ¿Qué se hizo?:</strong> Inyección de translate="no" en index.html y componente global ErrorBoundary en main.jsx.<br/><strong>2. ¿Por qué?:</strong> Traductores del navegador (Google Translate) alteran nodos de texto y rompen el desmontaje en React 18.<br/><strong>3. ¿Para qué?:</strong> Para garantizar el 100% de disponibilidad visual impidiendo que cualquier excepción provoque una página en blanco.' }
+    ],
+    39: [
+      { id: 1, title: 'Optimización de Storage', desc: '<strong>1. ¿Qué se hizo?:</strong> Compresión de imágenes en cliente (HTML5 Canvas) y subida optimizada.<br/><strong>2. ¿Por qué?:</strong> La subida de imágenes pesadas saturaba la red y el bucket de Supabase, bloqueando la UI.<br/><strong>3. ¿Para qué?:</strong> Para garantizar subidas en milisegundos y ahorrar ancho de banda y espacio.' },
+      { id: 2, title: 'Eliminación Asíncrona (Fire & Forget)', desc: '<strong>1. ¿Qué se hizo?:</strong> Borrado en segundo plano al sustituir imágenes en Supabase Storage.<br/><strong>2. ¿Por qué?:</strong> Esperar la confirmación del borrado para cerrar el modal generaba una mala experiencia (lag en UI).<br/><strong>3. ¿Para qué?:</strong> Para permitir una edición ultra fluida de productos en el catálogo sin congelar la pantalla.' },
+      { id: 3, title: 'Dashboard Contable y KPIs', desc: '<strong>1. ¿Qué se hizo?:</strong> Reestructuración del Dashboard Principal SaaS reemplazando métricas inactivas por KPIs Contables (Terceros, PUC).<br/><strong>2. ¿Por qué?:</strong> El usuario (Tenant) requiere visualizar su estado de contabilidad de forma inmediata.<br/><strong>3. ¿Para qué?:</strong> Para ofrecer un panel gerencial 100% acoplado al módulo financiero.' }
     ]
+  };
+
+  // Helper function to map Year-Month-Day to the original Absolute Day indexing (June 1 = Day 1)
+  const getAbsoluteDay = (year, month, day) => {
+    if (year === 2026 && month === 5) return day; // Junio (Month 5 in JS Date)
+    if (year === 2026 && month === 6) return 30 + day; // Julio
+    return -1;
+  };
+
+  const getAbsDayFromDate = (date) => getAbsoluteDay(date.getFullYear(), date.getMonth(), date.getDate());
+
+  // Manejo del mes actual mostrado
+  const nextMonth = () => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() + 1, 1));
+  const prevMonth = () => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1, 1));
+  const goToday = () => {
+    setCurrentMonthDate(new Date(2026, 6, 1)); // Foco en el mes activo de desarrollo (Julio 2026)
+    setSelectedDay(39); // Foco en el día actual
+  };
+
+  const renderCalendarGrid = () => {
+    const year = currentMonthDate.getFullYear();
+    const month = currentMonthDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDayIndex = new Date(year, month, 1).getDay(); // 0 is Sunday
+    const prevMonthDays = new Date(year, month, 0).getDate();
+
+    const days = [];
+
+    // Rellenar días del mes anterior
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
+      days.push({ day: prevMonthDays - i, isCurrentMonth: false, monthOffset: -1 });
+    }
+
+    // Días del mes actual
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push({ day: i, isCurrentMonth: true, monthOffset: 0 });
+    }
+
+    // Rellenar días del próximo mes para completar la grilla (máx 42 celdas)
+    const remaining = 42 - days.length;
+    for (let i = 1; i <= remaining; i++) {
+      days.push({ day: i, isCurrentMonth: false, monthOffset: 1 });
+    }
+
+    return days.map((cell, index) => {
+      // Determinar la fecha real para buscar en dailyReports
+      let cellDate;
+      if (cell.monthOffset === -1) {
+        cellDate = new Date(year, month - 1, cell.day);
+      } else if (cell.monthOffset === 1) {
+        cellDate = new Date(year, month + 1, cell.day);
+      } else {
+        cellDate = new Date(year, month, cell.day);
+      }
+
+      const absDay = getAbsDayFromDate(cellDate);
+      const hasReport = !!dailyReports[absDay];
+      const isSelected = absDay === selectedDay;
+
+      // Aplicar estilos Falcon
+      let baseClass = "py-2 position-relative d-flex align-items-center justify-content-center flex-column";
+      if (!cell.isCurrentMonth) {
+        baseClass += " text-400 bg-light";
+      } else {
+        baseClass += hasReport ? " fw-bold text-dark bg-soft-primary cursor-pointer hover-bg-200 transition-base" : " text-700 hover-bg-100 transition-base";
+      }
+
+      if (isSelected && cell.isCurrentMonth) {
+        return (
+          <div key={index} style={{ width: '14.28%', cursor: 'pointer' }} className="d-flex justify-content-center p-1" onClick={() => setSelectedDay(absDay)}>
+            <div className="py-2 bg-primary text-white rounded shadow-sm d-flex align-items-center justify-content-center fw-bold w-100 h-100">
+              {cell.day}
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div 
+          key={index} 
+          className={`${baseClass} rounded m-1`} 
+          style={{ width: 'calc(14.28% - 0.5rem)', height: '40px', cursor: (hasReport && cell.isCurrentMonth) ? 'pointer' : 'default' }} 
+          onClick={() => {
+            if (hasReport && cell.isCurrentMonth) setSelectedDay(absDay);
+          }}
+          title={hasReport ? "Ver reporte diario" : ""}
+        >
+          {cell.day}
+          {hasReport && cell.isCurrentMonth && <span className="position-absolute bottom-0 start-50 translate-middle-x p-1 bg-danger border border-light rounded-circle mb-1" style={{ width: '6px', height: '6px' }}></span>}
+        </div>
+      );
+    });
   };
 
   const currentEvents = dailyReports[selectedDay] || [{ id: 0, title: 'Día sin Registro de Avances', desc: 'El equipo se enfocó en análisis, diseño interno o descanso.' }];
 
-  const renderDay = (day) => {
-    // Definimos el estilo base y si el día es clickeable (si tiene reporte)
-    const hasReport = !!dailyReports[day];
-    let baseClass = `py-2 position-relative ${hasReport ? 'fw-bold text-dark' : 'text-500'}`;
-    
-    // Colores temáticos originales para mantener la estética de las fases
-    if (day >= 1 && day <= 15) {
-      baseClass += " bg-soft-primary";
-      if (day === 1) baseClass += " rounded-start-pill";
-      if (day === 15) baseClass += " rounded-end-pill";
-    } else if (day >= 16 && day <= 22) {
-      if (day === 16) baseClass += " border border-success rounded-start-pill border-end-0";
-      else if (day >= 17 && day <= 21) baseClass += " border border-success border-start-0 border-end-0";
-      else if (day === 22) baseClass += " border border-success border-start-0 rounded-end-pill";
-    } else if (day >= 23 && day <= 38) {
-      baseClass += " bg-soft-warning";
-      if (day === 23) baseClass += " rounded-start-pill";
-      if (day === 38) baseClass += " rounded-end-pill";
-    }
+  const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  const displayMonth = `${monthNames[currentMonthDate.getMonth()]} ${currentMonthDate.getFullYear()}`;
 
-    if (day === selectedDay) {
-       return (
-         <div key={`day-${day}`} style={{ width: '14%', cursor: 'pointer' }} className="d-flex justify-content-center" onClick={() => setSelectedDay(day)}>
-            <div className="py-2 bg-primary text-white rounded-circle shadow-sm d-flex align-items-center justify-content-center fw-bold" style={{ width: '32px', height: '32px' }}>
-              {day >= 31 ? day - 30 : day}
-            </div>
-         </div>
-       );
-    }
-
-    return (
-      <div 
-        key={`day-${day}`} 
-        className={`${baseClass} text-center`} 
-        style={{ width: '14%', cursor: hasReport ? 'pointer' : 'default' }} 
-        onClick={() => hasReport && setSelectedDay(day)}
-        title={hasReport ? "Ver reporte diario" : ""}
-      >
-        {day >= 31 ? day - 30 : day}
-        {hasReport && <span className="position-absolute top-0 start-50 translate-middle p-1 bg-danger border border-light rounded-circle" style={{ width: '8px', height: '8px' }}></span>}
-      </div>
-    );
-  };
+  // Determinamos el día seleccionado real para mostrar en el título
+  let selectedDateString = "";
+  if (selectedDay > 0 && selectedDay <= 30) {
+    selectedDateString = `${selectedDay} de Junio 2026`;
+  } else if (selectedDay > 30) {
+    selectedDateString = `${selectedDay - 30} de Julio 2026`;
+  } else {
+    selectedDateString = "Día sin Registro";
+  }
 
   return (
-    <div className="card h-100">
-      <div className="card-header bg-light d-flex justify-content-between align-items-center py-2">
+    <div className="card h-100 shadow-sm border-0">
+      <div className="card-header bg-light d-flex justify-content-between align-items-center py-2 border-bottom border-200">
         <h5 className="mb-0 text-800 fs-0"><span className="fas fa-calendar-alt text-primary me-2"></span>Cronograma de Avances</h5>
-        <div className="btn-group btn-group-sm" role="group">
-          <button className="btn btn-outline-secondary shadow-none" type="button"><span className="fas fa-chevron-left"></span></button>
-          <button className="btn btn-outline-secondary shadow-none active" type="button">Hoy</button>
-          <button className="btn btn-outline-secondary shadow-none" type="button"><span className="fas fa-chevron-right"></span></button>
+        <div className="d-flex align-items-center">
+          <span className="fw-semi-bold fs--1 text-600 me-3 d-none d-md-inline-block">{displayMonth}</span>
+          <div className="btn-group btn-group-sm" role="group">
+            <button className="btn btn-falcon-default shadow-none" type="button" onClick={prevMonth} title="Mes Anterior">
+              <span className="fas fa-chevron-left text-500"></span>
+            </button>
+            <button className="btn btn-falcon-primary shadow-none" type="button" onClick={goToday}>
+              Hoy
+            </button>
+            <button className="btn btn-falcon-default shadow-none" type="button" onClick={nextMonth} title="Mes Siguiente">
+              <span className="fas fa-chevron-right text-500"></span>
+            </button>
+          </div>
         </div>
       </div>
       <div className="card-body p-0">
         <div className="row g-0 h-100">
-          <div className="col-md-6 border-end-md border-200">
+          {/* Columna Izquierda: Calendario */}
+          <div className="col-md-7 border-end-md border-200">
             <div className="p-3">
-              <div className="d-flex justify-content-between text-center fw-semi-bold text-500 fs--1 mb-3">
-                <div style={{ width: '14%' }}>Dom</div>
-                <div style={{ width: '14%' }}>Lun</div>
-                <div style={{ width: '14%' }}>Mar</div>
-                <div style={{ width: '14%' }}>Mié</div>
-                <div style={{ width: '14%' }}>Jue</div>
-                <div style={{ width: '14%' }}>Vie</div>
-                <div style={{ width: '14%' }}>Sáb</div>
+              <div className="d-flex justify-content-between text-center fw-semi-bold text-500 fs--1 mb-2">
+                <div style={{ width: '14.28%' }}>Dom</div>
+                <div style={{ width: '14.28%' }}>Lun</div>
+                <div style={{ width: '14.28%' }}>Mar</div>
+                <div style={{ width: '14.28%' }}>Mié</div>
+                <div style={{ width: '14.28%' }}>Jue</div>
+                <div style={{ width: '14.28%' }}>Vie</div>
+                <div style={{ width: '14.28%' }}>Sáb</div>
               </div>
               
-              <div className="d-flex flex-wrap text-center fs--1 text-700 align-items-center">
-                {/* 31 May */}
-                <div className="text-400 py-2" style={{ width: '14%' }}>31</div>
-                
-                {/* Days 1 to 38 (Includes July 1 to 8) */}
-                {[...Array(38)].map((_, i) => renderDay(i + 1))}
-
-                {/* Next month days */}
-                <div className="py-2 text-400" style={{ width: '14%' }}>4</div>
+              <div className="d-flex flex-wrap text-center fs--1">
+                {renderCalendarGrid()}
               </div>
-              <div className="text-center mt-3 fs--2 text-500">
-                <span className="fas fa-info-circle me-1"></span> Los días con un punto rojo contienen reportes de avance.
+              <div className="d-flex justify-content-center align-items-center mt-3 fs--2 text-500">
+                <span className="fas fa-circle text-danger me-2" style={{ fontSize: '8px' }}></span> 
+                <span>Días con avances registrados</span>
               </div>
             </div>
           </div>
-          <div className="col-md-6">
-            <div className="p-3 h-100 d-flex flex-column bg-light">
-              <h4 className="mb-0 text-800 text-primary">{selectedDay >= 31 ? 'Julio 2026' : 'Junio 2026'}</h4>
-              <p className="fs--1 text-500 mb-4 fw-semi-bold">
-                Reporte del {selectedDay >= 31 ? `${selectedDay - 30} de Julio` : `${selectedDay} de Junio`}
-              </p>
+
+          {/* Columna Derecha: Reportes */}
+          <div className="col-md-5">
+            <div className="p-3 h-100 d-flex flex-column bg-light rounded-end-md">
+              <div className="mb-3 border-bottom border-200 pb-2">
+                <h4 className="mb-1 text-800 text-primary">Reporte Técnico</h4>
+                <p className="fs--1 text-600 mb-0 fw-semi-bold">
+                  <span className="fas fa-clock text-info me-1"></span>
+                  {selectedDateString}
+                </p>
+              </div>
               
-              <div className="flex-1 overflow-auto pe-2 scrollbar" style={{ maxHeight: '270px' }}>
-                <div className="accordion" id={`accordion-report-${selectedDay}`}>
+              <div className="flex-1 overflow-auto pe-2 scrollbar" style={{ maxHeight: '320px' }}>
+                <div className="accordion" id="accordion-report">
                   {currentEvents.map((evt, idx) => (
-                    <div key={evt.id} className="accordion-item border-x-0 border-top-0">
+                    <div key={evt.id} className="accordion-item border-x-0 border-top-0 mb-1 rounded bg-white shadow-sm">
                       <h2 className="accordion-header" id={`heading-rep-${evt.id}`}>
                         <button 
-                          className={`accordion-button shadow-none py-2 px-1 ${idx !== 0 ? 'collapsed' : ''}`}
+                          className={`accordion-button shadow-none py-2 px-3 ${idx !== 0 ? 'collapsed' : ''}`}
                           type="button" 
                           data-bs-toggle="collapse" 
                           data-bs-target={`#collapse-rep-${evt.id}`} 
                           aria-expanded={idx === 0 ? "true" : "false"} 
                           aria-controls={`collapse-rep-${evt.id}`}
-                          style={{ backgroundColor: 'transparent' }}
                         >
-                          <span className="fas fa-check-circle text-success me-2 fs--1"></span>
-                          <span className="fw-bold fs--1 text-800">{evt.title}</span>
+                          <div className="d-flex align-items-center w-100">
+                            <span className="fas fa-check-circle text-success me-2 fs--1"></span>
+                            <span className="fw-bold fs--1 text-800">{evt.title}</span>
+                          </div>
                         </button>
                       </h2>
                       <div 
                         id={`collapse-rep-${evt.id}`} 
                         className={`accordion-collapse collapse ${idx === 0 ? 'show' : ''}`} 
                         aria-labelledby={`heading-rep-${evt.id}`} 
-                        data-bs-parent={`#accordion-report-${selectedDay}`}
+                        data-bs-parent="#accordion-report"
                       >
-                        <div className="accordion-body pt-0 pb-2 ps-4 pe-2">
-                          <p className="fs--1 text-600 mb-0" style={{ lineHeight: '1.4' }} dangerouslySetInnerHTML={{ __html: evt.desc }}></p>
+                        <div className="accordion-body pt-0 pb-3 ps-4 pe-3 bg-white rounded-bottom">
+                          <p className="fs--1 text-600 mb-0 mt-2" style={{ lineHeight: '1.5' }} dangerouslySetInnerHTML={{ __html: evt.desc }}></p>
                         </div>
                       </div>
                     </div>

@@ -1,0 +1,7 @@
+
+
+3. 💻 Agente de Desarrollo (/master-dev)
+Función asignada: Refactorización del flujo en ProductoCreate.jsx y ProductosList.jsx.
+
+Por qué: El CRUD en el frontend debe manejar los errores de manera elegante y asegurarse de que el tenantId se está enviando correctamente al StorageService y a la API de Laravel.
+Tarea: Ajustar ProductoCreate.jsx para garantizar que la respuesta del StorageService no bloquee la creación del producto si falla, y optimizar el estado de React en ProductosList.jsx para que la renderización de la lista no dependa de re-cargas innecesarias.

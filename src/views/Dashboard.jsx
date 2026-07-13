@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import ReactECharts from 'echarts-for-react';
 import api from '../services/api';
+import useAuthStore from '../store/authStore';
 
 function Dashboard() {
+  const { tenantId, user } = useAuthStore();
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Función para obtener las métricas desde el backend
+  // Función para obtener las métricas desde el backend (para el Tenant actual)
   const fetchMetrics = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/dashboard/metrics');
+      const tid = tenantId || user?.app_metadata?.empresa_id || user?.app_metadata?.tenant_id;
+      const response = await api.get('/dashboard/metrics', {
+        headers: { 'X-Tenant-ID': tid }
+      });
       if (response.data.success) {
         setMetrics(response.data.data);
       }
@@ -21,299 +25,152 @@ function Dashboard() {
     }
   };
 
-  // Cargar datos al montar el componente
   useEffect(() => {
     fetchMetrics();
-  }, []);
+  }, [tenantId]);
 
-  // Gráfico Principal de MRR (8 columnas) - Mantenemos visual pero en el futuro se puede hacer dinámico
-  const mrrChartOptions = {
-    tooltip: { trigger: 'axis', backgroundColor: '#f9fafd', borderColor: '#d8e2ef', textStyle: { color: '#0b1727' } },
-    xAxis: {
-      type: 'category',
-      data: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-      boundaryGap: false,
-      axisLine: { show: false },
-      axisTick: { show: false },
-      axisLabel: { color: 'rgba(255,255,255,0.7)', margin: 15 },
-      splitLine: { show: true, lineStyle: { color: 'rgba(255,255,255,0.1)' } }
-    },
-    yAxis: { type: 'value', show: false },
-    series: [
-      {
-        name: 'MRR ($ USD)',
-        type: 'line',
-        data: [1500, 2100, 3200, 3900, 4500, 5800, 6200, 7500, 8100, 9500, 11000, 13500],
-        smooth: true,
-        symbol: 'circle',
-        symbolSize: 6,
-        itemStyle: { color: '#fff', borderColor: '#00B7FF', borderWidth: 2 },
-        lineStyle: { color: '#fff', width: 2 },
-        areaStyle: {
-          color: {
-            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
-            colorStops: [{ offset: 0, color: 'rgba(255,255,255,0.2)' }, { offset: 1, color: 'rgba(255,255,255,0)' }]
-          }
-        }
-      }
-    ],
-    grid: { left: '2%', right: '2%', bottom: '0', top: '10%', containLabel: true }
-  };
-
-  // Gráfico Doughnut para uso de Módulos (4 columnas)
-  const modulesUsageOptions = {
-    tooltip: { trigger: 'item' },
-    legend: { bottom: '0%', left: 'center', textStyle: { fontSize: 10 } },
-    series: [
-      {
-        name: 'Uso de Módulos',
-        type: 'pie',
-        radius: ['40%', '70%'],
-        avoidLabelOverlap: false,
-        itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
-        label: { show: false, position: 'center' },
-        emphasis: { label: { show: true, fontSize: '16', fontWeight: 'bold' } },
-        labelLine: { show: false },
-        data: [
-          { value: 1048, name: 'Facturación E.', itemStyle: { color: '#2c7be5' } },
-          { value: 735, name: 'Nómina', itemStyle: { color: '#00d27a' } },
-          { value: 580, name: 'Contabilidad', itemStyle: { color: '#f5803e' } },
-          { value: 484, name: 'POS', itemStyle: { color: '#e63757' } },
-          { value: 300, name: 'Inventario', itemStyle: { color: '#27bcfd' } }
-        ]
-      }
-    ]
-  };
-
-  // Mini gráficos para KPIs
-  const miniLineChartOptions = (data, color) => ({
-    tooltip: { show: false },
-    xAxis: { type: 'category', show: false, data: ['1', '2', '3', '4', '5', '6', '7'] },
-    yAxis: { show: false },
-    series: [{ type: 'line', data: data, smooth: true, symbol: 'none', lineStyle: { color: color, width: 2 }, areaStyle: { color: `${color}33` } }],
-    grid: { left: 0, right: 0, top: 0, bottom: 0 }
-  });
+  const currentDate = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
     <div className="pb-5">
-      <div className="d-flex align-items-center justify-content-between mb-4 mt-3">
-        <div className="d-flex align-items-center">
-          <span className="fas fa-satellite-dish fs-3 me-3 text-primary"></span>
-          <div>
-            <h2 className="mb-0">Centro de Control SaaS</h2>
-            <p className="text-500 mb-0">Visión global de telemetría y negocio</p>
+      {/* Falcon Welcome Widget */}
+      <div className="card shadow-none border mb-4 mt-3 bg-light overflow-hidden">
+        {/* Background graphic (optional if needed) */}
+        <div className="bg-holder bg-card" style={{ backgroundImage: 'url(../img/illustrations/corner-3.png)', opacity: 0.3 }}></div>
+        <div className="card-body position-relative">
+          <div className="row flex-between-center g-3">
+            <div className="col-auto">
+              <h5 className="text-600 fw-normal mb-1">Bienvenido a</h5>
+              <h2 className="text-primary fw-bold mb-0">
+                {loading ? 'Cargando...' : metrics?.empresa_nombre || 'Tu Empresa'}
+              </h2>
+            </div>
+            <div className="col-auto">
+              <div className="d-flex align-items-center">
+                <span className="text-500 fs--1 me-2 fw-semi-bold">Datos de hoy:</span>
+                <div className="input-group input-group-sm border rounded bg-white shadow-sm" style={{ width: '220px' }}>
+                  <span className="input-group-text bg-white border-0"><span className="fas fa-calendar-alt text-primary"></span></span>
+                  <input type="text" className="form-control border-0 fw-semi-bold text-700 bg-white" value={currentDate} readOnly />
+                </div>
+                <button className="btn btn-sm btn-falcon-default ms-2 shadow-sm" onClick={fetchMetrics} disabled={loading} title="Actualizar">
+                  <span className={`fas fa-sync-alt ${loading ? 'fa-spin text-primary' : 'text-primary'}`}></span>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-        <div>
-          <button className="btn btn-sm btn-outline-primary me-2"><span className="fas fa-download me-1"></span>Exportar Reporte</button>
-          {/* Conectamos el botón de actualizar con nuestra función y estado de carga */}
-          <button className="btn btn-sm btn-primary" onClick={fetchMetrics} disabled={loading}>
-            <span className={`fas fa-sync me-1 ${loading ? 'fa-spin' : ''}`}></span>
-            {loading ? 'Actualizando...' : 'Actualizar Datos'}
-          </button>
         </div>
       </div>
 
-      {/* 1. FILA DE KPIs (4 Tarjetas) conectada a métricas */}
+      {/* FILA DE KPIs (Módulos) */}
       <div className="row g-3 mb-4">
-        {/* MRR */}
+        {/* POS (Ventas Hoy) */}
         <div className="col-sm-6 col-md-3">
-          <div className="card h-100 shadow-sm border-0">
+          <div className="card h-100 shadow-sm border-0 border-top border-3 border-success">
             <div className="card-body">
-              <h6 className="fs--1 text-700 mb-1">MRR Mensual</h6>
-              <div className="d-flex align-items-center justify-content-between">
-                <h3 className="mb-0 text-primary">
-                  ${loading ? '...' : (metrics?.kpis?.mrr || 0).toLocaleString()}
-                </h3>
-                <span className="badge badge-soft-success rounded-pill">+12%</span>
+              <div className="d-flex justify-content-between align-items-center mb-1">
+                <h6 className="fs--1 text-700 mb-0">POS (Punto de Venta)</h6>
+                <span className="fas fa-cash-register text-success"></span>
               </div>
-              <div className="mt-3" style={{ height: '30px' }}>
-                <ReactECharts option={miniLineChartOptions([10, 12, 11, 15, 14, 18, 20], '#2c7be5')} style={{ height: '100%', width: '100%' }} />
-              </div>
+              <h3 className="mb-0 text-success fw-bold">
+                ${loading ? '...' : (metrics?.kpis?.ventas_hoy || 0).toLocaleString()}
+              </h3>
+              <p className="fs--2 text-500 mb-0">
+                {loading ? '...' : (metrics?.kpis?.tickets_hoy || 0)} tickets emitidos hoy
+              </p>
             </div>
           </div>
         </div>
-        {/* Tenants */}
+
+        {/* Terceros / Clientes */}
         <div className="col-sm-6 col-md-3">
-          <div className="card h-100 shadow-sm border-0">
+          <div className="card h-100 shadow-sm border-0 border-top border-3 border-primary">
             <div className="card-body">
-              <h6 className="fs--1 text-700 mb-1">Empresas Activas</h6>
-              <div className="d-flex align-items-center justify-content-between">
-                <h3 className="mb-0 text-700">
-                  {loading ? '...' : (metrics?.kpis?.empresas_activas || 0)}
-                </h3>
-                <span className="badge badge-soft-success rounded-pill">
-                  Total: {loading ? '...' : (metrics?.kpis?.total_empresas || 0)}
-                </span>
+              <div className="d-flex justify-content-between align-items-center mb-1">
+                <h6 className="fs--1 text-700 mb-0">Clientes / Terceros</h6>
+                <span className="fas fa-users text-primary"></span>
               </div>
-              <div className="mt-3" style={{ height: '30px' }}>
-                <ReactECharts option={miniLineChartOptions([1000, 1050, 1100, 1180, 1200, 1220, 1245], '#00d27a')} style={{ height: '100%', width: '100%' }} />
-              </div>
+              <h3 className="mb-0 text-primary fw-bold">
+                {loading ? '...' : (metrics?.kpis?.clientes_activos || 0)}
+              </h3>
+              <p className="fs--2 text-500 mb-0">Terceros registrados</p>
             </div>
           </div>
         </div>
-        {/* Churn */}
+
+        {/* Contabilidad */}
         <div className="col-sm-6 col-md-3">
-          <div className="card h-100 shadow-sm border-0">
+          <div className="card h-100 shadow-sm border-0 border-top border-3 border-warning">
             <div className="card-body">
-              <h6 className="fs--1 text-700 mb-1">Tasa de Churn</h6>
-              <div className="d-flex align-items-center justify-content-between">
-                <h3 className="mb-0 text-success">
-                  {loading ? '...' : `${metrics?.kpis?.churn_rate || 0}%`}
-                </h3>
-                <span className="badge badge-soft-success rounded-pill">-0.3%</span>
+              <div className="d-flex justify-content-between align-items-center mb-1">
+                <h6 className="fs--1 text-700 mb-0">Contabilidad</h6>
+                <span className="fas fa-file-invoice-dollar text-warning"></span>
               </div>
-              <div className="mt-3" style={{ height: '30px' }}>
-                <ReactECharts option={miniLineChartOptions([3.5, 3.0, 2.5, 2.0, 1.8, 1.5, 1.2], '#00d27a')} style={{ height: '100%', width: '100%' }} />
-              </div>
+              <h3 className="mb-0 text-warning fw-bold">
+                {loading ? '...' : (metrics?.kpis?.asientos_contables || 0)}
+              </h3>
+              <p className="fs--2 text-500 mb-0">Asientos registrados</p>
             </div>
           </div>
         </div>
-        {/* ARPU */}
+
+        {/* PUC */}
         <div className="col-sm-6 col-md-3">
-          <div className="card h-100 shadow-sm border-0">
+          <div className="card h-100 shadow-sm border-0 border-top border-3 border-info">
             <div className="card-body">
-              <h6 className="fs--1 text-700 mb-1">ARPU (Ingreso x Empresa)</h6>
-              <div className="d-flex align-items-center justify-content-between">
-                <h3 className="mb-0 text-warning">
-                  ${loading ? '...' : (metrics?.kpis?.arpu || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
-                </h3>
-                <span className="badge badge-soft-warning rounded-pill">Estable</span>
+              <div className="d-flex justify-content-between align-items-center mb-1">
+                <h6 className="fs--1 text-700 mb-0">Plan Único de Cuentas</h6>
+                <span className="fas fa-book text-info"></span>
               </div>
-              <div className="mt-3" style={{ height: '30px' }}>
-                <ReactECharts option={miniLineChartOptions([10.5, 10.6, 10.4, 10.7, 10.8, 10.84, 10.84], '#f5803e')} style={{ height: '100%', width: '100%' }} />
-              </div>
+              <h3 className="mb-0 text-info fw-bold">
+                {loading ? '...' : (metrics?.kpis?.cuentas_puc || 0)}
+              </h3>
+              <p className="fs--2 text-500 mb-0">Cuentas activas (PUC)</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. FILA GRÁFICOS (MRR + Módulos) */}
-      <div className="row g-3 mb-4">
-        <div className="col-lg-8">
-          <div className="card h-100 shadow-sm" style={{ backgroundImage: 'linear-gradient(to right, #004DCC, #0076FA)', border: 'none' }}>
-            <div className="card-header bg-transparent border-0 pb-0 d-flex justify-content-between">
-              <h5 className="text-white mb-0">Crecimiento de Ingresos (MRR)</h5>
-              <select className="form-select form-select-sm w-auto" aria-label="Filtros" style={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white', border: 'none' }}>
-                <option value="2026" className="text-dark">Año 2026</option>
-              </select>
-            </div>
-            <div className="card-body p-0" style={{ height: '280px' }}>
-              <ReactECharts option={mrrChartOptions} style={{ height: '100%', width: '100%' }} />
-            </div>
-          </div>
-        </div>
-        
-        <div className="col-lg-4">
-          <div className="card h-100 shadow-sm border-0">
-            <div className="card-header border-bottom">
-              <h5 className="mb-0">Uso de Módulos (Carga de Servidor)</h5>
-            </div>
-            <div className="card-body p-3">
-              <ReactECharts option={modulesUsageOptions} style={{ height: '240px', width: '100%' }} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. ALERTA Y MÉTRICAS DE INFRAESTRUCTURA (Conectadas dinámicamente) */}
-      <div className="row g-3 mb-4">
-        <div className="col-12">
-          <div className="alert alert-success border-0 d-flex align-items-center shadow-sm mb-0" role="alert">
-            <span className="fas fa-server text-success fs-2 me-3"></span>
-            <div className="fs--1 flex-grow-1">
-              <span className="text-success fw-semi-bold">Infraestructura Óptima.</span> Supabase DB (98% libre), Edge Functions (0 Errores).
-            </div>
-            <button className="btn btn-sm btn-outline-success">Ver Logs de Sistema</button>
-          </div>
-        </div>
-        
-        <div className="col-md-4">
-          <div className="card shadow-sm border-0 border-top border-3 border-info">
-            <div className="card-body py-3">
-              <h6 className="text-500 mb-2">Conexiones a Base de Datos</h6>
-              <h4 className="mb-0 text-info">
-                {loading ? '...' : (metrics?.infraestructura?.db_connections || 142)} / 500
-              </h4>
-              <p className="fs--2 text-500 mb-0">Pool de PostgreSQL activo</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="col-md-4">
-          <div className="card shadow-sm border-0 border-top border-3 border-warning">
-            <div className="card-body py-3">
-              <h6 className="text-500 mb-2">Almacenamiento (Storage)</h6>
-              <h4 className="mb-0 text-warning">
-                {loading ? '...' : (metrics?.infraestructura?.storage_used || '1.2 TB')}
-              </h4>
-              <div className="progress mt-2 mb-1" style={{ height: '4px' }}>
-                <div className="progress-bar bg-warning" role="progressbar" style={{ width: '74%' }}></div>
-              </div>
-              <p className="fs--2 text-500 mb-0">74% de la cuota actual</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-md-4">
-          <div className="card shadow-sm border-0 border-top border-3 border-danger">
-            <div className="card-body py-3">
-              <h6 className="text-500 mb-2">Usuarios Totales</h6>
-              <h4 className="mb-0 text-danger">
-                {loading ? '...' : (metrics?.kpis?.total_usuarios || 0)}
-              </h4>
-              <p className="fs--2 text-500 mb-0">Usuarios registrados globales</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 4. TABLA ONBOARDING Y FEED DE ACTIVIDAD */}
       <div className="row g-3">
+        {/* Tabla Actividad Reciente */}
         <div className="col-lg-8">
           <div className="card shadow-sm border-0 h-100">
             <div className="card-header bg-light d-flex justify-content-between align-items-center">
-              <h5 className="mb-0">Últimas Empresas (Onboarding en vivo)</h5>
-              <button className="btn btn-sm btn-link" onClick={fetchMetrics}>Refrescar</button>
+              <h5 className="mb-0">Actividad Reciente (POS)</h5>
             </div>
             <div className="card-body p-0">
               <div className="table-responsive">
                 <table className="table table-sm table-striped table-hover mb-0 fs--1">
                   <thead className="bg-200 text-900">
                     <tr>
-                      <th className="py-2 ps-3">Empresa (Tenant)</th>
-                      <th className="py-2">NIT / RUT</th>
-                      <th className="py-2">Plan</th>
-                      <th className="py-2">Ingreso Mensual</th>
+                      <th className="py-2 ps-3">Ticket</th>
+                      <th className="py-2">Total</th>
                       <th className="py-2">Estado</th>
+                      <th className="py-2">Fecha</th>
                     </tr>
                   </thead>
-                  {/* Cuerpo de la tabla alimentado dinámicamente */}
                   <tbody>
                     {loading ? (
-                      <tr key="loading">
-                        <td colSpan="5" className="text-center py-4 text-500">
-                          <span className="fas fa-spinner fa-spin me-2"></span>Cargando empresas...
+                      <tr>
+                        <td colSpan="4" className="text-center py-4 text-500">
+                          <span className="fas fa-spinner fa-spin me-2"></span>Cargando actividad...
                         </td>
                       </tr>
-                    ) : metrics?.ultimas_empresas?.length > 0 ? (
-                      metrics.ultimas_empresas.map((empresa) => (
-                        <tr key={empresa.id}>
-                          <td className="align-middle ps-3 fw-semi-bold">{empresa.nombre}</td>
-                          <td className="align-middle text-500">{empresa.ruc_nit || 'N/A'}</td>
-                          <td className="align-middle"><span className="badge bg-primary">{empresa.plan}</span></td>
-                          <td className="align-middle">${Number(empresa.ingreso_mensual).toFixed(2)}</td>
+                    ) : metrics?.ultimas_ventas?.length > 0 ? (
+                      metrics.ultimas_ventas.map((venta) => (
+                        <tr key={venta.id}>
+                          <td className="align-middle ps-3 fw-semi-bold text-primary">{venta.ticket}</td>
+                          <td className="align-middle fw-bold">${Number(venta.total).toLocaleString()}</td>
                           <td className="align-middle">
-                            <span className={`badge ${empresa.is_active ? 'badge-soft-success' : 'badge-soft-secondary'}`}>
-                              {empresa.is_active ? 'Activo' : 'Inactivo'}
-                            </span>
+                            <span className="badge badge-soft-success">{venta.estado}</span>
                           </td>
+                          <td className="align-middle text-500">{venta.fecha}</td>
                         </tr>
                       ))
                     ) : (
-                      <tr key="empty">
-                        <td colSpan="5" className="text-center py-4 text-500">
-                          No hay empresas registradas recientemente.
+                      <tr>
+                        <td colSpan="4" className="text-center py-5 text-500">
+                          <span className="fas fa-receipt fs-3 d-block mb-2 text-300"></span>
+                          No hay ventas registradas recientemente.
                         </td>
                       </tr>
                     )}
@@ -324,31 +181,18 @@ function Dashboard() {
           </div>
         </div>
 
+        {/* Panel lateral */}
         <div className="col-lg-4">
           <div className="card shadow-sm border-0 h-100">
             <div className="card-header bg-light">
-              <h5 className="mb-0">Auditoría en Vivo</h5>
+              <h5 className="mb-0">Inventario Rápido</h5>
             </div>
-            <div className="card-body fs--1 p-3">
-              <div className="d-flex mb-3">
-                <span className="fas fa-arrow-up text-success mt-1 me-2"></span>
-                <div>
-                  <p className="mb-0 fw-semi-bold">Dashboard Conectado</p>
-                  <p className="mb-0 text-500">Los datos ahora se reflejan desde la base de datos real en tiempo real.</p>
-                  <span className="text-400">Hace unos momentos</span>
-                </div>
-              </div>
-              <div className="d-flex mb-3">
-                <span className="fas fa-check-circle text-primary mt-1 me-2"></span>
-                <div>
-                  <p className="mb-0 fw-semi-bold">Sincronización Completada</p>
-                  <p className="mb-0 text-500">Métricas de onboarding extraídas de Supabase/PostgreSQL exitosamente.</p>
-                  <span className="text-400">Hace 1 min</span>
-                </div>
-              </div>
-            </div>
-            <div className="card-footer bg-light p-0">
-              <button className="btn btn-link d-block w-100 py-2 fs--1">Ver todo el registro</button>
+            <div className="card-body p-4 text-center">
+              <span className="fas fa-boxes text-primary fs-4 mb-3"></span>
+              <h3 className="fw-bold mb-1">{loading ? '...' : (metrics?.kpis?.total_productos || 0)}</h3>
+              <p className="text-500 fs--1 mb-4">Productos activos en catálogo</p>
+              
+              <button className="btn btn-outline-primary btn-sm w-100">Ir al Inventario</button>
             </div>
           </div>
         </div>

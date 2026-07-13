@@ -73,4 +73,7 @@ Route::middleware(['supabase.auth'])->group(function () {
     Route::prefix('pos')->group(function () {
         Route::post('/sync', [\App\Http\Controllers\Api\PosVentaController::class, 'sync']);
     });
+
+    // ── Configuracion ────────────────────────────────────────────────────────
+    Route::get('/empresa/settings', [\App\Http\Controllers\EmpresaController::class, 'settings']);
 });
