@@ -66,7 +66,7 @@ export default function SyncStatusBadge() {
     return (
       <div className="d-flex align-items-center">
         <span className="badge badge-soft-warning d-flex align-items-center py-2 px-3" title={`${pendientes} ventas por subir a la nube`}>
-          <span className="fas fa-cloud-upload-alt me-2 fs--1 text-warning spinner-grow spinner-grow-sm" style={{ animationDuration: '2s' }}></span>
+          <span className="fas fa-sync-alt fa-spin me-2 fs--1 text-warning"></span>
           <div className="text-start text-900" style={{ lineHeight: '1.2' }}>
             <div className="fw-bold text-warning-dark">Sincronizando</div>
             <div className="fs--2 fw-normal text-warning-dark">{pendientes} pendientes</div>

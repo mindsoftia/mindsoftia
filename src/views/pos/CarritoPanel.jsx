@@ -5,8 +5,26 @@
 import React, { useState } from 'react';
 import ClienteSelector from './ClienteSelector';
 
-export default function CarritoPanel({ items, subtotal, impuestos, total, procesando, onCambiarCantidad, onCobrar, ultimaVenta, cliente, setCliente }) {
-  const [metodo, setMetodo] = useState('efectivo');
+export default function CarritoPanel({ items, subtotal, impuestos, total, procesando, onCambiarCantidad, onCobrar, ultimaVenta, onNuevaVenta, cliente, setCliente }) {
+  const [metodo, setMetodo] = useState(1); // Usamos ID numérico ahora
+
+  // Cargar métodos desde LocalStorage (simulación de estado global/API)
+  const defaultMethods = [
+    { id: 1, name: 'Efectivo Principal', type: 'CASH', active: true }
+  ];
+  const savedMethodsStr = localStorage.getItem('pos_payment_methods');
+  const allMethods = savedMethodsStr ? JSON.parse(savedMethodsStr) : defaultMethods;
+  const activeMethods = allMethods.filter(m => m.active);
+
+  const getMethodIcon = (type) => {
+    switch(type) {
+      case 'CASH': return 'money-bill-wave';
+      case 'QR_WALLET': return 'mobile-alt';
+      case 'CARD': return 'credit-card';
+      case 'TRANSFER': return 'university';
+      default: return 'wallet';
+    }
+  };
 
   // Vista de éxito post-venta
   if (ultimaVenta && items.length === 0) {
@@ -28,7 +46,7 @@ export default function CarritoPanel({ items, subtotal, impuestos, total, proces
         </button>
         <button
           className="btn btn-primary btn-sm px-4"
-          onClick={() => window.location.reload()}
+          onClick={onNuevaVenta || (() => window.location.reload())}
         >
           <span className="fas fa-plus me-2"></span>Nueva Venta
         </button>
@@ -51,8 +69,8 @@ export default function CarritoPanel({ items, subtotal, impuestos, total, proces
     <>
       <ClienteSelector cliente={cliente} setCliente={setCliente} />
       
-      {/* Lista de items */}
-      <div className="pos-carrito-lista pe-2 mb-3 flex-grow-1">
+      {/* Lista de items (con overflow auto para el scroll interno) */}
+      <div className="pos-carrito-lista pe-2 mb-3 flex-grow-1 overflow-auto">
         {items.map(item => (
           <div
             key={item.id}
@@ -100,18 +118,14 @@ export default function CarritoPanel({ items, subtotal, impuestos, total, proces
         <div className="mb-2">
           <label className="form-label fs--2 text-uppercase text-600 mb-1">Método de Pago</label>
           <div className="d-flex gap-2">
-            {[
-              { id: 'efectivo', icon: 'money-bill-wave', label: 'Efectivo' },
-              { id: 'tarjeta', icon: 'credit-card', label: 'Tarjeta' },
-              { id: 'transferencia', icon: 'university', label: 'Transf.' }
-            ].map(m => (
+            {activeMethods.map(m => (
               <button
                 key={m.id}
-                className={`btn btn-sm flex-fill py-2 ${metodo === m.id ? 'btn-primary' : 'btn-outline-primary bg-white text-900'}`}
+                className={`btn btn-sm flex-fill py-1 px-1 ${metodo === m.id ? 'btn-primary shadow-sm' : 'btn-outline-primary bg-white border-0 shadow-sm text-900'}`}
                 onClick={() => setMetodo(m.id)}
               >
-                <span className={`fas fa-${m.icon} d-block mb-1 fs--1 ${metodo === m.id ? 'text-white' : 'text-primary'}`}></span>
-                <span className={`fs--2 d-block ${metodo === m.id ? 'text-white' : 'text-700'}`}>{m.label}</span>
+                <span className={`fas fa-${getMethodIcon(m.type)} d-block mb-1 fs--2 mt-1 ${metodo === m.id ? 'text-white' : 'text-primary'}`}></span>
+                <span className={`fs--2 d-block text-truncate fw-semi-bold ${metodo === m.id ? 'text-white' : 'text-700'}`} style={{maxWidth: '80px', margin: '0 auto'}}>{m.name}</span>
               </button>
             ))}
           </div>

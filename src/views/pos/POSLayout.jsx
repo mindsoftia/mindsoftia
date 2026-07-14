@@ -2,19 +2,74 @@
  * POSLayout.jsx — Contenedor maestro del POS.
  * Estilos: Falcon / Bootstrap 5 nativo. Sin dark mode propio.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductoGrid from './ProductoGrid';
 import CarritoPanel from './CarritoPanel';
 import SyncStatusBadge from './SyncStatusBadge';
 import { guardarVentaLocal } from '../../database/localPosDb';
 import { v4 as uuidv4 } from 'uuid';
+import Swal from 'sweetalert2';
 import './pos.css';
 
 export default function POSLayout() {
-  const [carrito, setCarrito]           = useState([]);
+  const [carrito, setCarrito]           = useState(() => {
+    const saved = localStorage.getItem('pos_carrito_guardado');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [procesando, setProcesando]     = useState(false);
   const [ultimaVenta, setUltimaVenta]   = useState(null);
-  const [cliente, setCliente]           = useState(null); // Paso 1: Vinculación de cliente
+  const [cliente, setCliente]           = useState(() => {
+    const saved = localStorage.getItem('pos_cliente_guardado');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  // Guardar en local storage cada vez que cambia
+  useEffect(() => {
+    localStorage.setItem('pos_carrito_guardado', JSON.stringify(carrito));
+  }, [carrito]);
+
+  useEffect(() => {
+    if (cliente) {
+      localStorage.setItem('pos_cliente_guardado', JSON.stringify(cliente));
+    } else {
+      localStorage.removeItem('pos_cliente_guardado');
+    }
+  }, [cliente]);
+
+  const limpiarCarrito = () => {
+    Swal.fire({
+      title: '¿Vaciar carrito?',
+      text: "Se eliminarán todos los productos y el cliente seleccionado.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#e63757',
+      cancelButtonColor: '#2c7be5',
+      confirmButtonText: 'Sí, vaciar',
+      cancelButtonText: 'Cancelar',
+      background: 'transparent',
+      backdrop: 'rgba(11, 23, 39, 0.85)',
+      customClass: {
+        popup: 'bg-white dark__bg-1000'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setCarrito([]);
+        setCliente(null);
+        localStorage.removeItem('pos_carrito_guardado');
+        localStorage.removeItem('pos_cliente_guardado');
+        Swal.fire({
+          title: 'Carrito vacío',
+          icon: 'success',
+          toast: true,
+          position: 'bottom-end',
+          showConfirmButton: false,
+          timer: 2000,
+          background: 'transparent',
+          customClass: { popup: 'bg-white dark__bg-1000 shadow-lg' }
+        });
+      }
+    });
+  };
 
   // ── Agregar / acumular producto en el carrito ──────────────
   const agregarProducto = (producto) => {
@@ -84,6 +139,8 @@ export default function POSLayout() {
       setUltimaVenta({ ...venta, items });
       setCarrito([]);
       setCliente(null); // Resetear cliente post-venta
+      localStorage.removeItem('pos_carrito_guardado');
+      localStorage.removeItem('pos_cliente_guardado');
     } catch (err) { console.error('Error guardando venta:', err); }
     finally { setProcesando(false); }
   };
@@ -105,23 +162,23 @@ export default function POSLayout() {
       </div>
 
       {/* Cuerpo dual — productos (izq) | carrito (der) */}
-      <div className="row g-3">
-        <div className="col-lg-7">
-          <div className="card h-100">
-            <div className="card-header bg-light py-2">
+      <div className="row g-3 align-items-start">
+        <div className="col-lg-8 col-xl-9">
+          <div className="card h-100 border-0 shadow-sm">
+            <div className="card-header bg-white py-2">
               <h6 className="mb-0 fs--1">
                 <span className="fas fa-th me-2 text-primary"></span>Catálogo de Productos
               </h6>
             </div>
-            <div className="card-body p-2">
+            <div className="card-body p-2 bg-light">
               <ProductoGrid onAgregar={agregarProducto} />
             </div>
           </div>
         </div>
 
-        <div className="col-lg-5">
-          <div className="card h-100">
-            <div className="card-header bg-light py-2">
+        <div className="col-lg-4 col-xl-3 position-sticky" style={{ top: '1rem', height: 'calc(100vh - 6rem)' }}>
+          <div className="card h-100 border-0 shadow-sm">
+            <div className="card-header bg-light py-2 d-flex justify-content-between align-items-center">
               <h6 className="mb-0 fs--1">
                 <span className="fas fa-shopping-cart me-2 text-success"></span>
                 Carrito
@@ -129,6 +186,15 @@ export default function POSLayout() {
                   <span className="badge bg-primary ms-2">{carrito.length}</span>
                 )}
               </h6>
+              {carrito.length > 0 && (
+                <button 
+                  className="btn btn-link text-danger p-0 fs--2 text-decoration-none" 
+                  title="Vaciar Carrito" 
+                  onClick={limpiarCarrito}
+                >
+                  <span className="fas fa-trash-alt me-1"></span>Limpiar
+                </button>
+              )}
             </div>
             <div className="card-body p-2 d-flex flex-column">
               <CarritoPanel
@@ -140,6 +206,7 @@ export default function POSLayout() {
                 onCambiarCantidad={cambiarCantidad}
                 onCobrar={cobrar}
                 ultimaVenta={ultimaVenta}
+                onNuevaVenta={() => setUltimaVenta(null)}
                 cliente={cliente}
                 setCliente={setCliente}
               />

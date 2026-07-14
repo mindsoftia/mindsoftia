@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const RoadmapCalendar = () => {
-  const [selectedDay, setSelectedDay] = useState(43); // Default: July 13 (Absolute Day 43)
+  const [selectedDay, setSelectedDay] = useState(44); // Default: July 14 (Absolute Day 44)
   const [currentMonthDate, setCurrentMonthDate] = useState(new Date(2026, 6, 1)); // Default: July 2026 (Month 6 is July in JS)
 
   // Datos interactivos de los reportes diarios
@@ -110,6 +110,12 @@ const RoadmapCalendar = () => {
       { id: 1, title: 'Seguridad Multi-Tenant & RBAC', desc: '<strong>1. ¿Qué se hizo?:</strong> Validación estricta de módulos y corrección del enrutador React v6 (Outlet).<br/><strong>2. ¿Por qué?:</strong> El POS quedaba en blanco por fallos al anidar rutas protegidas.<br/><strong>3. ¿Para qué?:</strong> Para garantizar acceso seguro y fluido a la interfaz operativa.' },
       { id: 2, title: 'Selector de Clientes y UX (POS)', desc: '<strong>1. ¿Qué se hizo?:</strong> Inyección de buscador local (IndexedDB) para atar terceros y rediseño a Botón Flotante en vistas base.<br/><strong>2. ¿Por qué?:</strong> Se necesitaba simplificar la UI y preparar la base para Facturación Electrónica.<br/><strong>3. ¿Para qué?:</strong> Para agilizar el cobro y cumplir requerimientos de la DIAN.' },
       { id: 3, title: 'Cálculos Contables de Venta', desc: '<strong>1. ¿Qué se hizo?:</strong> Desglose automático de IVA (19%) y Subtotal desde el precio de venta final.<br/><strong>2. ¿Por qué?:</strong> Los totales crudos no sirven para contabilizar los ingresos fiscales ni generar reportes.<br/><strong>3. ¿Para qué?:</strong> Para asegurar compatibilidad NIIF al registrar el comprobante de diario.' }
+    ],
+    44: [
+      { id: 1, title: 'Panel de Ajustes POS', desc: '<strong>1. ¿Qué se hizo?:</strong> Desarrollo de la interfaz `/ajustes/pos` con Floating Action Button y ventanas modales.<br/><strong>2. ¿Por qué?:</strong> Cada negocio necesita definir y activar sus propios medios de cobro (Efectivo, Tarjeta, Transferencia).<br/><strong>3. ¿Para qué?:</strong> Para que el cajero pueda recibir pagos divididos y enlazarlos a su respectiva cuenta contable.' },
+      { id: 2, title: 'Refactorización Reactiva POS', desc: '<strong>1. ¿Qué se hizo?:</strong> Persistencia en `localStorage`, motor de paginación (24 por página) y SweetAlert2.<br/><strong>2. ¿Por qué?:</strong> Navegar accidentalmente borraba las ventas; inventarios grandes colapsaban el navegador.<br/><strong>3. ¿Para qué?:</strong> Para asegurar un rendimiento perfecto, memoria ininterrumpida y una UX corporativa al borrar o completar ventas sin refrescar la página.' },
+      { id: 3, title: 'Controlador Sincronización', desc: '<strong>1. ¿Qué se hizo?:</strong> Diseño del `PosController` en Laravel apuntando al endpoint `/api/pos/sync`.<br/><strong>2. ¿Por qué?:</strong> Las facturas cobradas en el POS deben viajar al servidor para asentar existencias.<br/><strong>3. ¿Para qué?:</strong> Para inyectar las ventas y descontar el inventario usando transacciones ACID inquebrantables.' },
+      { id: 4, title: 'Puesta en Marcha de Puntos de Pago', desc: '<strong>1. ¿Qué se hizo?:</strong> Desarrollo y configuración dinámica de los medios de pago en el checkout del POS.<br/><strong>2. ¿Por qué?:</strong> El usuario final requería poder dividir el pago (Split Payment) entre efectivo, tarjeta y otros métodos.<br/><strong>3. ¿Para qué?:</strong> Para lograr flexibilidad en caja y asegurar que cada centavo vaya a la cuenta contable correcta.' }
     ]
   };
 
@@ -127,7 +133,7 @@ const RoadmapCalendar = () => {
   const prevMonth = () => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1, 1));
   const goToday = () => {
     setCurrentMonthDate(new Date(2026, 6, 1)); // Foco en el mes activo de desarrollo (Julio 2026)
-    setSelectedDay(43); // Foco en el día actual (13 de Julio)
+    setSelectedDay(44); // Foco en el día actual (14 de Julio)
   };
 
   const renderCalendarGrid = () => {

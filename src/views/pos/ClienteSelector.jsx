@@ -71,6 +71,14 @@ export default function ClienteSelector({ cliente, setCliente }) {
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
         />
+        <button 
+          className="btn btn-primary" 
+          type="button" 
+          title="Agregar nuevo cliente"
+          onClick={() => alert('Abriendo Modal de Creación de Cliente...')}
+        >
+          <span className="fas fa-plus"></span>
+        </button>
       </div>
       
       {showDropdown && resultados.length > 0 && (

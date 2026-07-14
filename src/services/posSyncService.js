@@ -104,7 +104,7 @@ export const posSyncService = {
         payload.push({ ...v, items });
       }
 
-      // Enviar a Laravel
+      // Enviar a Laravel / Backend
       const response = await axios.post('/api/pos/sync', { ventas: payload });
       const procesadas = response.data.procesadas || [];
 

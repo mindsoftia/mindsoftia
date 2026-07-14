@@ -11,6 +11,10 @@ export default function ProductoGrid({ onAgregar }) {
   const [productos, setProductos] = useState([]);
   const [cargando, setCargando]   = useState(true);
   const [clickedId, setClickedId] = useState(null);
+  
+  // Paginación
+  const [paginaActual, setPaginaActual] = useState(1);
+  const itemsPorPagina = 24;
 
   // Cargar productos: primero del caché local, luego nube
   useEffect(() => {
@@ -36,14 +40,28 @@ export default function ProductoGrid({ onAgregar }) {
   }, []);
 
   const filtrados = useCallback(() => {
-    if (!busqueda.trim()) return productos;
-    const q = busqueda.toLowerCase();
-    return productos.filter(p =>
-      p.nombre?.toLowerCase().includes(q) ||
-      p.referencia?.toLowerCase().includes(q) ||
-      p.codigo_barras?.toLowerCase().includes(q)
-    );
+    let result = productos;
+    if (busqueda.trim()) {
+      const q = busqueda.toLowerCase();
+      result = productos.filter(p =>
+        p.nombre?.toLowerCase().includes(q) ||
+        p.referencia?.toLowerCase().includes(q) ||
+        p.codigo_barras?.toLowerCase().includes(q)
+      );
+    }
+    return result;
   }, [busqueda, productos])();
+
+  // Resetear página al buscar
+  useEffect(() => {
+    setPaginaActual(1);
+  }, [busqueda]);
+
+  const totalPaginas = Math.ceil(filtrados.length / itemsPorPagina);
+  const productosPaginados = filtrados.slice(
+    (paginaActual - 1) * itemsPorPagina,
+    paginaActual * itemsPorPagina
+  );
 
   const handleClick = (producto) => {
     if (producto.estado === false) return;
@@ -54,6 +72,15 @@ export default function ProductoGrid({ onAgregar }) {
 
   return (
     <div>
+      {/* Pestañas de Categorías */}
+      <div className="d-flex gap-2 overflow-auto pb-2 mb-3" style={{ whiteSpace: 'nowrap' }}>
+        <button className="btn btn-primary btn-sm rounded-pill px-3 shadow-sm fs--2">Todos</button>
+        <button className="btn btn-outline-secondary btn-sm rounded-pill px-3 bg-white shadow-sm border-0 fs--2">Bebidas</button>
+        <button className="btn btn-outline-secondary btn-sm rounded-pill px-3 bg-white shadow-sm border-0 fs--2">Snacks</button>
+        <button className="btn btn-outline-secondary btn-sm rounded-pill px-3 bg-white shadow-sm border-0 fs--2">Electrónica</button>
+        <button className="btn btn-outline-secondary btn-sm rounded-pill px-3 bg-white shadow-sm border-0 fs--2">Servicios</button>
+      </div>
+
       {/* Buscador */}
       <div className="mb-2">
         <div className="input-group input-group-sm">
@@ -98,61 +125,88 @@ export default function ProductoGrid({ onAgregar }) {
           )}
         </div>
       ) : (
-        <div className="pos-productos-grid">
-          {filtrados.map(producto => (
-            <button
-              key={producto.id}
-              className={`pos-producto-card ${clickedId === producto.id ? 'clicked' : ''}`}
-              disabled={producto.estado === false}
-              onClick={() => handleClick(producto)}
-              title={producto.nombre}
-            >
-              {/* Icono */}
-              <div className="text-center mb-1">
-                <span
-                  className="fas fa-cube"
-                  style={{ fontSize: '1.4rem', color: '#2c7be5' }}
-                ></span>
-              </div>
-
-              {/* Nombre */}
-              <div
-                className="fw-semi-bold text-800 fs--1 text-center"
-                style={{
-                  overflow: 'hidden',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  lineHeight: '1.3',
-                  minHeight: '2.6em',
-                }}
+        <>
+          <div className="pos-productos-grid">
+            {productosPaginados.map(producto => (
+              <button
+                key={producto.id}
+                className={`pos-producto-card ${clickedId === producto.id ? 'clicked' : ''}`}
+                disabled={producto.estado === false}
+                onClick={() => handleClick(producto)}
+                title={producto.nombre}
               >
-                {producto.nombre}
-              </div>
-
-              {/* Precio */}
-              <div className="text-center mt-1">
-                <span className="fw-bold text-success fs--1">
-                  ${parseFloat(producto.precio_venta_1 || producto.precio_venta || 0).toLocaleString('es-CO')}
-                </span>
-              </div>
-
-              {/* Referencia / código */}
-              {producto.codigo_sku && (
-                <div className="text-muted text-center fs--2 mt-1">
-                  {producto.codigo_sku}
+                {/* Icono */}
+                <div className="text-center mb-1">
+                  <span
+                    className="fas fa-cube"
+                    style={{ fontSize: '1.2rem', color: '#2c7be5' }}
+                  ></span>
                 </div>
-              )}
 
-              {/* Badge estado */}
-              {producto.estado === false && (
+                {/* Nombre */}
+                <div
+                  className="fw-semi-bold text-800 fs--2 text-center"
+                  style={{
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    lineHeight: '1.2',
+                    minHeight: '2.4em',
+                  }}
+                >
+                  {producto.nombre}
+                </div>
+
+                {/* Precio */}
                 <div className="text-center mt-1">
-                  <span className="badge bg-danger fs--2">Inactivo</span>
+                  <span className="fw-bold text-success fs--2">
+                    ${parseFloat(producto.precio_venta_1 || producto.precio_venta || 0).toLocaleString('es-CO')}
+                  </span>
                 </div>
-              )}
-            </button>
-          ))}
-        </div>
+
+                {/* Referencia / código */}
+                {producto.codigo_sku && (
+                  <div className="text-muted text-center fs--2 mt-1">
+                    {producto.codigo_sku}
+                  </div>
+                )}
+
+                {/* Badge estado */}
+                {producto.estado === false && (
+                  <div className="text-center mt-1">
+                    <span className="badge bg-danger fs--2">Inactivo</span>
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Controles de Paginación */}
+          {totalPaginas > 1 && (
+            <div className="d-flex justify-content-center align-items-center mt-4 mb-2 gap-2">
+              <button 
+                className="btn btn-sm btn-outline-primary"
+                disabled={paginaActual === 1}
+                onClick={() => setPaginaActual(p => p - 1)}
+              >
+                <span className="fas fa-chevron-left"></span>
+              </button>
+              
+              <span className="fs--1 text-600 fw-semi-bold px-2">
+                Página {paginaActual} de {totalPaginas}
+              </span>
+              
+              <button 
+                className="btn btn-sm btn-outline-primary"
+                disabled={paginaActual === totalPaginas}
+                onClick={() => setPaginaActual(p => p + 1)}
+              >
+                <span className="fas fa-chevron-right"></span>
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

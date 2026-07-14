@@ -26,6 +26,7 @@ import Modulos    from './views/Modulos';
 
 // Tenant Settings Views
 import UserRoles  from './views/tenant/settings/UserRoles';
+import POSSettings from './views/tenant/settings/POSSettings';
 
 // Empresas Views
 import Certificados from './views/empresas/Certificados';
@@ -141,6 +142,7 @@ function App() {
           {/* ── Ajustes Inquilino (Empresa) ────────────────────────── */}
           <Route element={<ProtectedRoute requiredPermission="ajustes.usuarios" />}>
             <Route path="ajustes/usuarios" element={<UserRoles />} />
+            <Route path="ajustes/pos" element={<POSSettings />} />
           </Route>
 
           {/* ── Facturación y Suscripciones (SaaS SuperAdmin) ──────────────────────── */}
