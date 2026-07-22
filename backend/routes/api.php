@@ -40,10 +40,10 @@ Route::middleware(['supabase.auth'])->group(function () {
         Route::post('/roles/{id}/permisos', [\App\Http\Controllers\Api\RolePermissionController::class, 'syncPermissions']);
     });
 
-    // ── Contabilidad (Fase A) ────────────────────────────────────────────────
-    // Route::apiResource('puc', PucAccountController::class);
+    // ── Contabilidad (Fase A - PUC y Asientos) ───────────────────────────────
+    Route::apiResource('puc', \App\Http\Controllers\Api\AccountController::class);
+    Route::apiResource('accounts', \App\Http\Controllers\Api\AccountController::class);
     Route::apiResource('terceros', \App\Http\Controllers\Api\TerceroController::class);
-    // Route::apiResource('asientos', AsientoController::class);
 
     // ── Solo Admins ─────────────────────────────────────────────────────────
     Route::middleware(['role:admin'])->group(function () {

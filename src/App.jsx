@@ -51,6 +51,16 @@ import Planes from './views/facturacion/Planes';
 import HistorialPagos from './views/facturacion/HistorialPagos';
 import Cupones from './views/facturacion/Cupones';
 
+// Contabilidad Electrónica Views
+import AsientosIndex from './views/contabilidad/AsientosIndex';
+import PucIndex from './views/contabilidad/PucIndex';
+import ReportesFinancieros from './views/contabilidad/ReportesFinancieros';
+
+// Facturación Electrónica DIAN & RADIAN Views
+import FacturasElectronicasList from './views/ventas/FacturasElectronicasList';
+import RadianBandeja from './views/ventas/RadianBandeja';
+import ResolucionesDian from './views/tenant/settings/ResolucionesDian';
+
 // Página de acceso denegado
 function NoAutorizado() {
   return (
@@ -143,6 +153,14 @@ function App() {
           <Route element={<ProtectedRoute requiredPermission="ajustes.usuarios" />}>
             <Route path="ajustes/usuarios" element={<UserRoles />} />
             <Route path="ajustes/pos" element={<POSSettings />} />
+            <Route path="ajustes/resoluciones" element={<ResolucionesDian />} />
+          </Route>
+
+          {/* ── Facturación Electrónica DIAN & RADIAN ──────────────── */}
+          <Route element={<ProtectedRoute requiredModule="facturacion" />}>
+            <Route path="ventas/facturas" element={<FacturasElectronicasList />} />
+            <Route path="ventas/radian" element={<RadianBandeja />} />
+            <Route path="ventas" element={<Navigate to="/ventas/facturas" replace />} />
           </Route>
 
           {/* ── Facturación y Suscripciones (SaaS SuperAdmin) ──────────────────────── */}
@@ -189,10 +207,16 @@ function App() {
           <Route path="contactos/clientes" element={<ClientesList />} />
           <Route path="contactos" element={<Navigate to="/contactos/proveedores" replace />} />
 
-          {/* ── Fase A: Contabilidad (próximas semanas) ─────────────── */}
-          {/* <Route path="contabilidad/puc"      element={<PucIndex />} /> */}
-          {/* <Route path="terceros"              element={<TercerosIndex />} /> */}
-          {/* <Route path="contabilidad/asientos" element={<AsientosIndex />} /> */}
+          {/* ── Contabilidad Electrónica NIIF & DIAN ─────────────── */}
+          <Route element={<ProtectedRoute requiredModule="contabilidad" requiredPermission="contabilidad.ver" />}>
+            <Route path="contabilidad/asientos" element={<AsientosIndex />} />
+            <Route path="contabilidad/puc"      element={<PucIndex />} />
+            <Route path="contabilidad/reportes" element={<ReportesFinancieros />} />
+            <Route path="contabilidad/conciliacion" element={<div className="card m-3"><div className="card-body">Módulo de Conciliación Bancaria e Importación Extractos (En desarrollo)</div></div>} />
+            <Route path="contabilidad/impuestos" element={<div className="card m-3"><div className="card-body">Módulo de Impuestos DIAN (IVA 2408, Retención en la Fuente 2365, ICA)</div></div>} />
+            <Route path="contabilidad/cierre" element={<div className="card m-3"><div className="card-body">Módulo de Cierre Contable y Traslado a Resultados (En desarrollo)</div></div>} />
+            <Route path="contabilidad" element={<Navigate to="/contabilidad/asientos" replace />} />
+          </Route>
         </Route>
 
         {/* Ruta de fallback */}

@@ -104,6 +104,7 @@ function Sidebar() {
       id: 'ventasMenu',
       children: [
         { title: 'Facturación Electrónica', path: '/ventas/facturas' },
+        { title: 'Bandeja RADIAN (Recepción)', path: '/ventas/radian' },
         { title: 'Historial POS (Cierres)', path: '/ventas/pos-historial' },
         { title: 'Notas Crédito / Débito', path: '/ventas/notas' },
         { title: 'Cotizaciones / Pedidos', path: '/ventas/cotizaciones' },

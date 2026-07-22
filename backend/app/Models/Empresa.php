@@ -22,6 +22,8 @@ class Empresa extends Model
         'modulo_facturacion_electronica',
         'modulo_nomina',
         'modulo_pos_inventario',
+        'modulo_compras',
+        'modulo_contabilidad',
         'modulo_ia_copiloto',
     ];
 
@@ -30,6 +32,8 @@ class Empresa extends Model
         'modulo_facturacion_electronica' => 'boolean',
         'modulo_nomina'                  => 'boolean',
         'modulo_pos_inventario'          => 'boolean',
+        'modulo_compras'                 => 'boolean',
+        'modulo_contabilidad'            => 'boolean',
         'modulo_ia_copiloto'             => 'boolean',
     ];
 

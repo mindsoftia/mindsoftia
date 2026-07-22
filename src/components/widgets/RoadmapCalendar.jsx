@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const RoadmapCalendar = () => {
-  const [selectedDay, setSelectedDay] = useState(44); // Default: July 14 (Absolute Day 44)
+  const [selectedDay, setSelectedDay] = useState(52); // Default: July 22 (Absolute Day 52)
   const [currentMonthDate, setCurrentMonthDate] = useState(new Date(2026, 6, 1)); // Default: July 2026 (Month 6 is July in JS)
 
   // Datos interactivos de los reportes diarios
@@ -116,6 +116,31 @@ const RoadmapCalendar = () => {
       { id: 2, title: 'Refactorización Reactiva POS', desc: '<strong>1. ¿Qué se hizo?:</strong> Persistencia en `localStorage`, motor de paginación (24 por página) y SweetAlert2.<br/><strong>2. ¿Por qué?:</strong> Navegar accidentalmente borraba las ventas; inventarios grandes colapsaban el navegador.<br/><strong>3. ¿Para qué?:</strong> Para asegurar un rendimiento perfecto, memoria ininterrumpida y una UX corporativa al borrar o completar ventas sin refrescar la página.' },
       { id: 3, title: 'Controlador Sincronización', desc: '<strong>1. ¿Qué se hizo?:</strong> Diseño del `PosController` en Laravel apuntando al endpoint `/api/pos/sync`.<br/><strong>2. ¿Por qué?:</strong> Las facturas cobradas en el POS deben viajar al servidor para asentar existencias.<br/><strong>3. ¿Para qué?:</strong> Para inyectar las ventas y descontar el inventario usando transacciones ACID inquebrantables.' },
       { id: 4, title: 'Puesta en Marcha de Puntos de Pago', desc: '<strong>1. ¿Qué se hizo?:</strong> Desarrollo y configuración dinámica de los medios de pago en el checkout del POS.<br/><strong>2. ¿Por qué?:</strong> El usuario final requería poder dividir el pago (Split Payment) entre efectivo, tarjeta y otros métodos.<br/><strong>3. ¿Para qué?:</strong> Para lograr flexibilidad en caja y asegurar que cada centavo vaya a la cuenta contable correcta.' }
+    ],
+    45: [
+      { id: 1, title: 'Sincronización POS Bidireccional', desc: '<strong>1. ¿Qué se hizo?:</strong> Construcción del controlador `PosVentaController.php` con transacciones ACID para rebajar existencias offline.<br/><strong>2. ¿Por qué?:</strong> Cuando las cajas recuperan conectividad, envían paquetes masivos de tickets que no pueden fallar ni duplicarse.<br/><strong>3. ¿Para qué?:</strong> Para garantizar que el inventario multisede y el Kardex se mantengan sincronizados en tiempo real.' },
+      { id: 2, title: 'Cola de Reintentos en Background', desc: '<strong>1. ¿Qué se hizo?:</strong> Implementación de cola en IndexedDB (`localPosDb.js` v3) con reintento exponencial ante cortes de red.<br/><strong>2. ¿Por qué?:</strong> Si el router pierde señal en el milisegundo de cobro, la venta quedaría atrapada sin protección en memoria.<br/><strong>3. ¿Para qué?:</strong> Para blindar la persistencia local y asegurar que el 100% de los cobros terminen en Supabase.' },
+      { id: 3, title: 'Badges Visuales de Estado de Red', desc: '<strong>1. ¿Qué se hizo?:</strong> Componente `SyncStatusBadge.jsx` mostrando en vivo: En línea, Desconectado o Sincronizando pendientes.<br/><strong>2. ¿Por qué?:</strong> El cajero y el supervisor necesitan saber con absoluta certeza si sus ventas locales ya están en la nube.<br/><strong>3. ¿Para qué?:</strong> Para dar tranquilidad operativa y permitir gestionar proactivamente desconexiones prolongadas.' }
+    ],
+    46: [
+      { id: 1, title: 'Auditoría de Turnos y Cierres Z', desc: '<strong>1. ¿Qué se hizo?:</strong> Diseño relacional (`pos_cierres`) y maquetación Falcon para consultar cortes por cajero y fecha.<br/><strong>2. ¿Por qué?:</strong> Todo comercio requiere arqueos diarios para deslindar responsabilidades del efectivo físico recaudado.<br/><strong>3. ¿Para qué?:</strong> Para detectar sobrantes o faltantes en el acto y generar el Cierre Z del cuadre contable.' },
+      { id: 2, title: 'Impresión Térmica y Recibos POS', desc: '<strong>1. ¿Qué se hizo?:</strong> Generador de tiras térmicas (`POSReceiptModal.jsx`) de 58/80mm con desglose de IVA/IC y QR transitorio.<br/><strong>2. ¿Por qué?:</strong> El Estatuto Tributario exige entregar comprobante legible al consumidor al cancelar en mostrador.<br/><strong>3. ¿Para qué?:</strong> Para que el cajero imprima o envíe por WhatsApp el ticket instantáneamente tras cobrar.' },
+      { id: 3, title: 'Novedades y Préstamos de Caja', desc: '<strong>1. ¿Qué se hizo?:</strong> Formulario para registrar entradas y salidas extraordinarias de efectivo durante el turno operado.<br/><strong>2. ¿Por qué?:</strong> Si se retira dinero de la gaveta sin registrar el egreso, el arqueo final arrojará un faltante injustificado.<br/><strong>3. ¿Para qué?:</strong> Para mantener una trazabilidad de caja chica estricta y transparente ante la gerencia.' }
+    ],
+    47: [
+      { id: 1, title: 'Diseño Pilar 1: Contabilidad NIIF', desc: '<strong>1. ¿Qué se hizo?:</strong> Redacción de la arquitectura general (`DOC-CONT/01`) con `contab_saldos_periodo` y `contab_asientos`.<br/><strong>2. ¿Por qué?:</strong> Un ERP empresarial no puede calcular balances sumando millones de comprobantes históricos en vivo.<br/><strong>3. ¿Para qué?:</strong> Para establecer un modelo optimizado de saldos que abre el balance mensual en milisegundos.' },
+      { id: 2, title: 'Migraciones Relacionales PUC', desc: '<strong>1. ¿Qué se hizo?:</strong> Creación de migraciones SQL en Laravel para cuentas, asientos, líneas y saldos con aislamiento por `empresa_id`.<br/><strong>2. ¿Por qué?:</strong> La normativa contable NIIF requiere una jerarquía formal de 5 niveles (Clase, Grupo, Cuenta, Subcuenta, Auxiliar).<br/><strong>3. ¿Para qué?:</strong> Para sentar las bases físicas inmutables del catálogo contable de cada inquilino SaaS.' },
+      { id: 3, title: 'PosVentaObserver (Partida Doble)', desc: '<strong>1. ¿Qué se hizo?:</strong> Programación del observer en Laravel para asentar automáticamente las 4 líneas contables al cerrar ventas en el POS.<br/><strong>2. ¿Por qué?:</strong> El operador de caja no tiene formación contable ni tiempo de registrar diarios por cada venta.<br/><strong>3. ¿Para qué?:</strong> Para automatizar la contabilidad general del negocio y eliminar la digitación manual.' }
+    ],
+    51: [
+      { id: 1, title: 'Vistas Falcon Contables en React', desc: '<strong>1. ¿Qué se hizo?:</strong> Construcción de `AsientosIndex.jsx` (Libro Diario) y `ReportesFinancieros.jsx` (Balance y P&G) en Falcon UI.<br/><strong>2. ¿Por qué?:</strong> El contador y el auditor necesitan una interfaz clara, jerárquica y exportable a Excel para auditar el periodo.<br/><strong>3. ¿Para qué?:</strong> Para visualizar en vivo cómo el movimiento en caja impacta Activos, Pasivos, Ingresos y Costos.' },
+      { id: 2, title: 'Arquitectura Tributaria DIAN UBL 2.1', desc: '<strong>1. ¿Qué se hizo?:</strong> Especificación técnica (`DOC-CONT/02`) del estándar XML UBL 2.1, impuestos (`01, 04, 03`) y CUFE (`SHA-384`).<br/><strong>2. ¿Por qué?:</strong> Antes de codificar el segundo pilar, el equipo debía dominar las reglas de validación previa del Muisca.<br/><strong>3. ¿Para qué?:</strong> Para garantizar que cada factura emitida sea aceptada al primer intento por el portal de la DIAN.' },
+      { id: 3, title: 'Esquema Físico Multi-Tenant RLS', desc: '<strong>1. ¿Qué se hizo?:</strong> Creación del script SQL de `fe_resoluciones`, `fe_documentos` y `fe_eventos_radian` con políticas RLS.<br/><strong>2. ¿Por qué?:</strong> Era imprescindible almacenar de forma inmutable los archivos XML y respuestas tributarias aisladas por empresa.<br/><strong>3. ¿Para qué?:</strong> Para blindar el motor de facturación contra vulnerabilidades IDOR en Supabase.' }
+    ],
+    52: [
+      { id: 1, title: 'Despliegue SQL en Producción Supabase', desc: '<strong>1. ¿Qué se hizo?:</strong> Ejecución física en el SQL Editor de Supabase del script de facturación electrónica con RLS activo.<br/><strong>2. ¿Por qué?:</strong> Las tablas tributarias debían materializarse en la nube para ser consumidas por el backend y frontend.<br/><strong>3. ¿Para qué?:</strong> Para activar la persistencia multi-tenant y prevenir accesos no autorizados a comprobantes fiscales.' },
+      { id: 2, title: 'Vistas Falcon Facturación & RADIAN', desc: '<strong>1. ¿Qué se hizo?:</strong> Maquetación de `FacturasElectronicasList`, `RadianBandeja` y `ResolucionesDian` con modales XML y copia CUFE.<br/><strong>2. ¿Por qué?:</strong> El cliente requiere ver sus facturas, descargar el QR/PDF y gestionar en línea los eventos 030, 032 y 033.<br/><strong>3. ¿Para qué?:</strong> Para constituir mérito ejecutivo en títulos valores (Factoring) directamente desde la plataforma sin salir.' },
+      { id: 3, title: 'Alta Asistida de Cuentas PUC NIIF', desc: '<strong>1. ¿Qué se hizo?:</strong> Desarrollo de `AccountController` y hook `usePuc.js` autodefiniendo nivel, naturaleza y padre al digitar el código.<br/><strong>2. ¿Por qué?:</strong> Crear cuentas manualmente suele propiciar errores jerárquicos (ej. asignar naturaleza contraria a un grupo contable).<br/><strong>3. ¿Para qué?:</strong> Para dotar a MindSoftia de un asistente contable que blinda la estructura NIIF de cada empresa.' }
     ]
   };
 
@@ -133,7 +158,7 @@ const RoadmapCalendar = () => {
   const prevMonth = () => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1, 1));
   const goToday = () => {
     setCurrentMonthDate(new Date(2026, 6, 1)); // Foco en el mes activo de desarrollo (Julio 2026)
-    setSelectedDay(44); // Foco en el día actual (14 de Julio)
+    setSelectedDay(52); // Foco en el día actual (22 de Julio)
   };
 
   const renderCalendarGrid = () => {
