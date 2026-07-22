@@ -73,13 +73,41 @@ class DashboardController extends Controller
                     });
             }
                 
-            $empresa = \App\Models\Empresa::find($tenantId);
-            $empresaNombre = $empresa ? $empresa->nombre : 'Mindsoftia ERP';
+            $empresa = null;
+            if ($tenantId && is_numeric($tenantId)) {
+                $empresa = \App\Models\Empresa::find($tenantId);
+            }
+            if (!$empresa && $tenantId) {
+                $empresa = \App\Models\Empresa::where('subdominio', $tenantId)->first();
+            }
+            if (!$empresa) {
+                $host = $request->getHost();
+                $subdomain = explode('.', $host)[0] ?? null;
+                if ($subdomain && !in_array($subdomain, ['www', 'localhost', 'mindsoftia'])) {
+                    $empresa = \App\Models\Empresa::where('subdominio', $subdomain)->first();
+                }
+            }
+            if (!$empresa) {
+                $empresa = \App\Models\Empresa::first();
+            }
+
+            $empresaNombre = $empresa ? $empresa->nombre : 'Bucaramanga App';
+            $empresaNit = ($empresa && $empresa->ruc_nit) ? $empresa->ruc_nit : '901.458.112-8';
+            
+            // Período en formato amigable en español (Ej: "Julio 2026")
+            $mesesEs = [
+                1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+                5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+                9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+            ];
+            $periodoActual = ($mesesEs[(int)now()->format('n')] ?? 'Julio') . ' ' . now()->format('Y');
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'empresa_nombre' => $empresaNombre,
+                    'empresa_nit' => $empresaNit,
+                    'periodo_actual' => $periodoActual,
                     'kpis' => [
                         'ventas_hoy' => $ventasHoy ?? 0,
                         'tickets_hoy' => $ticketsHoy ?? 0,

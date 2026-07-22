@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import usePuc from '../../hooks/usePuc';
+import pucService from '../../services/pucService';
 
 /**
  * PucIndex — Plan Único de Cuentas & Balance de Prueba Mensual (`contab_saldos_periodo`)
@@ -43,6 +44,34 @@ function PucIndex() {
     { id: '18', codigo: '61', nombre: 'COSTO DE VENTAS OPERACIONAL', nivel: 2, naturaleza: 'debito', saldo_anterior: 0, debito: 32012.60, credito: 0, saldo_nuevo: 32012.60 },
     { id: '19', codigo: '6135', nombre: 'Comercio al por mayor y al por menor', nivel: 4, naturaleza: 'debito', saldo_anterior: 0, debito: 32012.60, credito: 0, saldo_nuevo: 32012.60 },
   ]);
+
+  // Cargar cuentas reales en vivo desde Supabase / API Laravel al montar
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCuentasReales = async () => {
+      try {
+        const res = await pucService.getAccounts();
+        if (isMounted && res && res.data && res.data.length > 0) {
+          const mapeadas = res.data.map(cta => ({
+            id: cta.id ? cta.id.toString() : `cta-${Math.random()}`,
+            codigo: cta.code,
+            nombre: cta.name,
+            nivel: cta.code.length <= 1 ? 1 : cta.code.length <= 2 ? 2 : cta.code.length <= 4 ? 4 : 6,
+            naturaleza: cta.nature || 'debito',
+            saldo_anterior: 0,
+            debito: 0,
+            credito: 0,
+            saldo_nuevo: 0
+          })).sort((a, b) => a.codigo.localeCompare(b.codigo, undefined, { numeric: true }));
+          setCuentas(mapeadas);
+        }
+      } catch (err) {
+        console.warn('⚠️ Manteniendo estado visual NIIF de reserva local:', err.message);
+      }
+    };
+    fetchCuentasReales();
+    return () => { isMounted = false; };
+  }, []);
 
   // Estado del formulario para Nueva Cuenta
   const [nuevaCuenta, setNuevaCuenta] = useState({
@@ -94,7 +123,7 @@ function PucIndex() {
       saldo_nuevo: 0
     };
 
-    // Intentar sincronizar con backend AccountController (si está activo)
+    // Intentar sincronizar con backend AccountController o Supabase Direct
     await createAccount({
       code: nueva.codigo,
       name: nueva.nombre,
@@ -104,9 +133,31 @@ function PucIndex() {
       description: nuevaCuenta.description
     });
 
-    // Actualizamos el estado de la UI manteniendo orden jerárquico NIIF
-    const listaActualizada = [...cuentas, nueva].sort((a, b) => a.codigo.localeCompare(b.codigo, undefined, { numeric: true }));
-    setCuentas(listaActualizada);
+    // Sincronizar catálogo real tras crear la nueva cuenta
+    try {
+      const res = await pucService.getAccounts();
+      if (res && res.data && res.data.length > 0) {
+        const mapeadas = res.data.map(cta => ({
+          id: cta.id ? cta.id.toString() : `cta-${Math.random()}`,
+          codigo: cta.code,
+          nombre: cta.name,
+          nivel: cta.code.length <= 1 ? 1 : cta.code.length <= 2 ? 2 : cta.code.length <= 4 ? 4 : 6,
+          naturaleza: cta.nature || 'debito',
+          saldo_anterior: 0,
+          debito: 0,
+          credito: 0,
+          saldo_nuevo: 0
+        })).sort((a, b) => a.codigo.localeCompare(b.codigo, undefined, { numeric: true }));
+        setCuentas(mapeadas);
+      } else {
+        const listaActualizada = [...cuentas, nueva].sort((a, b) => a.codigo.localeCompare(b.codigo, undefined, { numeric: true }));
+        setCuentas(listaActualizada);
+      }
+    } catch (e) {
+      const listaActualizada = [...cuentas, nueva].sort((a, b) => a.codigo.localeCompare(b.codigo, undefined, { numeric: true }));
+      setCuentas(listaActualizada);
+    }
+
     setModalAbierto(false);
     setNuevaCuenta({ codigo: '', nombre: '', is_transactional: true, description: '' });
   };
@@ -255,10 +306,10 @@ function PucIndex() {
                         )}
                       </td>
                       <td className="text-center">
-                        <span className="badge badge-subtle-secondary">{cta.nivel}</span>
+                        <span className="badge badge-soft-secondary text-800 dark__text-200 px-2 py-1">{cta.nivel}</span>
                       </td>
                       <td className="text-center">
-                        <span className={`badge ${cta.naturaleza === 'debito' ? 'badge-subtle-primary' : 'badge-subtle-warning'}`}>
+                        <span className={`badge ${cta.naturaleza === 'debito' ? 'badge-soft-primary text-primary dark__text-info' : 'badge-soft-warning text-warning dark__text-warning'} px-2 py-1`}>
                           {cta.naturaleza === 'debito' ? 'Débito' : 'Crédito'}
                         </span>
                       </td>
@@ -314,13 +365,13 @@ function PucIndex() {
                       <div className="row g-2 fs--2">
                         <div className="col-6">
                           <strong>Nivel detectado:</strong>{' '}
-                          <span className="badge badge-subtle-primary ms-1">
+                          <span className="badge badge-soft-primary text-primary dark__text-info ms-1 px-2 py-1">
                             {analisis.tipo ? analisis.tipo.toUpperCase() : 'AUXILIAR'} ({analisis.nivel} dígitos)
                           </span>
                         </div>
                         <div className="col-6">
                           <strong>Naturaleza NIIF:</strong>{' '}
-                          <span className={`badge ${analisis.naturaleza === 'debito' ? 'badge-subtle-success' : 'badge-subtle-warning'} ms-1`}>
+                          <span className={`badge ${analisis.naturaleza === 'debito' ? 'badge-soft-success text-success dark__text-success' : 'badge-soft-warning text-warning dark__text-warning'} ms-1 px-2 py-1`}>
                             {analisis.naturaleza.toUpperCase()}
                           </span>
                         </div>

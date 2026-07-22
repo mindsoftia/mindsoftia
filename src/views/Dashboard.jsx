@@ -37,8 +37,12 @@ export default function Dashboard() {
     return '¡Buenas noches';
   };
 
-  // Helpers para extraer datos dinámicos del backend
+  // Helpers para extraer datos dinámicos del backend y datos de empresa
   const stats = metrics?.kpis || {};
+  const empresaNombre = metrics?.empresa_nombre || user?.user_metadata?.empresa_nombre || 'Mindsoftia ERP';
+  const empresaNit = metrics?.empresa_nit || user?.user_metadata?.empresa_nit || '901.458.112-8';
+  const periodoActual = metrics?.periodo_actual || 'Julio 2026';
+
   const ventasHoy = stats.ventas_hoy || 0;
   const ticketsHoy = stats.tickets_hoy || 0;
   const clientesActivos = stats.clientes_activos || 0;
@@ -59,7 +63,21 @@ export default function Dashboard() {
           <div className="position-relative z-index-2">
             <div>
               <h3 className="text-primary mb-1">{obtenerSaludo()}, {userName}!</h3>
-              <p>Esto es lo que está pasando en tu tienda hoy</p>
+              <p className="text-600 mb-2">Esto es lo que está pasando en tu tienda hoy</p>
+              
+              <div className="d-flex flex-wrap align-items-center gap-2 mb-3">
+                <span className="badge badge-soft-primary text-primary dark__text-info py-2 px-3 fs--1 fw-medium d-inline-flex align-items-center shadow-none">
+                  <span className="fas fa-building me-2"></span>
+                  Empresa: <strong className="ms-1">{empresaNombre}</strong>
+                  <span className="mx-2 text-300">|</span>
+                  NIT: <strong className="ms-1 font-monospace">{empresaNit}</strong>
+                </span>
+
+                <span className="badge badge-soft-success text-success dark__text-success py-2 px-3 fs--1 fw-medium d-inline-flex align-items-center shadow-none">
+                  <span className="fas fa-calendar-check me-2"></span>
+                  Período Fiscal Activo: <strong className="ms-1">{periodoActual}</strong>
+                </span>
+              </div>
             </div>
             <div className="d-flex py-3">
               <div className="pe-3">

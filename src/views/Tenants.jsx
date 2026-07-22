@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api'; // Instancia Axios centralizada con token
+import { supabase } from '../services/supabase';
 
 // ── Estado inicial del formulario ──────────────────────────────────
 const FORM_INICIAL = {
@@ -25,13 +26,25 @@ function Tenants() {
   const [error, setError]           = useState(null);
   const [formData, setFormData]     = useState(FORM_INICIAL);
 
-  // ── Cargar empresas desde la API ──────────────────────────────────
+  // ── Cargar empresas desde la API con fallback a Supabase ──────────
   const fetchEmpresas = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/empresas');
-      // La API devuelve array directamente
-      setEmpresas(Array.isArray(data) ? data : data.data ?? []);
+      let lista = [];
+      try {
+        const { data } = await api.get('/empresas');
+        lista = Array.isArray(data) ? data : data.data ?? [];
+      } catch (errApi) {
+        console.warn('Fallback a Supabase directo tras error en API Laravel:', errApi);
+      }
+      
+      if (!lista || lista.length === 0) {
+        const { data: supaData, error: supaErr } = await supabase.from('empresas').select('*').order('id', { ascending: false });
+        if (!supaErr && supaData) {
+          lista = supaData;
+        }
+      }
+      setEmpresas(lista || []);
     } catch (err) {
       console.error('Error cargando empresas:', err);
       setError('No se pudo cargar el listado de empresas.');

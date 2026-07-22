@@ -206,7 +206,7 @@ function AsientosIndex() {
       <div className="card shadow-none border">
         <div className="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
           <h6 className="mb-0 fw-bold">Comprobantes del Periodo ({asientosFiltrados.length})</h6>
-          <span className="badge badge-subtle-primary fs--2">Sincronización en tiempo real activa</span>
+          <span className="badge badge-soft-primary text-primary dark__text-info fs--2 px-2 py-1">Sincronización en tiempo real activa</span>
         </div>
         <div className="card-body p-0">
           <div className="table-responsive">
@@ -240,7 +240,7 @@ function AsientosIndex() {
                         <td className="fw-bold text-primary">{as.numero}</td>
                         <td>{as.fecha}</td>
                         <td>
-                          <span className={`badge ${as.tipo === 'VENTA_POS' ? 'badge-subtle-success' : as.tipo === 'COMPRA_INV' ? 'badge-subtle-info' : 'badge-subtle-warning'}`}>
+                          <span className={`badge ${as.tipo === 'VENTA_POS' ? 'badge-soft-success text-success dark__text-success' : as.tipo === 'COMPRA_INV' ? 'badge-soft-info text-info dark__text-info' : 'badge-soft-warning text-warning dark__text-warning'} px-2 py-1`}>
                             {as.tipo}
                           </span>
                         </td>
@@ -248,7 +248,7 @@ function AsientosIndex() {
                         <td className="text-end fw-semi-bold">${as.total_debito.toLocaleString('es-CO', { minimumFractionDigits: 2 })}</td>
                         <td className="text-end fw-semi-bold">${as.total_credito.toLocaleString('es-CO', { minimumFractionDigits: 2 })}</td>
                         <td className="text-center">
-                          <span className="badge badge-subtle-success d-inline-flex align-items-center">
+                          <span className="badge badge-soft-success text-success dark__text-success d-inline-flex align-items-center px-2 py-1">
                             <span className="fas fa-check-circle me-1"></span>Confirmado
                           </span>
                         </td>

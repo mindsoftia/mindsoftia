@@ -82,7 +82,7 @@ function ReportesFinancieros() {
             <div className="card shadow-none border">
               <div className="card-header bg-light py-3 border-bottom d-flex justify-content-between">
                 <h6 className="mb-0 fw-bold">Estado de Resultados Integral (Corte: {periodo})</h6>
-                <span className="badge badge-subtle-success fs--2">NIIF para Pymes</span>
+                <span className="badge badge-soft-success text-success dark__text-success fs--2 px-2 py-1">NIIF para Pymes</span>
               </div>
               <div className="card-body p-0">
                 <table className="table table-sm table-hover mb-0 fs--1">

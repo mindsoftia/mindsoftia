@@ -55,6 +55,8 @@ import Cupones from './views/facturacion/Cupones';
 import AsientosIndex from './views/contabilidad/AsientosIndex';
 import PucIndex from './views/contabilidad/PucIndex';
 import ReportesFinancieros from './views/contabilidad/ReportesFinancieros';
+import ImpuestosIndex from './views/contabilidad/ImpuestosIndex';
+import CierresIndex from './views/contabilidad/CierresIndex';
 
 // Facturación Electrónica DIAN & RADIAN Views
 import FacturasElectronicasList from './views/ventas/FacturasElectronicasList';
@@ -213,8 +215,8 @@ function App() {
             <Route path="contabilidad/puc"      element={<PucIndex />} />
             <Route path="contabilidad/reportes" element={<ReportesFinancieros />} />
             <Route path="contabilidad/conciliacion" element={<div className="card m-3"><div className="card-body">Módulo de Conciliación Bancaria e Importación Extractos (En desarrollo)</div></div>} />
-            <Route path="contabilidad/impuestos" element={<div className="card m-3"><div className="card-body">Módulo de Impuestos DIAN (IVA 2408, Retención en la Fuente 2365, ICA)</div></div>} />
-            <Route path="contabilidad/cierre" element={<div className="card m-3"><div className="card-body">Módulo de Cierre Contable y Traslado a Resultados (En desarrollo)</div></div>} />
+            <Route path="contabilidad/impuestos" element={<ImpuestosIndex />} />
+            <Route path="contabilidad/cierre" element={<CierresIndex />} />
             <Route path="contabilidad" element={<Navigate to="/contabilidad/asientos" replace />} />
           </Route>
         </Route>
