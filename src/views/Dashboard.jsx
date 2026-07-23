@@ -6,6 +6,7 @@ export default function Dashboard() {
   const { tenantId, user } = useAuthStore();
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   const fetchMetrics = async () => {
     try {
@@ -16,9 +17,12 @@ export default function Dashboard() {
       });
       if (response.data.success) {
         setMetrics(response.data.data);
+      } else {
+        setErrorMsg('La API respondió pero success es false. ' + JSON.stringify(response.data));
       }
     } catch (error) {
       console.error('Error al obtener métricas del dashboard:', error);
+      setErrorMsg('Error de red o de código: ' + (error.response ? JSON.stringify(error.response.data) : error.message));
     } finally {
       setLoading(false);
     }
@@ -39,9 +43,9 @@ export default function Dashboard() {
 
   // Helpers para extraer datos dinámicos del backend y datos de empresa
   const stats = metrics?.kpis || {};
-  const empresaNombre = metrics?.empresa_nombre || user?.user_metadata?.empresa_nombre || 'Mindsoftia ERP';
-  const empresaNit = metrics?.empresa_nit || user?.user_metadata?.empresa_nit || '901.458.112-8';
-  const periodoActual = metrics?.periodo_actual || 'Julio 2026';
+  const empresaNombre = metrics?.empresa_nombre || user?.user_metadata?.empresa_nombre || (loading ? 'Cargando empresa...' : 'Empresa sin asignar');
+  const empresaNit = metrics?.empresa_nit || user?.user_metadata?.empresa_nit || (loading ? '...' : '000.000.000-0');
+  const periodoActual = metrics?.periodo_actual || (loading ? 'Cargando...' : 'Período no definido');
 
   const ventasHoy = stats.ventas_hoy || 0;
   const ticketsHoy = stats.tickets_hoy || 0;
@@ -61,6 +65,14 @@ export default function Dashboard() {
         <div className="card-header position-relative">
           <div className="bg-holder d-none d-md-block bg-card z-index-1" style={{ backgroundImage: 'url(../assets/img/illustrations/ecommerce-bg.png)', backgroundSize: '230px', backgroundPosition: 'right bottom', zIndex: '-1' }}></div>
           <div className="position-relative z-index-2">
+            
+            {/* DEBUG ERROR */}
+            {errorMsg && (
+              <div className="alert alert-danger" role="alert">
+                <strong>Debug API:</strong> {errorMsg}
+              </div>
+            )}
+            
             <div>
               <h3 className="text-primary mb-1">{obtenerSaludo()}, {userName}!</h3>
               <p className="text-600 mb-2">Esto es lo que está pasando en tu tienda hoy</p>

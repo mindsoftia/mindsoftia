@@ -27,6 +27,8 @@ import Modulos    from './views/Modulos';
 // Tenant Settings Views
 import UserRoles  from './views/tenant/settings/UserRoles';
 import POSSettings from './views/tenant/settings/POSSettings';
+import PerfilEmpresa from './views/ajustes/PerfilEmpresa';
+import Sincronizacion from './views/ajustes/Sincronizacion';
 
 // Empresas Views
 import Certificados from './views/empresas/Certificados';
@@ -153,9 +155,11 @@ function App() {
 
           {/* ── Ajustes Inquilino (Empresa) ────────────────────────── */}
           <Route element={<ProtectedRoute requiredPermission="ajustes.usuarios" />}>
+            <Route path="ajustes/perfil-empresa" element={<PerfilEmpresa />} />
             <Route path="ajustes/usuarios" element={<UserRoles />} />
             <Route path="ajustes/pos" element={<POSSettings />} />
             <Route path="ajustes/resoluciones" element={<ResolucionesDian />} />
+            <Route path="ajustes/sincronizacion" element={<Sincronizacion />} />
           </Route>
 
           {/* ── Facturación Electrónica DIAN & RADIAN ──────────────── */}

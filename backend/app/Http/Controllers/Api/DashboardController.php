@@ -18,11 +18,29 @@ class DashboardController extends Controller
      */
     public function getMetrics(Request $request): JsonResponse
     {
+        \Illuminate\Support\Facades\Log::info('DashboardController getMetrics INICIADO', [
+            'headers' => $request->headers->all(),
+            'host' => $request->getHost(),
+            'url' => $request->fullUrl()
+        ]);
         try {
             $tenantId = $request->header('X-Tenant-ID');
+            $empresa = null;
             
+            // Si no hay header, intentamos resolver por subdominio
+            if (!$tenantId || $tenantId === 'undefined' || $tenantId === 'null') {
+                $host = $request->getHost();
+                $subdomain = explode('.', $host)[0] ?? null;
+                if ($subdomain && !in_array($subdomain, ['www', 'localhost', 'mindsoftia'])) {
+                    $empresa = \App\Models\Empresa::where('subdominio', $subdomain)->first();
+                    if ($empresa) {
+                        $tenantId = $empresa->id;
+                    }
+                }
+            }
+
             if (!$tenantId) {
-                return response()->json(['success' => false, 'message' => 'Tenant ID no proporcionado'], 400);
+                return response()->json(['success' => false, 'message' => 'Tenant ID no proporcionado y no se pudo inferir del subdominio'], 400);
             }
 
             // 1. POS Metrics
@@ -73,25 +91,17 @@ class DashboardController extends Controller
                     });
             }
                 
-            $empresa = null;
-            if ($tenantId && is_numeric($tenantId)) {
+            if (!$empresa && $tenantId && is_numeric($tenantId)) {
                 $empresa = \App\Models\Empresa::find($tenantId);
             }
             if (!$empresa && $tenantId) {
                 $empresa = \App\Models\Empresa::where('subdominio', $tenantId)->first();
             }
             if (!$empresa) {
-                $host = $request->getHost();
-                $subdomain = explode('.', $host)[0] ?? null;
-                if ($subdomain && !in_array($subdomain, ['www', 'localhost', 'mindsoftia'])) {
-                    $empresa = \App\Models\Empresa::where('subdominio', $subdomain)->first();
-                }
-            }
-            if (!$empresa) {
                 $empresa = \App\Models\Empresa::first();
             }
 
-            $empresaNombre = $empresa ? $empresa->nombre : 'Bucaramanga App';
+            $empresaNombre = $empresa ? $empresa->nombre : 'Empresa Desconocida';
             $empresaNit = ($empresa && $empresa->ruc_nit) ? $empresa->ruc_nit : '901.458.112-8';
             
             // Período en formato amigable en español (Ej: "Julio 2026")
@@ -101,6 +111,11 @@ class DashboardController extends Controller
                 9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
             ];
             $periodoActual = ($mesesEs[(int)now()->format('n')] ?? 'Julio') . ' ' . now()->format('Y');
+
+            \Illuminate\Support\Facades\Log::info('DashboardController getMetrics OK', [
+                'empresa_nombre' => $empresaNombre,
+                'tenant_id' => $tenantId
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -120,8 +135,8 @@ class DashboardController extends Controller
                 ]
             ]);
 
-        } catch (\Exception $e) {
-            \Log::error('Error al obtener métricas del dashboard: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Error al obtener métricas del dashboard: ' . $e->getMessage());
             
             return response()->json([
                 'success' => false,

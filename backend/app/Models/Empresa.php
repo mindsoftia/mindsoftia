@@ -25,6 +25,19 @@ class Empresa extends Model
         'modulo_compras',
         'modulo_contabilidad',
         'modulo_ia_copiloto',
+        // Información DIAN
+        'nombre_comercial',
+        'tipo_persona',
+        'tipo_documento_id',
+        'digito_verificacion',
+        'codigo_ciiu',
+        'responsabilidades_rut',
+        'direccion_fiscal',
+        'codigo_postal',
+        'codigo_departamento',
+        'codigo_municipio',
+        'email_facturacion',
+        'matricula_mercantil',
     ];
 
     protected $casts = [
@@ -35,6 +48,7 @@ class Empresa extends Model
         'modulo_compras'                 => 'boolean',
         'modulo_contabilidad'            => 'boolean',
         'modulo_ia_copiloto'             => 'boolean',
+        'responsabilidades_rut'          => 'array',
     ];
 
     public function users()

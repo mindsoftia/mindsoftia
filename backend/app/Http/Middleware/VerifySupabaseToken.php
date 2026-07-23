@@ -17,6 +17,7 @@ class VerifySupabaseToken
      */
     public function handle(Request $request, Closure $next): Response
     {
+        \Illuminate\Support\Facades\Log::info('VerifySupabaseToken INICIADO', ['path' => $request->path(), 'has_token' => $request->bearerToken() ? true : false]);
         $token = $request->bearerToken();
 
         if (!$token) {
@@ -54,11 +55,12 @@ class VerifySupabaseToken
                 $empresaId = $decoded->app_metadata->empresa_id ?? $decoded->app_metadata->tenant_id ?? null;
             }
 
-            $superAdmins = ['amadomora@gmail.com'];
+            $superAdmins = ['amadomora@gmail.com', 'enbucaramangapp@gmail.com'];
             $isSuperAdmin = in_array($decoded->email ?? '', $superAdmins);
 
             if (!$empresaId && !$isSuperAdmin && !$request->is('api/onboarding')) {
                 $emailDebug = $decoded->email ?? 'sin-email';
+                \Illuminate\Support\Facades\Log::info('VerifySupabaseToken DENEGADO 403', ['email' => $emailDebug, 'empresaId' => $empresaId, 'isSuperAdmin' => $isSuperAdmin]);
                 return response()->json([
                     'error'   => 'Acceso denegado',
                     'message' => "El usuario ($emailDebug) no tiene una empresa asignada. Por favor completa el Onboarding."
@@ -75,7 +77,7 @@ class VerifySupabaseToken
             }
             $request->attributes->set('auth_role', $role);
 
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             $headerDump = 'unknown';
             $parts = explode('.', $token);
             if (count($parts) === 3) {
@@ -110,7 +112,7 @@ class VerifySupabaseToken
                             $empresaId = $app_metadata->empresa_id ?? $app_metadata->tenant_id ?? null;
                         }
 
-                        $superAdmins = ['amadomora@gmail.com'];
+                        $superAdmins = ['amadomora@gmail.com', 'enbucaramangapp@gmail.com'];
                         $isSuperAdmin = in_array($decoded->email ?? '', $superAdmins);
 
                         \Illuminate\Support\Facades\Log::info('JWT Debug (ES256)', [

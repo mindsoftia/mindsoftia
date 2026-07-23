@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\SyncController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,14 +46,13 @@ Route::middleware(['supabase.auth'])->group(function () {
     Route::apiResource('accounts', \App\Http\Controllers\Api\AccountController::class);
     Route::apiResource('terceros', \App\Http\Controllers\Api\TerceroController::class);
 
-    // ── Solo Admins ─────────────────────────────────────────────────────────
-    Route::middleware(['role:admin'])->group(function () {
-        // Route::apiResource('usuarios', UserController::class);
-    });
-
-    // ── Superadmin (Gestión de Tenants y Dashboard) ────────────────────────────────────
+    // ── Dashboard Metrics (Accesible por Tenants) ──────────────────────────────────
     Route::get('/dashboard/metrics', [\App\Http\Controllers\Api\DashboardController::class, 'getMetrics']);
-    Route::apiResource('empresas', \App\Http\Controllers\EmpresaController::class);
+
+    // ── Solo Admins (Gestión de Empresas) ───────────────────────────────────
+    Route::middleware(['role:admin'])->group(function () {
+        Route::apiResource('empresas', \App\Http\Controllers\EmpresaController::class);
+    });
 
     // ── NexoPOS — Módulo Inventario Multisede (Paso 3) ─────────────────────────
     Route::prefix('inventario')->group(function () {
@@ -77,4 +77,10 @@ Route::middleware(['supabase.auth'])->group(function () {
 
     // ── Configuracion ────────────────────────────────────────────────────────
     Route::get('/empresa/settings', [\App\Http\Controllers\EmpresaController::class, 'settings']);
+    Route::get('/empresa/perfil', [\App\Http\Controllers\Api\EmpresaController::class, 'getPerfil']);
+    Route::put('/empresa/perfil', [\App\Http\Controllers\Api\EmpresaController::class, 'updatePerfil']);
+
+    // Rutas de Sincronización
+    Route::get('/sync/status', [SyncController::class, 'getStatus']);
+    Route::post('/sync/force', [SyncController::class, 'forceSync']);
 });

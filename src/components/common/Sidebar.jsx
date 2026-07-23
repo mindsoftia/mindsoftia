@@ -167,7 +167,7 @@ function Sidebar() {
     icon: 'fas fa-cog',
     id: 'tenantConfig',
     children: [
-      { title: 'Perfil de Empresa', path: '/ajustes/perfil' },
+      { title: 'Perfil de Empresa', path: '/ajustes/perfil-empresa' },
       { title: 'Usuarios y Roles', path: '/ajustes/usuarios' },
       { title: 'Configuración POS', path: '/ajustes/pos' },
       { title: 'Resoluciones DIAN', path: '/ajustes/resoluciones' },
