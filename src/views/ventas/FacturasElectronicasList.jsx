@@ -13,6 +13,7 @@ function FacturasElectronicasList() {
   const [filtroEstado, setFiltroEstado] = useState('TODOS');
   const [busqueda, setBusqueda] = useState('');
   const [xmlModal, setXmlModal] = useState(null);
+  const [detalleModal, setDetalleModal] = useState(null);
 
   // Lista demo/reactiva conectada al modelo `FeDocumento` / `fe_documentos` en Supabase
   const [documentos, setDocumentos] = useState([
@@ -207,7 +208,7 @@ function FacturasElectronicasList() {
       <div className="card shadow-none border">
         <div className="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
           <h6 className="mb-0 fw-bold">Historial de Comprobantes Electrónicos ({docFiltrados.length})</h6>
-          <span className="badge badge-subtle-primary fs--2">Validación UBL 2.1 — Anexo Técnico 1.8</span>
+          <span className="badge badge-soft-primary fs--2">Validación UBL 2.1 — Anexo Técnico 1.8</span>
         </div>
         <div className="card-body p-0">
           <div className="table-responsive">
@@ -255,13 +256,16 @@ function FacturasElectronicasList() {
                       </div>
                     </td>
                     <td className="text-center">
-                      <span className={`badge ${doc.estado_dian === 'aprobado' ? 'badge-subtle-success' : doc.estado_dian === 'enviado' ? 'badge-subtle-info' : 'badge-subtle-warning'} d-inline-flex align-items-center`}>
+                      <span className={`badge ${doc.estado_dian === 'aprobado' ? 'badge-soft-success' : doc.estado_dian === 'enviado' ? 'badge-soft-info' : 'badge-soft-warning'} d-inline-flex align-items-center`}>
                         <span className={`fas ${doc.estado_dian === 'aprobado' ? 'fa-check-circle' : 'fa-spinner fa-spin'} me-1`}></span>
                         {doc.estado_dian.toUpperCase()}
                       </span>
                     </td>
                     <td className="text-center">
                       <div className="btn-group btn-group-sm">
+                        <button className="btn btn-outline-info" onClick={() => setDetalleModal(doc)} title="Ver Detalle Financiero">
+                          <span className="fas fa-eye"></span>
+                        </button>
                         <button className="btn btn-outline-secondary" onClick={() => setXmlModal(doc)} title="Ver XML UBL 2.1">
                           <span className="fas fa-code"></span>
                         </button>
@@ -342,6 +346,68 @@ function FacturasElectronicasList() {
               <div className="modal-footer bg-light py-2">
                 <button type="button" className="btn btn-secondary btn-sm" onClick={() => setXmlModal(null)}>Cerrar</button>
                 <button type="button" className="btn btn-primary btn-sm">Descargar XML Firmado</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal Detalle Financiero y Retenciones ────────────────────────── */}
+      {detalleModal && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} tabIndex="-1">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content border-0 shadow-lg">
+              <div className="modal-header bg-light py-3">
+                <h5 className="modal-title fw-bold fs-0">
+                  <span className="fas fa-file-invoice-dollar text-primary me-2"></span>
+                  Detalle Financiero — Factura #{detalleModal.numero_completo}
+                </h5>
+                <button type="button" className="btn-close" onClick={() => setDetalleModal(null)}></button>
+              </div>
+              <div className="modal-body p-4 bg-white">
+                <div className="d-flex justify-content-between mb-3">
+                  <span className="text-700 fw-semi-bold">Adquirente:</span>
+                  <span className="text-900 fw-bold">{detalleModal.adquirente_nombre}</span>
+                </div>
+                <div className="d-flex justify-content-between mb-3 border-bottom pb-2">
+                  <span className="text-700 fw-semi-bold">NIT / CC:</span>
+                  <span className="text-900 font-monospace">{detalleModal.adquirente_nit}</span>
+                </div>
+                
+                <div className="d-flex justify-content-between mb-1">
+                  <span className="text-600">Subtotal:</span>
+                  <span className="text-800">${detalleModal.subtotal.toLocaleString('es-CO', { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div className="d-flex justify-content-between mb-1">
+                  <span className="text-600">(+) IVA (19%):</span>
+                  <span className="text-800">${detalleModal.iva_19.toLocaleString('es-CO', { minimumFractionDigits: 2 })}</span>
+                </div>
+                
+                {/* Simulando Retenciones Financieras */}
+                <div className="d-flex justify-content-between mb-1 mt-3 text-danger">
+                  <span className="fw-semi-bold">(-) Retención en la Fuente (2.5%):</span>
+                  <span className="fw-semi-bold">-${(detalleModal.subtotal * 0.025).toLocaleString('es-CO', { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div className="d-flex justify-content-between mb-3 text-danger border-bottom pb-2">
+                  <span className="fw-semi-bold">(-) ReteICA (11x1000):</span>
+                  <span className="fw-semi-bold">-${(detalleModal.subtotal * 0.011).toLocaleString('es-CO', { minimumFractionDigits: 2 })}</span>
+                </div>
+                
+                <div className="d-flex justify-content-between mt-2">
+                  <span className="fs-1 fw-bolder text-900">Total a Pagar (Neto):</span>
+                  <span className="fs-1 fw-bolder text-success">
+                    ${(detalleModal.total - (detalleModal.subtotal * 0.036)).toLocaleString('es-CO', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+                
+                <div className="mt-4 alert alert-info fs--1 mb-0 py-2">
+                  <span className="fas fa-info-circle me-2"></span>
+                  <strong>Nota Contable NIIF:</strong> Las retenciones son a título informativo para el recaudo y flujo de caja. Ante la DIAN, el valor total legal de la factura electrónica UBL 2.1 sigue siendo de <strong>${detalleModal.total.toLocaleString('es-CO', { minimumFractionDigits: 2 })}</strong>.
+                </div>
+              </div>
+              <div className="modal-footer bg-light py-2">
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setDetalleModal(null)}>Cerrar</button>
+                <button type="button" className="btn btn-primary btn-sm">Descargar PDF</button>
               </div>
             </div>
           </div>
