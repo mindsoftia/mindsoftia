@@ -29,6 +29,7 @@ import UserRoles  from './views/tenant/settings/UserRoles';
 import POSSettings from './views/tenant/settings/POSSettings';
 import PerfilEmpresa from './views/ajustes/PerfilEmpresa';
 import Sincronizacion from './views/ajustes/Sincronizacion';
+import DocumentosSoporteList from './views/compras/DocumentosSoporteList';
 
 // Empresas Views
 import Certificados from './views/empresas/Certificados';
@@ -206,6 +207,7 @@ function App() {
           <Route element={<ProtectedRoute requiredModule="compras" requiredPermission="compras.ingresar" />}>
             <Route path="compras/facturas" element={<FacturasCompraList />} />
             <Route path="compras/facturas/nueva" element={<FacturaCompraForm />} />
+            <Route path="compras/documentos-soporte" element={<DocumentosSoporteList />} />
           </Route>
 
           {/* ── Contactos ───────────────── */}

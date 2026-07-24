@@ -84,7 +84,8 @@ function Sidebar() {
         { title: 'Productos y Servicios', path: '/inventario/productos' },
         { title: 'Categorías y Familias', path: '/inventario/categorias' },
         { title: 'Bodegas y Sucursales', path: '/inventario/bodegas' },
-        { title: 'Movimientos (Kardex)', path: '/inventario/movimientos' }
+        { title: 'Movimientos (Kardex)', path: '/inventario/movimientos' },
+        { title: 'Costeo y Ensambles', path: '/inventario/costeo' }
       ]
     }
   ];
@@ -123,6 +124,7 @@ function Sidebar() {
       children: [
         { title: 'Facturas de Compra', path: '/compras/facturas' },
         { title: 'Órdenes de Compra', path: '/compras/ordenes' },
+        { title: 'Documentos Soporte DIAN', path: '/compras/documentos-soporte' },
         { title: 'Comprobantes de Egreso', path: '/compras/egresos' },
         { title: 'Cuentas por Pagar', path: '/compras/cuentas-por-pagar' }
       ]

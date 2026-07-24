@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 function TopNav() {
   const { theme, toggleTheme } = useTheme();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const navigate = useNavigate();
   const { user, role, logout } = useAuthStore();
 
@@ -94,19 +95,108 @@ function TopNav() {
               className="btn btn-link text-600 p-1"
               title="Personalizar Tema"
               style={{ border: 'none', background: 'none' }}
+              data-bs-toggle="offcanvas" 
+              data-bs-target="#settings-offcanvas" 
             >
               <span className="fas fa-cog fa-spin fs-1"></span>
             </button>
           </li>
 
+          {/* Sincronización POS */}
+          <li className="nav-item">
+            <button 
+              className="btn btn-link text-600 p-1"
+              title="Estado de Sincronización (Nube)"
+              style={{ border: 'none', background: 'none' }}
+            >
+              <span className="fas fa-cloud-upload-alt text-success fs-1"></span>
+            </button>
+          </li>
+
+          {/* Semáforo DIAN */}
+          <li className="nav-item">
+            <div 
+              className="d-flex align-items-center justify-content-center p-1"
+              title="Servicios DIAN Operativos"
+              style={{ cursor: 'pointer' }}
+            >
+              <span className="badge badge-soft-success rounded-pill d-flex align-items-center">
+                <i className="fas fa-shield-alt me-1"></i> DIAN
+              </span>
+            </div>
+          </li>
+
           {/* Notifications */}
           <li className="nav-item position-relative">
-            <button className="btn btn-link text-600 p-1 position-relative">
-              <span className="fas fa-bell"></span>
+            <button 
+              className="btn btn-link text-600 p-1 position-relative"
+              onClick={() => setNotificationsOpen(!notificationsOpen)}
+              onBlur={() => setTimeout(() => setNotificationsOpen(false), 200)}
+            >
+              <span className="fas fa-bell fs-1"></span>
               <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.6rem' }}>
                 3
               </span>
             </button>
+
+            {/* Notifications Dropdown Panel */}
+            {notificationsOpen && (
+              <div className="dropdown-menu dropdown-menu-end show shadow-lg border" style={{ display: 'block', position: 'absolute', right: 0, top: '45px', zIndex: 1050, width: '320px', padding: 0 }}>
+                <div className="card shadow-none">
+                  <div className="card-header bg-light py-2 d-flex justify-content-between align-items-center">
+                    <h6 className="mb-0"><i className="fas fa-bell text-primary me-2"></i>Notificaciones</h6>
+                    <a className="fs--2" href="#!">Marcar leídas</a>
+                  </div>
+                  <div className="card-body p-0" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                    <div className="list-group list-group-flush fs--1">
+                      
+                      <div className="list-group-item list-group-item-action border-bottom bg-200">
+                        <div className="d-flex">
+                          <div className="avatar avatar-xl me-3">
+                            <div className="avatar-name rounded-circle bg-danger text-white"><i className="fas fa-certificate"></i></div>
+                          </div>
+                          <div className="flex-1">
+                            <h6 className="mb-1 fw-bold text-danger">Certificado Digital por Vencer</h6>
+                            <p className="mb-0 text-1000">El certificado de firma electrónica expira en 15 días. Renuévelo para evitar paralizar la Facturación Electrónica.</p>
+                            <span className="text-500 fs--2">Hace 2 horas</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="list-group-item list-group-item-action border-bottom">
+                        <div className="d-flex">
+                          <div className="avatar avatar-xl me-3">
+                            <div className="avatar-name rounded-circle bg-warning text-white"><i className="fas fa-file-invoice"></i></div>
+                          </div>
+                          <div className="flex-1">
+                            <h6 className="mb-1">Consecutivos FE por Agotarse</h6>
+                            <p className="mb-0 text-1000">Resolución 18760000001 (Prefijo SETT). Quedan menos de 100 folios.</p>
+                            <span className="text-500 fs--2">Hace 5 horas</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="list-group-item list-group-item-action border-bottom">
+                        <div className="d-flex">
+                          <div className="avatar avatar-xl me-3">
+                            <div className="avatar-name rounded-circle bg-success text-white"><i className="fas fa-check-double"></i></div>
+                          </div>
+                          <div className="flex-1">
+                            <h6 className="mb-1">Acuse de Recibo RADIAN</h6>
+                            <p className="mb-0 text-1000">El cliente 'Inversiones ABC' ha aceptado expresamente la factura FE-102.</p>
+                            <span className="text-500 fs--2">Ayer</span>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                  <div className="card-footer bg-light p-0 border-top">
+                    <a className="btn btn-link d-block w-100 py-2 fs--1" href="#!">Ver todas las notificaciones</a>
+                  </div>
+                </div>
+              </div>
+            )}
           </li>
 
           {/* User Dropdown */}

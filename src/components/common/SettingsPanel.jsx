@@ -34,34 +34,7 @@ function SettingsPanel() {
 
   return (
     <>
-      <a className="settings-toggle d-flex align-items-center justify-content-center shadow-lg" 
-         data-bs-toggle="offcanvas" 
-         data-bs-target="#settings-offcanvas" 
-         style={{
-           position: 'fixed', 
-           right: 0, 
-           top: '50%', 
-           transform: 'translateY(-50%)', 
-           zIndex: 1040, 
-           backgroundColor: '#fff', 
-           border: '1px solid #e3e6ed', 
-           borderRight: 0, 
-           padding: '15px 5px', 
-           borderTopLeftRadius: '0.35rem', 
-           borderBottomLeftRadius: '0.35rem', 
-           writingMode: 'vertical-rl', 
-           textOrientation: 'mixed', 
-           cursor: 'pointer', 
-           color: '#2c7be5', 
-           fontWeight: 600, 
-           textDecoration: 'none',
-           transition: 'all 0.2s ease-in-out'
-         }}
-         onMouseOver={(e) => e.currentTarget.style.paddingRight = '10px'}
-         onMouseOut={(e) => e.currentTarget.style.paddingRight = '5px'}
-      >
-        <span className="fas fa-cog fs--1 me-2 mb-2" style={{transform: 'rotate(90deg)'}}></span> <span className="fs--1">Mindsoftia</span>
-      </a>
+
 
       <div className="offcanvas offcanvas-end" id="settings-offcanvas" tabIndex="-1" aria-labelledby="settings-offcanvas-label" style={{width: '350px'}}>
         <div className="offcanvas-header bg-shape bg-primary text-white d-flex align-items-start">
