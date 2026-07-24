@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const RoadmapCalendar = () => {
-  const [selectedDay, setSelectedDay] = useState(52); // Default: July 22 (Absolute Day 52)
+  const [selectedDay, setSelectedDay] = useState(53); // Default: July 23 (Absolute Day 53)
   const [currentMonthDate, setCurrentMonthDate] = useState(new Date(2026, 6, 1)); // Default: July 2026 (Month 6 is July in JS)
 
   // Datos interactivos de los reportes diarios
@@ -141,6 +141,11 @@ const RoadmapCalendar = () => {
       { id: 1, title: 'Despliegue SQL en Producción Supabase', desc: '<strong>1. ¿Qué se hizo?:</strong> Ejecución física en el SQL Editor de Supabase del script de facturación electrónica con RLS activo.<br/><strong>2. ¿Por qué?:</strong> Las tablas tributarias debían materializarse en la nube para ser consumidas por el backend y frontend.<br/><strong>3. ¿Para qué?:</strong> Para activar la persistencia multi-tenant y prevenir accesos no autorizados a comprobantes fiscales.' },
       { id: 2, title: 'Vistas Falcon Facturación & RADIAN', desc: '<strong>1. ¿Qué se hizo?:</strong> Maquetación de `FacturasElectronicasList`, `RadianBandeja` y `ResolucionesDian` con modales XML y copia CUFE.<br/><strong>2. ¿Por qué?:</strong> El cliente requiere ver sus facturas, descargar el QR/PDF y gestionar en línea los eventos 030, 032 y 033.<br/><strong>3. ¿Para qué?:</strong> Para constituir mérito ejecutivo en títulos valores (Factoring) directamente desde la plataforma sin salir.' },
       { id: 3, title: 'Alta Asistida de Cuentas PUC NIIF', desc: '<strong>1. ¿Qué se hizo?:</strong> Desarrollo de `AccountController` y hook `usePuc.js` autodefiniendo nivel, naturaleza y padre al digitar el código.<br/><strong>2. ¿Por qué?:</strong> Crear cuentas manualmente suele propiciar errores jerárquicos (ej. asignar naturaleza contraria a un grupo contable).<br/><strong>3. ¿Para qué?:</strong> Para dotar a MindSoftia de un asistente contable que blinda la estructura NIIF de cada empresa.' }
+    ],
+    53: [
+      { id: 1, title: 'Documentos Soporte DIAN', desc: '<strong>1. ¿Qué se hizo?:</strong> Construcción de la vista `DocumentosSoporteList.jsx` en React con enrutamiento y modales integrados.<br/><strong>2. ¿Por qué?:</strong> El ERP redirigía al vacío al intentar gestionar proveedores no obligados a facturar.<br/><strong>3. ¿Para qué?:</strong> Para permitir el registro contable y la posterior transmisión UBL 2.1 del gasto deducible.' },
+      { id: 2, title: 'Centro de Notificaciones y UX', desc: '<strong>1. ¿Qué se hizo?:</strong> Reubicación del menú a la barra superior (`TopNav`), sumando íconos de nube (POS), semáforo DIAN y Dropdown interactivo de alertas.<br/><strong>2. ¿Por qué?:</strong> El botón flotante obstruía la vista y no había feedback en vivo del estado del sistema.<br/><strong>3. ¿Para qué?:</strong> Para notificar urgencias financieras (ej. Vencimiento de Certificado PFX) previniendo paros operativos.' },
+      { id: 3, title: 'Arquitectura Multi-Tenant (Notificaciones)', desc: '<strong>1. ¿Qué se hizo?:</strong> Creación de migración en PostgreSQL con estructura UUID y políticas de Row Level Security (RLS).<br/><strong>2. ¿Por qué?:</strong> La información de alertas (rechazos DIAN, Acuses RADIAN) es extremadamente confidencial.<br/><strong>3. ¿Para qué?:</strong> Para aislar criptográficamente las notificaciones garantizando la postura Zero Trust.' }
     ]
   };
 
@@ -158,7 +163,7 @@ const RoadmapCalendar = () => {
   const prevMonth = () => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1, 1));
   const goToday = () => {
     setCurrentMonthDate(new Date(2026, 6, 1)); // Foco en el mes activo de desarrollo (Julio 2026)
-    setSelectedDay(52); // Foco en el día actual (22 de Julio)
+    setSelectedDay(53); // Foco en el día actual (23 de Julio)
   };
 
   const renderCalendarGrid = () => {
