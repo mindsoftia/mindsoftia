@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Models\PosVenta;
+use App\Models\Empresa;
 use App\Observers\PosVentaObserver;
+use App\Observers\EmpresaObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +27,8 @@ class AppServiceProvider extends ServiceProvider
         // Escucha eventos del modelo PosVenta y genera asientos
         // contables automáticamente al sincronizarse cada venta.
         PosVenta::observe(PosVentaObserver::class);
+
+        // ── Empresa: Autoseeding del PUC NIIF ────────────────────
+        Empresa::observe(EmpresaObserver::class);
     }
 }

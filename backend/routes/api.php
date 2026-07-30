@@ -75,6 +75,16 @@ Route::middleware(['supabase.auth'])->group(function () {
         Route::post('/sync', [\App\Http\Controllers\Api\PosVentaController::class, 'sync']);
     });
 
+    // ── Módulo EDS (Estación de Servicio) ────────────────────────
+    Route::prefix('eds')->group(function () {
+        Route::get('/islas', [\App\Http\Controllers\EdsController::class, 'getIslas']);
+        Route::post('/islas', [\App\Http\Controllers\EdsController::class, 'storeIsla']);
+        Route::get('/turnos/actual', [\App\Http\Controllers\EdsController::class, 'getTurnoActual']);
+        Route::post('/turnos/abrir', [\App\Http\Controllers\EdsController::class, 'abrirTurno']);
+        Route::post('/turnos/cerrar/{id}', [\App\Http\Controllers\EdsController::class, 'cerrarTurno']);
+        Route::post('/lecturas', [\App\Http\Controllers\EdsController::class, 'registrarLectura']);
+    });
+
     // ── Configuracion ────────────────────────────────────────────────────────
     Route::get('/empresa/settings', [\App\Http\Controllers\EmpresaController::class, 'settings']);
     Route::get('/empresa/perfil', [\App\Http\Controllers\Api\EmpresaController::class, 'getPerfil']);

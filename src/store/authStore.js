@@ -45,7 +45,7 @@ const useAuthStore = create(
               subdominio: profile.subdominio || null,
               role: profile.role || null,
               permissions: profile.permissions || [],
-              modules: profile.modules || ['pos', 'facturacion', 'compras', 'nomina', 'contabilidad', 'ia'] // Simulamos módulos activos si el backend aún no los provee
+              modules: profile.modules || ['pos', 'facturacion', 'compras', 'nomina', 'contabilidad', 'ia', 'eds'] // Simulamos módulos activos si el backend aún no los provee
             });
           }
         } catch (err) {
@@ -157,7 +157,7 @@ const useAuthStore = create(
         const mods = get().modules;
         if (!mods || mods.length === 0) {
           // Fallback temporal para desarrollo si el array está vacío (ej. antes de re-login)
-          return ['pos', 'facturacion', 'compras', 'nomina', 'contabilidad', 'ia'].includes(moduleName);
+          return ['pos', 'facturacion', 'compras', 'nomina', 'contabilidad', 'ia', 'eds'].includes(moduleName);
         }
         return mods.includes(moduleName);
       },

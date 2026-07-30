@@ -162,6 +162,20 @@ function Sidebar() {
     });
   }
 
+  // ── Módulo EDS ─────────────────────────────────────────────────────────
+  if (hasModule && hasModule('eds')) {
+    tenantMenu.push({
+      title: 'Estación (EDS)',
+      icon: 'fas fa-gas-pump text-danger',
+      id: 'edsMenu',
+      children: [
+        { title: 'Tablero Táctil POS', path: '/eds/dashboard' },
+        { title: 'Gestión de Turnos', path: '/eds/turnos' },
+        { title: 'Infraestructura', path: '/eds/infraestructura' }
+      ]
+    });
+  }
+
   // El módulo de IA/Automatización se eliminó para que sea transparente al cliente
 
   tenantMenu.push({

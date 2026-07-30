@@ -16,6 +16,7 @@ const FORM_INICIAL = {
   modulo_nomina: false,
   modulo_pos_inventario: false,
   modulo_ia_copiloto: false,
+  has_eds_module: false,
 };
 
 function Tenants() {
@@ -112,6 +113,7 @@ function Tenants() {
     if (empresa.modulo_pos_inventario)          activos.push({ label: 'POS', color: 'badge-subtle-primary' });
     if (empresa.modulo_nomina)                  activos.push({ label: 'Nómina', color: 'badge-subtle-warning' });
     if (empresa.modulo_ia_copiloto)             activos.push({ label: 'IA', color: 'badge-subtle-info' });
+    if (empresa.has_eds_module)                 activos.push({ label: 'EDS', color: 'badge-subtle-danger' });
     if (activos.length === 0) return <span className="text-400 fs--2">Base</span>;
     return activos.map(m => (
       <span key={m.label} className={`badge ${m.color} me-1`}>{m.label}</span>
@@ -412,6 +414,24 @@ function Tenants() {
                             type="checkbox"
                             checked={!!formData.modulo_ia_copiloto}
                             onChange={() => handleToggleModulo('modulo_ia_copiloto')}
+                          />
+                        </div>
+                      </div>
+
+                      {/* ★ Toggle: Módulo EDS ★ */}
+                      <div className={`border rounded p-2 mb-1 d-flex justify-content-between align-items-center ${formData.has_eds_module ? 'border-danger bg-danger-subtle' : ''}`}>
+                        <div className="fs--1">
+                          <span className="fas fa-gas-pump me-2 text-danger fs--2"></span>
+                          Estación de Servicio (EDS)
+                          <div className="text-500 fs--2">Surtidores y Turnos Volumétricos</div>
+                        </div>
+                        <div className="form-check form-switch mb-0">
+                          <input
+                            id="toggle-eds-module"
+                            className="form-check-input mt-0"
+                            type="checkbox"
+                            checked={!!formData.has_eds_module}
+                            onChange={() => handleToggleModulo('has_eds_module')}
                           />
                         </div>
                       </div>

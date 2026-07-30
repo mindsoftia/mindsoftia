@@ -57,6 +57,7 @@ class AuthController extends Controller
                     if ($emp->modulo_contabilidad ?? true) $modules[] = 'contabilidad';
                     if ($emp->modulo_nomina) $modules[] = 'nomina';
                     if ($emp->modulo_ia_copiloto) $modules[] = 'ia';
+                    if ($emp->has_eds_module) $modules[] = 'eds';
                 }
             } catch (\Exception $e) {
                 // Ignore UUID cast errors (SQLSTATE 22P02) or other DB relation errors
