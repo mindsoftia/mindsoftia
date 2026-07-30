@@ -77,8 +77,12 @@ Route::middleware(['supabase.auth'])->group(function () {
 
     // ── Módulo EDS (Estación de Servicio) ────────────────────────
     Route::prefix('eds')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\EdsController::class, 'getDashboardData']);
         Route::get('/islas', [\App\Http\Controllers\EdsController::class, 'getIslas']);
         Route::post('/islas', [\App\Http\Controllers\EdsController::class, 'storeIsla']);
+        Route::post('/islas/{islaId}/surtidores', [\App\Http\Controllers\EdsController::class, 'storeSurtidor']);
+        Route::post('/surtidores/{surtidorId}/mangueras', [\App\Http\Controllers\EdsController::class, 'storeManguera']);
+        
         Route::get('/turnos/actual', [\App\Http\Controllers\EdsController::class, 'getTurnoActual']);
         Route::post('/turnos/abrir', [\App\Http\Controllers\EdsController::class, 'abrirTurno']);
         Route::post('/turnos/cerrar/{id}', [\App\Http\Controllers\EdsController::class, 'cerrarTurno']);

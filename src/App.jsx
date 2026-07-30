@@ -66,6 +66,11 @@ import FacturasElectronicasList from './views/ventas/FacturasElectronicasList';
 import RadianBandeja from './views/ventas/RadianBandeja';
 import ResolucionesDian from './views/tenant/settings/ResolucionesDian';
 
+// EDS Views
+import EdsDashboard from './views/eds/EdsDashboard';
+import EdsTurnos from './views/eds/EdsTurnos';
+import EdsInfraestructura from './views/eds/EdsInfraestructura';
+
 // Página de acceso denegado
 function NoAutorizado() {
   return (
@@ -224,6 +229,14 @@ function App() {
             <Route path="contabilidad/impuestos" element={<ImpuestosIndex />} />
             <Route path="contabilidad/cierre" element={<CierresIndex />} />
             <Route path="contabilidad" element={<Navigate to="/contabilidad/asientos" replace />} />
+          </Route>
+
+          {/* ── Módulo de Estación de Servicio (EDS) ─────────────── */}
+          <Route element={<ProtectedRoute requiredModule="eds" />}>
+            <Route path="eds/dashboard" element={<EdsDashboard />} />
+            <Route path="eds/turnos" element={<EdsTurnos />} />
+            <Route path="eds/infraestructura" element={<EdsInfraestructura />} />
+            <Route path="eds" element={<Navigate to="/eds/dashboard" replace />} />
           </Route>
         </Route>
 

@@ -38,6 +38,51 @@ class EdsController extends Controller
         return response()->json($isla, 201);
     }
 
+    public function storeSurtidor(Request $request, $islaId)
+    {
+        $data = $request->validate([
+            'codigo' => 'required|string|max:50',
+            'estado' => 'boolean'
+        ]);
+
+        $data['empresa_id'] = request()->attributes->get('empresa_id');
+        $data['isla_id'] = $islaId;
+        
+        $surtidor = EdsSurtidor::create($data);
+        return response()->json($surtidor, 201);
+    }
+
+    public function storeManguera(Request $request, $surtidorId)
+    {
+        $data = $request->validate([
+            'codigo' => 'required|string|max:50',
+            'combustible' => 'required|string|max:50',
+            'color_hex' => 'required|string|max:10',
+            'precio_actual' => 'required|numeric',
+            'estado' => 'boolean'
+        ]);
+
+        $data['empresa_id'] = request()->attributes->get('empresa_id');
+        $data['surtidor_id'] = $surtidorId;
+        
+        $manguera = EdsManguera::create($data);
+        return response()->json($manguera, 201);
+    }
+
+    public function getDashboardData()
+    {
+        $islas = EdsIsla::with('surtidores.mangueras')->get();
+        $turno = EdsTurno::where('estado', 'ABIERTO')
+                    ->where('usuario_id', auth()->id())
+                    ->with('lecturas')
+                    ->first();
+        
+        return response()->json([
+            'islas' => $islas,
+            'turnoActual' => $turno
+        ]);
+    }
+
     // ── OPERATIVA (TURNOS Y LECTURAS) ─────────────────────────────
 
     public function getTurnoActual()
