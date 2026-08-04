@@ -45,7 +45,7 @@ const useAuthStore = create(
               subdominio: profile.subdominio || null,
               role: profile.role || null,
               permissions: profile.permissions || [],
-              modules: profile.modules || ['pos', 'facturacion', 'compras', 'nomina', 'contabilidad', 'ia', 'eds'] // Simulamos módulos activos si el backend aún no los provee
+              modules: profile.modules || [] // Carga estricta desde BD
             });
           }
         } catch (err) {
@@ -135,6 +135,8 @@ const useAuthStore = create(
           set({
             session:  data.session,
             user: data.session.user,
+            modules: [], // Purga forzada del caché para seguridad multi-tenant
+            permissions: []
           });
           // Recuperar permisos si recargamos la página
           await get().fetchProfile(data.session.access_token);
@@ -155,9 +157,8 @@ const useAuthStore = create(
 
       hasModule: (moduleName) => {
         const mods = get().modules;
-        if (!mods || mods.length === 0) {
-          // Fallback temporal para desarrollo si el array está vacío (ej. antes de re-login)
-          return ['pos', 'facturacion', 'compras', 'nomina', 'contabilidad', 'ia', 'eds'].includes(moduleName);
+        if (!mods || !Array.isArray(mods)) {
+          return false;
         }
         return mods.includes(moduleName);
       },

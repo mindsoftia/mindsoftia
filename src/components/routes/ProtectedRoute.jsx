@@ -22,12 +22,10 @@ function ProtectedRoute({ children, allowedRoles, requiredModule, requiredPermis
   const { session, role, restoreSession, hasModule, hasPermission } = useAuthStore();
   const location = useLocation();
 
-  // Intentar restaurar sesión desde localStorage si no existe en store,
-  // o si falta el tenantId (para recuperar permisos y contexto de BD actualizados).
+  // Validar siempre la sesión con Supabase y nuestro Backend al cargar la aplicación (F5).
+  // Esto previene que permisos o módulos revocados sigan vivos en el caché local (Zustand persist).
   useEffect(() => {
-    if (!session || !useAuthStore.getState().tenantId) {
-      restoreSession();
-    }
+    restoreSession();
   }, []);
 
   // Sin sesión → redirigir al login

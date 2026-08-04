@@ -25,6 +25,7 @@ class Empresa extends Model
         'modulo_compras',
         'modulo_contabilidad',
         'modulo_ia_copiloto',
+        'has_eds_module',
         // Información DIAN
         'nombre_comercial',
         'tipo_persona',
@@ -48,6 +49,7 @@ class Empresa extends Model
         'modulo_compras'                 => 'boolean',
         'modulo_contabilidad'            => 'boolean',
         'modulo_ia_copiloto'             => 'boolean',
+        'has_eds_module'                 => 'boolean',
         'responsabilidades_rut'          => 'array',
     ];
 

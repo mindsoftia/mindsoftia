@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 const RoadmapCalendar = () => {
-  const [selectedDay, setSelectedDay] = useState(53); // Default: July 23 (Absolute Day 53)
-  const [currentMonthDate, setCurrentMonthDate] = useState(new Date(2026, 6, 1)); // Default: July 2026 (Month 6 is July in JS)
+  const [selectedDay, setSelectedDay] = useState(65); // Default: Agosto 4 (Absolute Day 65)
+  const [currentMonthDate, setCurrentMonthDate] = useState(new Date(2026, 7, 1)); // Default: Agosto 2026 (Month 7 is August in JS)
 
   // Datos interactivos de los reportes diarios
   const dailyReports = {
@@ -162,13 +162,24 @@ const RoadmapCalendar = () => {
     60: [
       { id: 1, title: 'Tablero Táctil POS (UI)', desc: '<strong>1. ¿Qué se hizo?:</strong> Maquetación del `EdsDashboard.jsx` con tarjetas colosales y botones táctiles optimizados (Touch Action).<br/><strong>2. ¿Por qué?:</strong> Los isleros trabajan de pie, con prisa y pantallas táctiles (tablets) bajo el sol.<br/><strong>3. ¿Para qué?:</strong> Para brindar una interfaz ultra rápida, sin CSS personalizado, basándonos estrictamente en los componentes de Falcon.' },
       { id: 2, title: 'Flujo de Permisos Dinámicos', desc: '<strong>1. ¿Qué se hizo?:</strong> Refactorización profunda de `authStore.js` y `AuthController.php` inyectando el flag `eds`.<br/><strong>2. ¿Por qué?:</strong> El menú de EDS no aparecía incluso tras activar el módulo en la base de datos, por falta de mapeo del token JWT.<br/><strong>3. ¿Para qué?:</strong> Para que la interfaz reaccione al instante (mostrando el menú lateral) cuando la empresa tiene autorización legal de uso.' }
+    ],
+    64: [
+      { id: 1, title: 'Modularidad Pura y Motor Silencioso', desc: '<strong>1. ¿Qué se hizo?:</strong> Documentación de arquitectura contable y de cómo el Módulo Base persiste en la sombra para generar la partida doble.<br/><strong>2. ¿Por qué?:</strong> Era vital definir las reglas contables cuando un cliente contrata servicios independientes (ej. Solo Nómina).<br/><strong>3. ¿Para qué?:</strong> Para garantizar la escalabilidad e integridad NIIF sin romper la experiencia minimalista del usuario.' },
+      { id: 2, title: 'Aislamiento Estricto Multi-Tenant (UI)', desc: '<strong>1. ¿Qué se hizo?:</strong> Refactorización de `Sidebar.jsx` aplicando condicionales absolutas a rutas anidadas como "Catálogo e Inventario" y "Configuración POS".<br/><strong>2. ¿Por qué?:</strong> El menú lateral filtraba secciones principales pero dejaba huérfanas opciones internas de submódulos no contratados.<br/><strong>3. ¿Para qué?:</strong> Para mantener una interfaz limpia y obedecer ciegamente al Administrador central en el aislamiento del tenant.' },
+      { id: 3, title: 'Purgador Automático de Caché (Zustand)', desc: '<strong>1. ¿Qué se hizo?:</strong> Inyección del comando de purga (`modules: []`) en el método `restoreSession` del estado global.<br/><strong>2. ¿Por qué?:</strong> El navegador retenía simulaciones viejas de módulos en el localStorage, ignorando las restricciones impuestas por PostgreSQL.<br/><strong>3. ¿Para qué?:</strong> Para garantizar seguridad Zero-Trust forzando al cliente a validar permisos reales con el backend tras cada F5.' }
+    ],
+    65: [
+      { id: 1, title: 'Bug Fix: AuthController (Módulos Silenciosos)', desc: '<strong>1. ¿Qué se hizo?:</strong> Refactorización del método <code>me()</code> en <code>AuthController.php</code> separando en 3 pasos explícitos: (1) Consulta de permisos en <code>usuarios_empresas</code>, (2) Fallback directo a <code>Empresa::find()</code> si falla, (3) Mapeo estricto de módulos desde la empresa. Se eliminó el operador <code>?? true</code> que forzaba a <code>compras</code> y <code>contabilidad</code> a estar siempre activos.<br/><strong>2. ¿Por qué?:</strong> El bloque <code>catch</code> nunca ejecutaba el mapeo de módulos cuando había un error UUID/Integer mismatch en la tabla <code>usuarios_empresas</code>. El resultado era un array vacío <code>modules: []</code> aunque la BD tenía <code>modulo_facturacion_electronica = true</code>.<br/><strong>3. ¿Para qué?:</strong> Para que el Frontend reciba la lista correcta de módulos al hacer <code>fetchProfile()</code> tras el login, activando los menús de Ventas y Catálogo e Inventario en la barra lateral del tenant.' },
+      { id: 2, title: 'Zero-Trust: ProtectedRoute.jsx (Revalidación Obligatoria)', desc: '<strong>1. ¿Qué se hizo?:</strong> Se eliminó el condicional optimista <code>if (!session || !tenantId)</code> del <code>useEffect</code> en <code>ProtectedRoute.jsx</code>. Ahora <code>restoreSession()</code> se invoca incondicionalmente en cada carga de la aplicación.<br/><strong>2. ¿Por qué?:</strong> Zustand persiste el estado en <code>localStorage</code>. Si el admin activa módulos desde el panel, el tenant tenía que esperar al próximo Login para verlos, porque el sistema se saltaba la validación al detectar una sesión previa cacheada.<br/><strong>3. ¿Para qué?:</strong> Para implementar una política Zero-Trust: la aplicación jamás confía en el caché local y siempre verifica el estado real de la empresa con el backend tras cada recarga (F5).' },
+      { id: 3, title: 'Corrector de Fechas del Roadmap (35 Julio → 4 Agosto)', desc: '<strong>1. ¿Qué se hizo?:</strong> Corrección de la función <code>selectedDateString</code> en <code>RoadmapCalendar.jsx</code>, añadiendo el rango explícito para el mes de Agosto (Día Absoluto &gt; 61).<br/><strong>2. ¿Por qué?:</strong> La condición anterior solo contemplaba Junio (1-30) y Julio (todo lo mayor a 30). Como el día absoluto de Agosto 4 es 65, el sistema calculaba <code>65 - 30 = 35</code> y mostraba: <em>"35 de Julio 2026"</em> en vez de "4 de Agosto 2026".<br/><strong>3. ¿Para qué?:</strong> Para que el título del Reporte Técnico muestre la fecha correcta al seleccionar cualquier día de Agosto en el calendario interactivo.' },
+      { id: 4, title: 'Columna has_eds_module: BD + Modelo + API', desc: '<strong>1. ¿Qué se hizo?:</strong> Creación de la columna <code>has_eds_module BOOLEAN DEFAULT false</code> en la tabla <code>empresas</code> de Supabase vía <code>Schema::table()</code>. Se añadió el campo a <code>$fillable</code> y <code>$casts</code> en <code>Empresa.php</code>, y a las reglas de validación de <code>store()</code> y <code>update()</code> en <code>EmpresaController.php</code>.<br/><strong>2. ¿Por qué?:</strong> El frontend tenía el toggle del módulo EDS en <code>Tenants.jsx</code>, pero al intentar guardar, el backend lanzaba <code>SQLSTATE[42703]: Undefined column</code> porque la columna no existía en la BD ni en el modelo.<br/><strong>3. ¿Para qué?:</strong> Para cerrar la brecha entre la interfaz y la base de datos, permitiendo al SuperAdmin asignar el módulo EDS a las empresas y que el backend retorne el flag <code>eds</code> correctamente en el array <code>modules</code>.' }
     ]
   };
 
-  // Helper function to map Year-Month-Day to the original Absolute Day indexing (June 1 = Day 1)
   const getAbsoluteDay = (year, month, day) => {
     if (year === 2026 && month === 5) return day; // Junio (Month 5 in JS Date)
     if (year === 2026 && month === 6) return 30 + day; // Julio
+    if (year === 2026 && month === 7) return 61 + day; // Agosto (30 Junio + 31 Julio = 61)
     return -1;
   };
 
@@ -178,8 +189,8 @@ const RoadmapCalendar = () => {
   const nextMonth = () => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() + 1, 1));
   const prevMonth = () => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1, 1));
   const goToday = () => {
-    setCurrentMonthDate(new Date(2026, 6, 1)); // Foco en el mes activo de desarrollo (Julio 2026)
-    setSelectedDay(53); // Foco en el día actual (23 de Julio)
+    setCurrentMonthDate(new Date(2026, 7, 1)); // Foco en el mes activo de desarrollo (Agosto 2026)
+    setSelectedDay(65); // Foco en el día actual (4 de Agosto)
   };
 
   const renderCalendarGrid = () => {
@@ -266,8 +277,10 @@ const RoadmapCalendar = () => {
   let selectedDateString = "";
   if (selectedDay > 0 && selectedDay <= 30) {
     selectedDateString = `${selectedDay} de Junio 2026`;
-  } else if (selectedDay > 30) {
+  } else if (selectedDay > 30 && selectedDay <= 61) {
     selectedDateString = `${selectedDay - 30} de Julio 2026`;
+  } else if (selectedDay > 61) {
+    selectedDateString = `${selectedDay - 61} de Agosto 2026`;
   } else {
     selectedDateString = "Día sin Registro";
   }

@@ -22,11 +22,13 @@ class AuthController extends Controller
         $permisos = [];
         $empresaNombre = null;
         $subdominio = null;
-
         $modules = [];
+        $emp = null;
 
         // Si tenemos tenant_id, buscamos los permisos exactos en la base de datos
         if ($userId && $tenantId) {
+
+            // — Paso 1: Intentar cargar rol y permisos desde usuarios_empresas —
             try {
                 $usuarioEmpresa = UsuarioEmpresa::with(['rol.permisos', 'empresa'])
                     ->where('id_usuario', $userId)
@@ -38,40 +40,37 @@ class AuthController extends Controller
                     $permisos = $usuarioEmpresa->rol->permisos->pluck('codigo_permiso')->toArray();
                     $roleName = $usuarioEmpresa->rol->nombre_rol;
                 }
-                
-                $emp = null;
+
                 if ($usuarioEmpresa && $usuarioEmpresa->empresa) {
                     $emp = $usuarioEmpresa->empresa;
-                } else {
-                    $emp = \App\Models\Empresa::find($tenantId);
-                }
-
-                if ($emp) {
-                    $empresaNombre = $emp->nombre;
-                    $subdominio = $emp->subdominio;
-                    
-                    // Mapeo dinámico de módulos desde la BD para la seguridad del Frontend
-                    if ($emp->modulo_pos_inventario) $modules[] = 'pos';
-                    if ($emp->modulo_facturacion_electronica) $modules[] = 'facturacion';
-                    if ($emp->modulo_compras ?? true) $modules[] = 'compras'; // ?? true por precaución si no ha migrado
-                    if ($emp->modulo_contabilidad ?? true) $modules[] = 'contabilidad';
-                    if ($emp->modulo_nomina) $modules[] = 'nomina';
-                    if ($emp->modulo_ia_copiloto) $modules[] = 'ia';
-                    if ($emp->has_eds_module) $modules[] = 'eds';
                 }
             } catch (\Exception $e) {
-                // Ignore UUID cast errors (SQLSTATE 22P02) or other DB relation errors
+                // Ignorar errores de UUID cast (SQLSTATE 22P02) u otros
+                \Illuminate\Support\Facades\Log::warning('UsuarioEmpresa lookup failed: ' . $e->getMessage());
+            }
+
+            // — Paso 2: Si no se obtuvo empresa desde la relacion, buscar directamente —
+            if (!$emp) {
                 $emp = \App\Models\Empresa::find($tenantId);
-                if ($emp) {
-                    $empresaNombre = $emp->nombre;
-                    $subdominio = $emp->subdominio;
-                }
-                $roleName = $roleName ?: 'admin'; // Default fallback
+            }
+
+            // — Paso 3: Mapear modulos desde la empresa (siempre que exista) —
+            if ($emp) {
+                $empresaNombre = $emp->nombre;
+                $subdominio    = $emp->subdominio;
+
+                // Mapeo estricto: solo agrega el modulo si la columna es true en BD
+                if ($emp->modulo_pos_inventario)          $modules[] = 'pos';
+                if ($emp->modulo_facturacion_electronica) $modules[] = 'facturacion';
+                if ($emp->modulo_compras)                 $modules[] = 'compras';
+                if ($emp->modulo_contabilidad)            $modules[] = 'contabilidad';
+                if ($emp->modulo_nomina)                  $modules[] = 'nomina';
+                if ($emp->modulo_ia_copiloto)             $modules[] = 'ia';
+                if ($emp->has_eds_module)                 $modules[] = 'eds';
             }
         }
 
         // Forzar rol de propietario para desarrollo local
-        // (Bypassa cualquier limitación de base de datos para pruebas completas)
         $roleName = 'propietario';
 
         return response()->json([

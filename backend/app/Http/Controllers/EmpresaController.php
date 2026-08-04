@@ -26,6 +26,7 @@ class EmpresaController extends Controller
             'modulo_nomina'                  => 'boolean',
             'modulo_pos_inventario'          => 'boolean',
             'modulo_ia_copiloto'             => 'boolean',
+            'has_eds_module'                 => 'boolean',
         ]);
 
         $empresa = Empresa::create($validated);
@@ -51,6 +52,7 @@ class EmpresaController extends Controller
             'modulo_nomina'                  => 'boolean',
             'modulo_pos_inventario'          => 'boolean',
             'modulo_ia_copiloto'             => 'boolean',
+            'has_eds_module'                 => 'boolean',
         ]);
 
         $empresa->update($validated);

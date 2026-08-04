@@ -75,8 +75,11 @@ function Sidebar() {
         { title: 'Clientes', path: '/contactos/clientes' },
         { title: 'Proveedores', path: '/contactos/proveedores' }
       ]
-    },
-    {
+    }
+  ];
+
+  if (hasModule && hasModule('pos')) {
+    tenantMenu.push({
       title: 'Catálogo e Inventario',
       icon: 'fas fa-boxes',
       id: 'inventarioMenu',
@@ -87,10 +90,8 @@ function Sidebar() {
         { title: 'Movimientos (Kardex)', path: '/inventario/movimientos' },
         { title: 'Costeo y Ensambles', path: '/inventario/costeo' }
       ]
-    }
-  ];
-
-  if (hasModule && hasModule('pos')) {
+    });
+    
     tenantMenu.push({
       title: 'Vender (POS)',
       icon: 'fas fa-cash-register', // Icono más orientado a la acción de cobrar
@@ -178,17 +179,26 @@ function Sidebar() {
 
   // El módulo de IA/Automatización se eliminó para que sea transparente al cliente
 
+  const ajustesChildren = [
+    { title: 'Perfil de Empresa', path: '/ajustes/perfil-empresa' },
+    { title: 'Usuarios y Roles', path: '/ajustes/usuarios' }
+  ];
+
+  if (hasModule && hasModule('pos')) {
+    ajustesChildren.push({ title: 'Configuración POS', path: '/ajustes/pos' });
+  }
+
+  if (hasModule && (hasModule('facturacion') || hasModule('nomina') || hasModule('pos'))) {
+    ajustesChildren.push({ title: 'Resoluciones DIAN', path: '/ajustes/resoluciones' });
+  }
+
+  ajustesChildren.push({ title: 'Sincronización', path: '/ajustes/sincronizacion' });
+
   tenantMenu.push({
     title: 'Ajustes',
     icon: 'fas fa-cog',
     id: 'tenantConfig',
-    children: [
-      { title: 'Perfil de Empresa', path: '/ajustes/perfil-empresa' },
-      { title: 'Usuarios y Roles', path: '/ajustes/usuarios' },
-      { title: 'Configuración POS', path: '/ajustes/pos' },
-      { title: 'Resoluciones DIAN', path: '/ajustes/resoluciones' },
-      { title: 'Sincronización', path: '/ajustes/sincronizacion' }
-    ]
+    children: ajustesChildren
   });
 
   // Si el rol es admin (Superadmin) o si es tu correo de propietario, cargamos su menú.
