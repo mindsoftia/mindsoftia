@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const RoadmapCalendar = () => {
-  const [selectedDay, setSelectedDay] = useState(65); // Default: Agosto 4 (Absolute Day 65)
+  const [selectedDay, setSelectedDay] = useState(66); // Default: Agosto 5 (Absolute Day 66)
   const [currentMonthDate, setCurrentMonthDate] = useState(new Date(2026, 7, 1)); // Default: Agosto 2026 (Month 7 is August in JS)
 
   // Datos interactivos de los reportes diarios
@@ -173,6 +173,11 @@ const RoadmapCalendar = () => {
       { id: 2, title: 'Zero-Trust: ProtectedRoute.jsx (Revalidación Obligatoria)', desc: '<strong>1. ¿Qué se hizo?:</strong> Se eliminó el condicional optimista <code>if (!session || !tenantId)</code> del <code>useEffect</code> en <code>ProtectedRoute.jsx</code>. Ahora <code>restoreSession()</code> se invoca incondicionalmente en cada carga de la aplicación.<br/><strong>2. ¿Por qué?:</strong> Zustand persiste el estado en <code>localStorage</code>. Si el admin activa módulos desde el panel, el tenant tenía que esperar al próximo Login para verlos, porque el sistema se saltaba la validación al detectar una sesión previa cacheada.<br/><strong>3. ¿Para qué?:</strong> Para implementar una política Zero-Trust: la aplicación jamás confía en el caché local y siempre verifica el estado real de la empresa con el backend tras cada recarga (F5).' },
       { id: 3, title: 'Corrector de Fechas del Roadmap (35 Julio → 4 Agosto)', desc: '<strong>1. ¿Qué se hizo?:</strong> Corrección de la función <code>selectedDateString</code> en <code>RoadmapCalendar.jsx</code>, añadiendo el rango explícito para el mes de Agosto (Día Absoluto &gt; 61).<br/><strong>2. ¿Por qué?:</strong> La condición anterior solo contemplaba Junio (1-30) y Julio (todo lo mayor a 30). Como el día absoluto de Agosto 4 es 65, el sistema calculaba <code>65 - 30 = 35</code> y mostraba: <em>"35 de Julio 2026"</em> en vez de "4 de Agosto 2026".<br/><strong>3. ¿Para qué?:</strong> Para que el título del Reporte Técnico muestre la fecha correcta al seleccionar cualquier día de Agosto en el calendario interactivo.' },
       { id: 4, title: 'Columna has_eds_module: BD + Modelo + API', desc: '<strong>1. ¿Qué se hizo?:</strong> Creación de la columna <code>has_eds_module BOOLEAN DEFAULT false</code> en la tabla <code>empresas</code> de Supabase vía <code>Schema::table()</code>. Se añadió el campo a <code>$fillable</code> y <code>$casts</code> en <code>Empresa.php</code>, y a las reglas de validación de <code>store()</code> y <code>update()</code> en <code>EmpresaController.php</code>.<br/><strong>2. ¿Por qué?:</strong> El frontend tenía el toggle del módulo EDS en <code>Tenants.jsx</code>, pero al intentar guardar, el backend lanzaba <code>SQLSTATE[42703]: Undefined column</code> porque la columna no existía en la BD ni en el modelo.<br/><strong>3. ¿Para qué?:</strong> Para cerrar la brecha entre la interfaz y la base de datos, permitiendo al SuperAdmin asignar el módulo EDS a las empresas y que el backend retorne el flag <code>eds</code> correctamente en el array <code>modules</code>.' }
+    ],
+    66: [
+      { id: 1, title: 'Motor Base de Conocimiento (Backend)', desc: '<strong>1. ¿Qué se hizo?:</strong> Creación de migraciones, modelos (LmsCourse, KbArticle) y controladores (AcademyController) para el módulo LMS.<br/><strong>2. ¿Por qué?:</strong> MindSoftia requiere un oráculo normativo interno para capacitar a los usuarios sobre los 3 Pilares Electrónicos (DIAN).<br/><strong>3. ¿Para qué?:</strong> Para que la plataforma sirva la estructura de los cursos y artículos a la interfaz de las empresas sin salir del ERP.' },
+      { id: 2, title: 'Panel Administrativo CMS (UI)', desc: '<strong>1. ¿Qué se hizo?:</strong> Desarrollo de la vista <code>AdminAcademy.jsx</code> en React con tablas interactivas para gestionar Cursos, Lecciones y Artículos.<br/><strong>2. ¿Por qué?:</strong> El equipo de operaciones y legal necesitaba una interfaz para redactar resoluciones y normativas fiscales.<br/><strong>3. ¿Para qué?:</strong> Para dotar al SuperAdmin de un gestor de contenidos (CMS) fácil de usar sin requerir tocar código ni base de datos directa.' },
+      { id: 3, title: 'Editor Enriquecido y Experiencia (UX)', desc: '<strong>1. ¿Qué se hizo?:</strong> Integración de <code>react-quill</code> para redacción WYSIWYG de lecciones, rediseño del Sidebar y corrección de acceso Multi-Tenant.<br/><strong>2. ¿Por qué?:</strong> Escribir HTML crudo no es viable para la carga de normativas; además, los inquilinos necesitaban acceso fluido (acordeón) a su capacitación.<br/><strong>3. ¿Para qué?:</strong> Para que el contenido sea amigable, indexable y el usuario consuma el conocimiento contable de forma premium e inmediata.' }
     ]
   };
 
@@ -190,7 +195,7 @@ const RoadmapCalendar = () => {
   const prevMonth = () => setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1, 1));
   const goToday = () => {
     setCurrentMonthDate(new Date(2026, 7, 1)); // Foco en el mes activo de desarrollo (Agosto 2026)
-    setSelectedDay(65); // Foco en el día actual (4 de Agosto)
+    setSelectedDay(66); // Foco en el día actual (5 de Agosto)
   };
 
   const renderCalendarGrid = () => {
