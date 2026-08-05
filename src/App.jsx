@@ -23,6 +23,8 @@ import Settings   from './views/Settings';
 import RolesPermissions from './views/RolesPermissions';
 import RoadmapDev from './views/RoadmapDev';
 import Modulos    from './views/Modulos';
+import Academy    from './views/Academy';
+import AdminAcademy from './views/admin/AdminAcademy';
 
 // Tenant Settings Views
 import UserRoles  from './views/tenant/settings/UserRoles';
@@ -158,6 +160,8 @@ function App() {
           <Route path="configuracion" element={<Settings />} />
           <Route path="permisos"     element={<RolesPermissions />} />
           <Route path="roadmap"      element={<RoadmapDev />} />
+          <Route path="admin/academy" element={<AdminAcademy />} />
+          <Route path="academy"      element={<Academy />} />
 
           {/* ── Ajustes Inquilino (Empresa) ────────────────────────── */}
           <Route element={<ProtectedRoute requiredPermission="ajustes.usuarios" />}>

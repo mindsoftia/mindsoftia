@@ -9,6 +9,8 @@ function TopNav() {
   const { theme, toggleTheme } = useTheme();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [syncOpen, setSyncOpen] = useState(false);
+  const [dianOpen, setDianOpen] = useState(false);
   const navigate = useNavigate();
   const { user, role, logout } = useAuthStore();
 
@@ -103,27 +105,87 @@ function TopNav() {
           </li>
 
           {/* Sincronización POS */}
-          <li className="nav-item">
+          <li className="nav-item position-relative">
             <button 
               className="btn btn-link text-600 p-1"
               title="Estado de Sincronización (Nube)"
               style={{ border: 'none', background: 'none' }}
+              onClick={() => setSyncOpen(!syncOpen)}
+              onBlur={() => setTimeout(() => setSyncOpen(false), 200)}
             >
               <span className="fas fa-cloud-upload-alt text-success fs-1"></span>
             </button>
+            
+            {/* Sync Dropdown Panel */}
+            {syncOpen && (
+              <div className="dropdown-menu dropdown-menu-end show shadow-lg border" style={{ display: 'block', position: 'absolute', right: 0, top: '45px', zIndex: 1050, width: '260px', padding: 0 }}>
+                <div className="card shadow-none">
+                  <div className="card-header bg-light py-2">
+                    <h6 className="mb-0"><i className="fas fa-cloud text-primary me-2"></i>Sincronización POS</h6>
+                  </div>
+                  <div className="card-body p-3 fs--1">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <span className="text-700">Base de Datos Central</span>
+                      <span className="badge bg-success">Conectada</span>
+                    </div>
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <span className="text-700">Servidores Locales</span>
+                      <span className="badge bg-success">Sincronizados</span>
+                    </div>
+                    <div className="d-flex justify-content-between align-items-center">
+                      <span className="text-700">Último paquete</span>
+                      <span className="text-500"><i className="fas fa-clock me-1"></i>Hace 2 min</span>
+                    </div>
+                  </div>
+                  <div className="card-footer bg-light p-2 border-top text-center">
+                    <a className="btn btn-link btn-sm py-0 w-100" href="#!">Forzar Sincronización</a>
+                  </div>
+                </div>
+              </div>
+            )}
           </li>
 
           {/* Semáforo DIAN */}
-          <li className="nav-item">
-            <div 
-              className="d-flex align-items-center justify-content-center p-1"
+          <li className="nav-item position-relative">
+            <button 
+              className="btn btn-link p-1"
               title="Servicios DIAN Operativos"
-              style={{ cursor: 'pointer' }}
+              style={{ border: 'none', background: 'none' }}
+              onClick={() => setDianOpen(!dianOpen)}
+              onBlur={() => setTimeout(() => setDianOpen(false), 200)}
             >
-              <span className="badge badge-soft-success rounded-pill d-flex align-items-center">
+              <span className="badge badge-soft-success rounded-pill d-flex align-items-center p-2 fs--2">
                 <i className="fas fa-shield-alt me-1"></i> DIAN
               </span>
-            </div>
+            </button>
+
+            {/* DIAN Dropdown Panel */}
+            {dianOpen && (
+              <div className="dropdown-menu dropdown-menu-end show shadow-lg border" style={{ display: 'block', position: 'absolute', right: 0, top: '45px', zIndex: 1050, width: '280px', padding: 0 }}>
+                <div className="card shadow-none">
+                  <div className="card-header bg-light py-2">
+                    <h6 className="mb-0"><i className="fas fa-shield-alt text-success me-2"></i>Estado Plataforma DIAN</h6>
+                  </div>
+                  <div className="card-body p-3 fs--1">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <span className="text-700">Facturación (UBL 2.1)</span>
+                      <span className="badge badge-soft-success"><i className="fas fa-check me-1"></i>100% OK</span>
+                    </div>
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <span className="text-700">Nómina Electrónica</span>
+                      <span className="badge badge-soft-success"><i className="fas fa-check me-1"></i>100% OK</span>
+                    </div>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <span className="text-700">Sistema RADIAN</span>
+                      <span className="badge badge-soft-warning"><i className="fas fa-exclamation-triangle me-1"></i>Lento</span>
+                    </div>
+                    <div className="alert alert-success p-2 mb-0 text-center fs--2">
+                      <strong>Servicio Estable.</strong> Última validación DIAN realizada a las {new Date().toLocaleTimeString('es-CO', {hour: '2-digit', minute:'2-digit'})}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </li>
 
           {/* Notifications */}

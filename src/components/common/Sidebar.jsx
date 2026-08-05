@@ -55,6 +55,20 @@ function Sidebar() {
       ]
     },
     {
+      title: 'MindSoftia Academy',
+      icon: 'fas fa-graduation-cap',
+      children: [
+        {
+          title: 'Contenidos',
+          path: '/academy'
+        },
+        {
+          title: 'Gestión (CMS)',
+          path: '/admin/academy'
+        }
+      ]
+    },
+    {
       title: 'Roadmap Dev',
       icon: 'fas fa-map-signs',
       path: '/roadmap'
@@ -199,6 +213,15 @@ function Sidebar() {
     icon: 'fas fa-cog',
     id: 'tenantConfig',
     children: ajustesChildren
+  });
+
+  tenantMenu.push({
+    title: 'MindSoftia Academy',
+    icon: 'fas fa-graduation-cap text-primary',
+    id: 'academyTenantMenu',
+    children: [
+      { title: 'Contenidos', path: '/academy' }
+    ]
   });
 
   // Si el rol es admin (Superadmin) o si es tu correo de propietario, cargamos su menú.

@@ -26,6 +26,11 @@ function Tenants() {
   const [saving, setSaving]         = useState(false);
   const [error, setError]           = useState(null);
   const [formData, setFormData]     = useState(FORM_INICIAL);
+  
+  // ── Estados para filtros y vista ──────────────────────────────────
+  const [viewMode, setViewMode]     = useState('table'); // 'table' o 'grid'
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
 
   // ── Cargar empresas desde la API con fallback a Supabase ──────────
   const fetchEmpresas = async () => {
@@ -120,26 +125,77 @@ function Tenants() {
     ));
   };
 
+  // ── Filtrado de empresas ──────────────────────────────────────────
+  const filteredEmpresas = empresas.filter(emp => {
+    const matchesSearch = emp.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          emp.subdominio?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          emp.ruc_nit?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = filterStatus === 'all' 
+                          ? true 
+                          : filterStatus === 'active' 
+                            ? !!emp.is_active 
+                            : !emp.is_active;
+                            
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <>
-      {/* ── Encabezado ──────────────────────────────────────────────── */}
-      <div className="card mb-3">
-        <div className="card-header bg-light">
-          <div className="row align-items-center">
-            <div className="col">
-              <h5 className="mb-0">Gestión de Empresas (Tenants)</h5>
+      {/* ── Encabezado y Filtros ────────────────────────────────────── */}
+      <div className="card mb-3 shadow-none border">
+        <div className="card-body p-3">
+          <div className="row flex-between-center g-3">
+            <div className="col-12 col-md-auto">
+              <h5 className="mb-0 d-flex align-items-center">
+                Gestión de Empresas <span className="badge badge-soft-primary ms-2">{filteredEmpresas.length}</span>
+              </h5>
             </div>
-            <div className="col-auto">
-              <button id="btn-nueva-empresa" className="btn btn-primary btn-sm" onClick={() => abrirModal()}>
-                <span className="fas fa-plus me-1"></span>Nueva Empresa
-              </button>
+            <div className="col-12 col-md-auto d-flex flex-wrap align-items-center gap-2">
+              <div className="search-box position-relative" style={{ width: '220px' }}>
+                <input 
+                  className="form-control form-control-sm search-input ps-4" 
+                  type="search" 
+                  placeholder="Buscar nombre o NIT..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <span className="fas fa-search search-box-icon position-absolute top-50 start-0 translate-middle-y ms-3 text-400 fs--2"></span>
+              </div>
+              <select 
+                className="form-select form-select-sm w-auto cursor-pointer" 
+                value={filterStatus} 
+                onChange={(e) => setFilterStatus(e.target.value)}
+              >
+                <option value="all">Todas</option>
+                <option value="active">Activas</option>
+                <option value="inactive">Inactivas</option>
+              </select>
+              
+              <div className="btn-group btn-group-sm ms-1" role="group">
+                <button 
+                  className={`btn ${viewMode === 'table' ? 'btn-primary' : 'btn-outline-primary'}`} 
+                  onClick={() => setViewMode('table')}
+                  title="Vista Tabla"
+                >
+                  <span className="fas fa-list"></span>
+                </button>
+                <button 
+                  className={`btn ${viewMode === 'grid' ? 'btn-primary' : 'btn-outline-primary'}`} 
+                  onClick={() => setViewMode('grid')}
+                  title="Vista Tarjetas (Compacta)"
+                >
+                  <span className="fas fa-th"></span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Tabla de empresas ────────────────────────────────────────── */}
-      <div className="card">
+      {/* ── Vista Condicional (Tabla o Grid) ────────────────────────── */}
+      {viewMode === 'table' ? (
+        <div className="card shadow-sm border-0">
         <div className="card-body p-0">
           <div className="table-responsive scrollbar">
             <table className="table table-sm table-striped fs--1 mb-0 overflow-hidden">
@@ -159,22 +215,22 @@ function Tenants() {
                   <tr>
                     <td colSpan="7" className="text-center py-4">
                       <span className="spinner-border spinner-border-sm me-2"></span>
-                      Cargando empresas desde Supabase...
+                      Cargando empresas...
                     </td>
                   </tr>
-                ) : empresas.length === 0 ? (
+                ) : filteredEmpresas.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="text-center py-4 text-400">
-                      <span className="fas fa-building fa-2x mb-2 d-block"></span>
-                      No hay empresas registradas.
+                    <td colSpan="7" className="text-center py-5 text-400">
+                      <span className="fas fa-building fa-2x mb-3 d-block text-300"></span>
+                      No se encontraron empresas con los filtros actuales.
                     </td>
                   </tr>
                 ) : (
-                  empresas.map((empresa) => (
+                  filteredEmpresas.map((empresa) => (
                     <tr key={empresa.id}>
                       <td className="align-middle fw-semi-bold">{empresa.nombre}</td>
                       <td className="align-middle text-primary fw-semi-bold">
-                        <span className="fas fa-link me-1" style={{ fontSize: '0.7rem' }}></span>
+                        <span className="fas fa-link me-1 text-400" style={{ fontSize: '0.7rem' }}></span>
                         {empresa.subdominio ? `${empresa.subdominio}.mindsoftia.com` : '-'}
                       </td>
                       <td className="align-middle">{empresa.ruc_nit || '-'}</td>
@@ -186,9 +242,9 @@ function Tenants() {
                         {badgesModulos(empresa)}
                       </td>
                       <td className="align-middle text-center">
-                        <div className="form-check form-switch d-flex justify-content-center mb-0">
-                          <input className="form-check-input" type="checkbox" checked={!!empresa.is_active} readOnly />
-                        </div>
+                        <span className={`badge ${empresa.is_active ? 'badge-soft-success' : 'badge-soft-secondary'} rounded-pill`}>
+                          {empresa.is_active ? 'Activa' : 'Inactiva'}
+                        </span>
                       </td>
                       <td className="align-middle text-end">
                         <button
@@ -211,6 +267,74 @@ function Tenants() {
           </div>
         </div>
       </div>
+      ) : (
+        <div className="row g-2">
+          {loading ? (
+            <div className="col-12 text-center py-5">
+              <span className="spinner-border text-primary"></span>
+            </div>
+          ) : filteredEmpresas.length === 0 ? (
+            <div className="col-12 text-center py-5 text-400 bg-white rounded border">
+              <span className="fas fa-building fa-2x mb-3 d-block text-300"></span>
+              No se encontraron empresas con los filtros actuales.
+            </div>
+          ) : (
+            filteredEmpresas.map((empresa) => (
+              <div key={empresa.id} className="col-6 col-sm-4 col-md-3 col-xl-2">
+                <div className="card shadow-sm border-0 h-100 hover-shadow transition-base">
+                  <div className="card-body p-3 d-flex flex-column">
+                    <div className="d-flex justify-content-between align-items-start mb-2">
+                      <div className="avatar avatar-l bg-soft-primary text-primary rounded-circle fw-bold d-flex justify-content-center align-items-center">
+                        {empresa.nombre.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="dropdown">
+                        <button className="btn btn-link btn-sm text-500 p-0 shadow-none" type="button" data-bs-toggle="dropdown">
+                          <span className="fas fa-ellipsis-h fs--1"></span>
+                        </button>
+                        <div className="dropdown-menu dropdown-menu-end py-2">
+                          <button className="dropdown-item text-primary" onClick={() => abrirModal(empresa)}>Editar</button>
+                          <div className="dropdown-divider"></div>
+                          <button className="dropdown-item text-danger">Eliminar</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <h6 className="mb-1 text-800 text-truncate" title={empresa.nombre}>{empresa.nombre}</h6>
+                    <div className="fs--2 text-primary mb-2 text-truncate">
+                      <span className="fas fa-link me-1 text-400"></span>
+                      {empresa.subdominio || '-'}
+                    </div>
+                    
+                    <div className="mt-auto pt-2 border-top border-200">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className={`badge ${empresa.is_active ? 'badge-soft-success' : 'badge-soft-secondary'} rounded-pill fs--2`}>
+                          {empresa.is_active ? 'Activa' : 'Inactiva'}
+                        </span>
+                        <div className="d-flex flex-wrap gap-1 justify-content-end">
+                          {empresa.modulo_facturacion_electronica && <span className="fas fa-file-invoice-dollar text-success fs--2" title="DIAN"></span>}
+                          {empresa.modulo_pos_inventario && <span className="fas fa-cash-register text-primary fs--2" title="POS"></span>}
+                          {empresa.modulo_nomina && <span className="fas fa-users text-warning fs--2" title="Nómina"></span>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* ── BOTÓN FLOTANTE (FAB) PARA NUEVA EMPRESA ── */}
+      <button 
+        id="btn-nueva-empresa-fab"
+        className="btn btn-primary rounded-circle shadow-lg position-fixed d-flex justify-content-center align-items-center hover-shadow transition-base"
+        style={{ bottom: '2rem', right: '2rem', width: '64px', height: '64px', zIndex: 1040 }}
+        onClick={() => abrirModal()}
+        title="Crear Nueva Empresa"
+      >
+        <span className="fas fa-plus fs-2"></span>
+      </button>
 
       {/* ── Modal Crear / Editar ─────────────────────────────────────── */}
       {showModal && (

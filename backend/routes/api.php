@@ -49,9 +49,30 @@ Route::middleware(['supabase.auth'])->group(function () {
     // ── Dashboard Metrics (Accesible por Tenants) ──────────────────────────────────
     Route::get('/dashboard/metrics', [\App\Http\Controllers\Api\DashboardController::class, 'getMetrics']);
 
-    // ── Solo Admins (Gestión de Empresas) ───────────────────────────────────
+    // ── SaaS Superadmin Metrics ─────────────────────────────────────────────────────
+    Route::get('/admin/dashboard/metrics', [\App\Http\Controllers\Api\AdminDashboardController::class, 'getMetrics']);
+
+    // ── Solo Admins (Gestión de Empresas y CMS) ─────────────────────────────
     Route::middleware(['role:admin'])->group(function () {
         Route::apiResource('empresas', \App\Http\Controllers\EmpresaController::class);
+        
+        // Rutas Administrativas de la Academia
+        Route::prefix('admin/academy')->group(function () {
+            Route::get('/courses', [\App\Http\Controllers\Api\AdminAcademyController::class, 'getCourses']);
+            Route::post('/courses', [\App\Http\Controllers\Api\AdminAcademyController::class, 'storeCourse']);
+            Route::put('/courses/{id}', [\App\Http\Controllers\Api\AdminAcademyController::class, 'updateCourse']);
+            Route::delete('/courses/{id}', [\App\Http\Controllers\Api\AdminAcademyController::class, 'deleteCourse']);
+            
+            Route::get('/courses/{courseId}/lessons', [\App\Http\Controllers\Api\AdminAcademyController::class, 'getLessons']);
+            Route::post('/courses/{courseId}/lessons', [\App\Http\Controllers\Api\AdminAcademyController::class, 'storeLesson']);
+            Route::put('/courses/{courseId}/lessons/{lessonId}', [\App\Http\Controllers\Api\AdminAcademyController::class, 'updateLesson']);
+            Route::delete('/courses/{courseId}/lessons/{lessonId}', [\App\Http\Controllers\Api\AdminAcademyController::class, 'deleteLesson']);
+            
+            Route::get('/articles', [\App\Http\Controllers\Api\AdminAcademyController::class, 'getArticles']);
+            Route::post('/articles', [\App\Http\Controllers\Api\AdminAcademyController::class, 'storeArticle']);
+            Route::put('/articles/{id}', [\App\Http\Controllers\Api\AdminAcademyController::class, 'updateArticle']);
+            Route::delete('/articles/{id}', [\App\Http\Controllers\Api\AdminAcademyController::class, 'deleteArticle']);
+        });
     });
 
     // ── NexoPOS — Módulo Inventario Multisede (Paso 3) ─────────────────────────
@@ -93,6 +114,16 @@ Route::middleware(['supabase.auth'])->group(function () {
     Route::get('/empresa/settings', [\App\Http\Controllers\EmpresaController::class, 'settings']);
     Route::get('/empresa/perfil', [\App\Http\Controllers\Api\EmpresaController::class, 'getPerfil']);
     Route::put('/empresa/perfil', [\App\Http\Controllers\Api\EmpresaController::class, 'updatePerfil']);
+
+    // Rutas de administración
+    Route::get('/admin/dashboard/metrics', [\App\Http\Controllers\Api\AdminDashboardController::class, 'getMetrics']);
+
+    // Rutas de Academia MindSoftia (LMS y Knowledge Base)
+    Route::prefix('academy')->group(function () {
+        Route::get('/courses', [\App\Http\Controllers\Api\AcademyController::class, 'getCourses']);
+        Route::get('/courses/{id}', [\App\Http\Controllers\Api\AcademyController::class, 'getCourseDetails']);
+        Route::get('/kb/articles', [\App\Http\Controllers\Api\AcademyController::class, 'getArticles']);
+    });
 
     // Rutas de Sincronización
     Route::get('/sync/status', [SyncController::class, 'getStatus']);
