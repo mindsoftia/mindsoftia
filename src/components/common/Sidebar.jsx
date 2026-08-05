@@ -57,6 +57,7 @@ function Sidebar() {
     {
       title: 'MindSoftia Academy',
       icon: 'fas fa-graduation-cap',
+      id: 'academyMenu',
       children: [
         {
           title: 'Contenidos',
